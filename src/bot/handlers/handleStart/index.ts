@@ -1,9 +1,9 @@
-import { Context } from "telegraf";
+import { Scenes } from "telegraf";
 import UserController from "@controller/UserController";
 import { keyboards } from "@infrastructure/telegram/keyboards";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
-export const handleStart = async (ctx: Context) => {
+export const handleStart = async (ctx: Scenes.SceneContext) => {
   const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
   const username = ctx.from?.username ?? null;
 
@@ -17,8 +17,17 @@ export const handleStart = async (ctx: Context) => {
   }
 
   try {
-    await UserController.register(accountId, username);
-    await ctx.reply(`👋 Восап хоуми`, keyboards.main);
+    let user = await UserController.getByAccountId(accountId);
+
+    if (!user) {
+      user = await UserController.register(accountId, username);
+    }
+
+    if (user.nickname) {
+      return ctx.reply(`👋 Васап ${user?.nickname}`, keyboards.main);
+    }
+
+    return await ctx.scene.enter("chooseNickname", { accountId });
   } catch (error) {
     await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
 

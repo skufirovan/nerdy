@@ -18,21 +18,15 @@ export const handleProfile = async (ctx: Context) => {
   }
 
   try {
-    const user = await UserController.getByAccountId(accountId);
+    let user = await UserController.getByAccountId(accountId);
 
     if (!user) {
-      userActionsLogger(
-        "warn",
-        "handleProfile",
-        "Пользователь не зарегистрирован",
-        meta
-      );
-      return ctx.reply("⚠️ Вы не зарегистрированы.");
+      user = await UserController.register(accountId, username);
     }
 
     await ctx.reply(
       `👋 Васап, ${
-        user.username ?? "игрок"
+        user.nickname ?? "игрок"
       }\n📆 Ты зарегистрировался ${formatDateToDDMMYYYY(
         user.registeredAt
       )}\n👑 Статус пасса: ${user.hasPass ? "активен" : "не активен"}`,
