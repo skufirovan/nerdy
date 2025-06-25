@@ -4,6 +4,7 @@
   "main": "src/main.ts",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec ts-node -r tsconfig-paths/register src/main.ts",
+    "prisma:mig": "npx prisma migrate dev --schema src/prisma/schema.prisma",
     "test": "jest"
   },
   "author": "",

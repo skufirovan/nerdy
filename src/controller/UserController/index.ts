@@ -1,6 +1,7 @@
 import UserService from "@core/UserService";
 import { InMemoryCache } from "@infrastructure/cache";
 import UserDto from "@domain/dtos/UserDto";
+import { User } from "@prisma/generated";
 
 const TTL = 5 * 60 * 60 * 1000;
 const cache = new InMemoryCache<bigint, UserDto>(TTL);
@@ -28,6 +29,21 @@ export default class UserController {
       const user = await UserService.getByAccountId(accountId);
 
       if (!user) return null;
+
+      const dto = new UserDto(user);
+      cache.set(accountId, dto);
+
+      return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateUserInfo<
+    T extends keyof Omit<User, NON_UPDATABLE_USER_FIELDS>
+  >(accountId: bigint, field: T, value: User[T]) {
+    try {
+      const user = await UserService.updateUserInfo(accountId, field, value);
 
       const dto = new UserDto(user);
       cache.set(accountId, dto);

@@ -16,7 +16,7 @@ export default class UserRepository {
   }
 
   static async updateField<
-    T extends keyof Omit<User, "id" | "accountId" | "registeredAt">
+    T extends keyof Omit<User, NON_UPDATABLE_USER_FIELDS>
   >(accountId: bigint, field: T, value: User[T]) {
     return prisma.user.update({
       where: { accountId },

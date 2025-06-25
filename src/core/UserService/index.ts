@@ -78,26 +78,61 @@ export default class UserService {
       username,
     };
 
-    const user = await UserRepository.findByAccountId(accountId);
+    try {
+      const user = await UserRepository.findByAccountId(accountId);
 
-    if (!user) return null;
-    if (user.username === username) return user;
+      if (!user) return null;
+      if (user.username === username) return user;
 
-    await UserRepository.updateField(accountId, "username", username);
+      await UserRepository.updateField(accountId, "username", username);
 
-    let message = "";
-    const was = user.username;
-    const now = username;
+      let message = "";
+      const was = user.username;
+      const now = username;
 
-    if (!was && now) {
-      message = `Установлен username: @${now}`;
-    } else if (was && !now) {
-      message = `Удалён username: был @${was}`;
-    } else {
-      message = `Сменил username: был @${was}, стал @${now}`;
+      if (!was && now) {
+        message = `Установлен username: @${now}`;
+      } else if (was && !now) {
+        message = `Удалён username: был @${was}`;
+      } else {
+        message = `Сменил username: был @${was}, стал @${now}`;
+      }
+
+      serviceLogger("info", "UserService.syncUsername", message, meta);
+      return { ...user, username };
+    } catch (error) {
+      serviceLogger(
+        "error",
+        "UserService.syncUsername",
+        `Ошибка при обновлении username: ${(error as Error).message}`,
+        meta
+      );
+      throw new Error("Ошибка при обновлении username");
     }
+  }
 
-    serviceLogger("info", "UserService.syncUsername", message, meta);
-    return { ...user, username };
+  static async updateUserInfo<
+    T extends keyof Omit<User, NON_UPDATABLE_USER_FIELDS>
+  >(accountId: bigint, field: T, value: User[T]): Promise<User> {
+    const meta = {
+      accountId,
+    };
+
+    try {
+      if (value === null || value === undefined) {
+        throw new Error("Значение поля не должно быть null/undefined");
+      }
+      return await UserRepository.updateField(accountId, field, value);
+    } catch (error) {
+      serviceLogger(
+        "error",
+        "UserService.updateUserInfo",
+        `Ошибка при обновлении данных пользователя ${field}: ${value}: ${
+          (error as Error).message
+        }`,
+        meta
+      );
+      throw new Error("Ошибка при обновлении данных пользователя");
+    }
   }
 }
