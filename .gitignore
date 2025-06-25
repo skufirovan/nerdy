@@ -1,0 +1,7 @@
+node_modules
+logs
+coverage
+public
+src/prisma
+.vscode
+.env
