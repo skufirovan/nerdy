@@ -16,6 +16,10 @@ export default class UserRepository {
     return prisma.user.findUnique({ where: { accountId } });
   }
 
+  static async findByNickname(nickname: string) {
+    return prisma.user.findUnique({ where: { nickname } });
+  }
+
   static async updateUserInfo(
     accountId: bigint,
     data: Partial<Omit<User, NON_UPDATABLE_USER_FIELDS>>

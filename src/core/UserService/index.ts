@@ -74,6 +74,19 @@ export default class UserService {
     }
   }
 
+  static async getByNickname(nickname: string): Promise<User | null> {
+    try {
+      return await UserRepository.findByNickname(nickname);
+    } catch (error) {
+      serviceLogger(
+        "error",
+        "UserService.getByNickname",
+        `Ошибка при поиске ${nickname}: ${(error as Error).message}`
+      );
+      throw new Error("Ошибка при получении пользователя");
+    }
+  }
+
   static async updateUserInfo(
     accountId: bigint,
     data: Partial<Omit<User, NON_UPDATABLE_USER_FIELDS>>
