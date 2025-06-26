@@ -1,9 +1,8 @@
-import { Scenes } from "telegraf";
-import UserController from "@controller/UserController";
+import { MyContext } from "@bot/scenes";
 import { keyboards } from "@bot/markup/keyboards";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
-export const handleStart = async (ctx: Scenes.SceneContext) => {
+export const handleStart = async (ctx: MyContext) => {
   const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
   const username = ctx.from?.username ?? null;
 
@@ -12,16 +11,9 @@ export const handleStart = async (ctx: Scenes.SceneContext) => {
     username,
   };
 
-  if (!accountId) {
-    return await ctx.reply("⚠️ Не удалось определить ваш Telegram ID");
-  }
-
   try {
-    let user = await UserController.getByAccountId(accountId);
+    const user = ctx.user;
 
-    if (!user) {
-      user = await UserController.register(accountId, username);
-    }
     await ctx.reply(
       [
         `👨🏿‍🦲 Ты в [NERDY](https://t.me/nerdy4ever) — игре, где тебе предстоит подняться с самого дна ск айсберга\n`,

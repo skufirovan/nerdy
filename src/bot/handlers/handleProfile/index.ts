@@ -1,28 +1,17 @@
-import { Context, Markup } from "telegraf";
-import UserController from "@controller/UserController";
+import { Markup } from "telegraf";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { MyContext } from "@bot/scenes";
 import { BUTTONS } from "@bot/markup/buttons";
 import { formatDateToDDMMYYYY } from "@utils/index";
 
-export const handleProfile = async (ctx: Context) => {
+export const handleProfile = async (ctx: MyContext) => {
   const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
   const username = ctx.from?.username ?? null;
 
-  const meta = {
-    accountId,
-    username,
-  };
-
-  if (!accountId) {
-    return ctx.reply("⚠️ Не удалось определить ваш Telegram ID");
-  }
+  const meta = { accountId, username };
 
   try {
-    let user = await UserController.getByAccountId(accountId);
-
-    if (!user) {
-      user = await UserController.register(accountId, username);
-    }
+    const user = ctx.user;
 
     await ctx.reply(
       [

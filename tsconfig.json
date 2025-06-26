@@ -20,6 +20,7 @@
       "@core/*": ["core/*"],
       "@domain/*": ["domain/*"],
       "@infrastructure/*": ["infrastructure/*"],
+      "@middlewares/*": ["middlewares/*"],
       "@utils/*": ["utils/*"]
     }
   },
