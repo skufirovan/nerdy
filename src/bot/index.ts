@@ -1,7 +1,7 @@
 import { session, Telegraf } from "telegraf";
 import { config } from "dotenv";
-import { registerTelegramActions } from "@infrastructure/telegram/actions";
-import { BUTTONS } from "@infrastructure/telegram/buttons";
+import { registerTelegramActions } from "@bot/actions";
+import { BUTTONS } from "@bot/markup/buttons";
 import { handleStart, handleProfile } from "./handlers";
 import { MyContext, stage } from "./scenes";
 
