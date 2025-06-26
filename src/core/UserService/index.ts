@@ -1,6 +1,7 @@
 import UserRepository from "@infrastructure/repositories/UserRepository";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
 import { User } from "@prisma/generated";
+import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
 
 export default class UserService {
   static async register(
@@ -13,10 +14,14 @@ export default class UserService {
     };
 
     try {
-      const updatedUser = await this.syncUsername(accountId, username);
+      const existingUser = await this.getByAccountId(accountId);
 
-      if (updatedUser) {
-        return updatedUser;
+      if (existingUser) {
+        if (existingUser.username !== username) {
+          await this.updateUserInfo(accountId, { username });
+          return { ...existingUser, username };
+        }
+        return existingUser;
       }
 
       const newUser = await UserRepository.create(accountId, username);
@@ -69,65 +74,27 @@ export default class UserService {
     }
   }
 
-  static async syncUsername(
+  static async updateUserInfo(
     accountId: bigint,
-    username: string | null
-  ): Promise<User | null> {
+    data: Partial<Omit<User, NON_UPDATABLE_USER_FIELDS>>
+  ): Promise<User> {
     const meta = {
       accountId,
-      username,
     };
 
     try {
-      const user = await UserRepository.findByAccountId(accountId);
-
-      if (!user) return null;
-      if (user.username === username) return user;
-
-      await UserRepository.updateField(accountId, "username", username);
-
-      let message = "";
-      const was = user.username;
-      const now = username;
-
-      if (!was && now) {
-        message = `Установлен username: @${now}`;
-      } else if (was && !now) {
-        message = `Удалён username: был @${was}`;
-      } else {
-        message = `Сменил username: был @${was}, стал @${now}`;
-      }
-
-      serviceLogger("info", "UserService.syncUsername", message, meta);
-      return { ...user, username };
-    } catch (error) {
       serviceLogger(
-        "error",
-        "UserService.syncUsername",
-        `Ошибка при обновлении username: ${(error as Error).message}`,
+        "info",
+        "UserService.updateUserInfo",
+        `Обновлены данные пользователя ${data}`,
         meta
       );
-      throw new Error("Ошибка при обновлении username");
-    }
-  }
-
-  static async updateUserInfo<
-    T extends keyof Omit<User, NON_UPDATABLE_USER_FIELDS>
-  >(accountId: bigint, field: T, value: User[T]): Promise<User> {
-    const meta = {
-      accountId,
-    };
-
-    try {
-      if (value === null || value === undefined) {
-        throw new Error("Значение поля не должно быть null/undefined");
-      }
-      return await UserRepository.updateField(accountId, field, value);
+      return await UserRepository.updateUserInfo(accountId, data);
     } catch (error) {
       serviceLogger(
         "error",
         "UserService.updateUserInfo",
-        `Ошибка при обновлении данных пользователя ${field}: ${value}: ${
+        `Ошибка при обновлении данных пользователя ${JSON.stringify(data)}: ${
           (error as Error).message
         }`,
         meta

@@ -1,5 +1,6 @@
 import { prisma } from "@prisma/client";
 import { User } from "@prisma/generated";
+import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
 
 export default class UserRepository {
   static async create(accountId: bigint, username: string | null) {
@@ -15,12 +16,13 @@ export default class UserRepository {
     return prisma.user.findUnique({ where: { accountId } });
   }
 
-  static async updateField<
-    T extends keyof Omit<User, NON_UPDATABLE_USER_FIELDS>
-  >(accountId: bigint, field: T, value: User[T]) {
+  static async updateUserInfo(
+    accountId: bigint,
+    data: Partial<Omit<User, NON_UPDATABLE_USER_FIELDS>>
+  ) {
     return prisma.user.update({
       where: { accountId },
-      data: { [field]: value },
+      data,
     });
   }
 }
