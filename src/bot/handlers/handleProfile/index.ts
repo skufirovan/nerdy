@@ -1,7 +1,7 @@
 import { Context, Markup } from "telegraf";
 import UserController from "@controller/UserController";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import { BUTTONS } from "@infrastructure/telegram/buttons";
+import { BUTTONS } from "@bot/markup/buttons";
 import { formatDateToDDMMYYYY } from "@utils/index";
 
 export const handleProfile = async (ctx: Context) => {
@@ -25,11 +25,11 @@ export const handleProfile = async (ctx: Context) => {
     }
 
     await ctx.reply(
-      `👋 Васап, ${
-        user.nickname ?? "игрок"
-      }\n📆 Ты зарегистрировался ${formatDateToDDMMYYYY(
-        user.registeredAt
-      )}\n👑 Статус пасса: ${user.hasPass ? "активен" : "не активен"}`,
+      [
+        `${user.nickname ?? "игрок"}\n`,
+        `☁️ Ты зарегистрировался ${formatDateToDDMMYYYY(user.registeredAt)}`,
+        `☁️ Статус пасса: ${user.hasPass ? "активен" : "не активен"}`,
+      ].join("\n"),
       Markup.inlineKeyboard([
         Markup.button.callback(BUTTONS.CLOSE, "DELETE_MESSAGE"),
       ])
