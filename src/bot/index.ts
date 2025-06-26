@@ -2,7 +2,7 @@ import { session, Telegraf } from "telegraf";
 import { config } from "dotenv";
 import { registerTelegramActions } from "@bot/actions";
 import { BUTTONS } from "@bot/markup/buttons";
-import { handleStart, handleProfile } from "./handlers";
+import { handleStart, handleProfile, handleMenu } from "./handlers";
 import { MyContext, stage } from "./scenes";
 import { attachUser } from "@middlewares/index";
 
@@ -17,5 +17,6 @@ bot.use(attachUser);
 bot.start(handleStart);
 
 bot.hears(BUTTONS.PROFILE, handleProfile);
+bot.hears(BUTTONS.MENU, handleMenu);
 
 registerTelegramActions(bot);
