@@ -3,5 +3,6 @@ logs
 coverage
 public
 src/prisma
+src/bot/assets
 .vscode
 .env
