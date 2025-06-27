@@ -12,9 +12,7 @@ export const handleStart = async (ctx: MyContext) => {
   };
 
   try {
-    const user = ctx.user;
-
-    await ctx.reply(
+    return await ctx.reply(
       [
         `👨🏿‍🦲 Ты в [NERDY](https://t.me/nerdy4ever) — игре, где тебе предстоит подняться с самого дна ск айсберга\n`,
         `➖ Тут все просто — закупай оборудку, пиши демочки, записывай диссы на леймов\n`,
@@ -23,17 +21,9 @@ export const handleStart = async (ctx: MyContext) => {
       ].join("\n"),
       {
         parse_mode: "Markdown",
+        ...keyboards.main,
       }
     );
-
-    if (user.nickname) {
-      return await ctx.reply(
-        `${user?.nickname}, это ты, братик? Сори не признал`,
-        keyboards.main
-      );
-    }
-
-    return await ctx.scene.enter("chooseNickname", { accountId });
   } catch (error) {
     await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
 

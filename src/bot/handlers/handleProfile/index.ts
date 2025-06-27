@@ -15,9 +15,9 @@ export const handleProfile = async (ctx: MyContext) => {
 
     await ctx.reply(
       [
-        `${user.nickname ?? "игрок"}\n`,
-        `☁️ Ты зарегистрировался ${formatDateToDDMMYYYY(user.registeredAt)}`,
-        `☁️ Статус пасса: ${user.hasPass ? "активен" : "не активен"}`,
+        `${user!.nickname ?? "игрок"}\n`,
+        `☁️ Ты зарегистрировался ${formatDateToDDMMYYYY(user!.registeredAt)}`,
+        `☁️ Статус пасса: ${user!.hasPass ? "активен" : "не активен"}`,
       ].join("\n"),
       Markup.inlineKeyboard([CLOSE_BUTTON])
     );
