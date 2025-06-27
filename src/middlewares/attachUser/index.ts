@@ -1,4 +1,4 @@
-import { MyContext } from "@bot/scenes";
+import { MyContext, SessionData } from "@bot/scenes";
 import UserController from "@controller/UserController";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
@@ -12,9 +12,14 @@ export const attachUser = async (ctx: MyContext, next: () => Promise<void>) => {
 
   try {
     let user = await UserController.getByAccountId(accountId);
+    const session = ctx.session as SessionData;
 
     if (!user) {
-      user = await UserController.register(accountId, username);
+      if (!session.nickname) {
+        return ctx.scene.enter("chooseNickname", { accountId });
+      }
+      user = await UserController.register(accountId, username, session.nickname);
+      delete session.nickname;
     }
 
     ctx.user = user;

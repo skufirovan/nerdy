@@ -6,7 +6,8 @@ import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
 export default class UserService {
   static async register(
     accountId: bigint,
-    username: string | null
+    username: string | null,
+    nickname: string
   ): Promise<User> {
     const meta = {
       accountId,
@@ -24,7 +25,7 @@ export default class UserService {
         return existingUser;
       }
 
-      const newUser = await UserRepository.create(accountId, username);
+      const newUser = await UserRepository.create(accountId, username, nickname);
 
       serviceLogger(
         "info",

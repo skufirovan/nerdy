@@ -16,7 +16,7 @@ type NicknameValidationResult = {
 };
 
 export function validateNickname(nickname: string): NicknameValidationResult {
-  if (!nickname || nickname.trim().length <= 3) {
+  if (!nickname || nickname.trim().length < 3) {
     return { isValid: false, error: "TOO_SHORT" };
   }
 
