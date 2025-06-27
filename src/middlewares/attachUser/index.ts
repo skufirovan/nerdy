@@ -18,7 +18,11 @@ export const attachUser = async (ctx: MyContext, next: () => Promise<void>) => {
       if (!session.nickname) {
         return ctx.scene.enter("chooseNickname", { accountId });
       }
-      user = await UserController.register(accountId, username, session.nickname);
+      user = await UserController.register(
+        accountId,
+        username,
+        session.nickname
+      );
       delete session.nickname;
     }
 

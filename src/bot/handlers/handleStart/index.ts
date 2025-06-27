@@ -1,6 +1,7 @@
 import { MyContext } from "@bot/scenes";
 import { keyboards } from "@bot/markup/keyboards";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { CHANNEL_LINK, SECTION_EMOJI } from "@bot/markup/constants";
 
 export const handleStart = async (ctx: MyContext) => {
   const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
@@ -14,10 +15,10 @@ export const handleStart = async (ctx: MyContext) => {
   try {
     return await ctx.reply(
       [
-        `👨🏿‍🦲 Ты в [NERDY](https://t.me/nerdy4ever) — игре, где тебе предстоит подняться с самого дна ск айсберга\n`,
+        `${SECTION_EMOJI} Ты в [NERDY](${CHANNEL_LINK}) — игре, где тебе предстоит подняться с самого дна ск айсберга\n`,
         `➖ Тут все просто — закупай оборудку, пиши демочки, записывай диссы на леймов\n`,
         `➖ Путь не будет лёгким, запомни: первая демка — всегда комо\n`,
-        `📍Не пропусти важные обновления: https://t.me/nerdy4ever`,
+        `📍Не пропусти важные обновления: ${CHANNEL_LINK}`,
       ].join("\n"),
       {
         parse_mode: "Markdown",

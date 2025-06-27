@@ -8,7 +8,11 @@ const TTL = 0 * 60 * 60 * 1000;
 const cache = new InMemoryCache<bigint, UserDto>(TTL);
 
 export default class UserController {
-  static async register(accountId: bigint, username: string | null, nickname: string) {
+  static async register(
+    accountId: bigint,
+    username: string | null,
+    nickname: string
+  ) {
     try {
       const user = await UserService.register(accountId, username, nickname);
       const dto = new UserDto(user);

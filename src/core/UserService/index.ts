@@ -25,7 +25,11 @@ export default class UserService {
         return existingUser;
       }
 
-      const newUser = await UserRepository.create(accountId, username, nickname);
+      const newUser = await UserRepository.create(
+        accountId,
+        username,
+        nickname
+      );
 
       serviceLogger(
         "info",
