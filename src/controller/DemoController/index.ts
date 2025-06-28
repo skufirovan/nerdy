@@ -1,19 +1,14 @@
 import DemoService from "@core/DemoService";
 import DemoDto from "@domain/dtos/DemoDto";
-import { CreateDemoResult } from "@domain/types";
-import { Demo } from "@prisma/generated";
 
 export default class DemoController {
   static async create(
     accountId: bigint,
     name: string,
     text: string
-  ): Promise<DemoDto | null> {
+  ): Promise<DemoDto> {
     try {
       const result = await DemoService.create(accountId, name, text);
-
-      if (!result) return null;
-
       const dto = new DemoDto(result);
       return dto;
     } catch (error) {
@@ -44,7 +39,9 @@ export default class DemoController {
     }
   }
 
-  static async canRecord(accountId: bigint) {
+  static async canRecord(
+    accountId: bigint
+  ): Promise<{ ok: boolean; message?: string }> {
     try {
       const { canRecord, remainingTimeText } = await DemoService.canRecord(
         accountId
@@ -54,7 +51,7 @@ export default class DemoController {
         return { ok: false, message: remainingTimeText! };
       }
 
-      return true;
+      return { ok: true };
     } catch (error) {
       throw error;
     }

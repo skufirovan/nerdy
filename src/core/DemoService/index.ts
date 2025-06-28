@@ -1,21 +1,19 @@
 import DemoRepository from "@infrastructure/repositories/DemoRepository";
 import UserRepository from "@infrastructure/repositories/UserRepository";
 import { Demo } from "@prisma/generated";
-import { CreateDemoResult } from "@domain/types";
+import UserService from "@core/UserService";
+import { getWaitingTime } from "@utils/index";
 
 export default class DemoService {
   static async create(
     accountId: bigint,
     name: string,
     text: string
-  ): Promise<Demo | null> {
+  ): Promise<Demo> {
     try {
-      const { canRecord } = await this.canRecord(accountId);
-
-      if (!canRecord) {
-        return null;
-      }
-
+      await UserService.updateUserInfo(accountId, {
+        lastDemoRecordedAt: new Date(),
+      });
       return await DemoRepository.create(accountId, name, text);
     } catch (error) {
       throw new Error("Ошибка при записи демки");
@@ -46,9 +44,7 @@ export default class DemoService {
       const user = await UserRepository.findByAccountId(accountId);
       if (!user) throw new Error("User not found");
 
-      const WAITING_TIME = user.hasPass
-        ? 3 * 60 * 60 * 1000
-        : 6 * 60 * 60 * 1000;
+      const WAITING_TIME = getWaitingTime(user.hasPass).recordDemoRT;
 
       const now = Date.now();
       const lastRecorded = user.lastDemoRecordedAt?.getTime() ?? 0;

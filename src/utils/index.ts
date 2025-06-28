@@ -28,7 +28,7 @@ export function validateNickname(nickname: string): NicknameValidationResult {
     return { isValid: false, error: "CONTAINS_AT" };
   }
 
-  if (/\p{Emoji}/u.test(nickname)) {
+  if (/[\p{Extended_Pictographic}]/u.test(nickname)) {
     return { isValid: false, error: "EMOJI" };
   }
 
@@ -37,4 +37,14 @@ export function validateNickname(nickname: string): NicknameValidationResult {
   }
 
   return { isValid: true };
+}
+
+type WaitingTimeResult = {
+  recordDemoRT: number;
+};
+
+export function getWaitingTime(hasPass: boolean): WaitingTimeResult {
+  const recordDemoRT = hasPass ? 3 * 60 * 60 * 1000 : 6 * 60 * 60 * 1000;
+
+  return { recordDemoRT };
 }
