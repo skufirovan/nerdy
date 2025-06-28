@@ -1,5 +1,14 @@
 import { Markup } from "telegraf";
-import { ACTIVITIES_BUTTONS, BUTTONS, MENU_BUTTONS } from "./buttons";
+import {
+  ACTIVITIES_BUTTONS,
+  BUTTONS,
+  CLOSE_BUTTON,
+  PAGINATE_BUTTONS,
+  MENU_BUTTONS,
+  PROFILE_BUTTONS,
+  DEMOS_BUTTONS,
+  CONFIRM_BUTTONS,
+} from "./buttons";
 
 type Button = {
   text: string;
@@ -18,7 +27,19 @@ export const keyboards = {
     [toButton(MENU_BUTTONS.LABEL)],
     [toButton(MENU_BUTTONS.DONAT)],
   ]),
+  profile: Markup.inlineKeyboard([
+    [toButton(PROFILE_BUTTONS.DEMOS)],
+    [CLOSE_BUTTON],
+  ]),
+  demos: Markup.inlineKeyboard([
+    [toButton(PAGINATE_BUTTONS.PREV), toButton(PAGINATE_BUTTONS.NEXT)],
+    [toButton(DEMOS_BUTTONS.DELETE_DEMO)],
+  ]),
   activities: Markup.inlineKeyboard([
     [toButton(ACTIVITIES_BUTTONS.RECORD_DEMO)],
+  ]),
+  confirm: Markup.inlineKeyboard([
+    toButton(CONFIRM_BUTTONS.CONFIRM),
+    toButton(CONFIRM_BUTTONS.CANCEL),
   ]),
 };

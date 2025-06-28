@@ -3,9 +3,15 @@ import { MyContext } from "./scenes";
 import { registerDeleteMessageAction } from "./deleteMessage/action";
 import { showActivitiesAction } from "./showActivities/action";
 import { recordDemo } from "./recordDemo/action";
+import { paginateActions } from "./pagination/action";
+import { showDemosAction } from "./showDemos/action";
+import { deleteDemoAction } from "./deleteDemo/action";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   registerDeleteMessageAction(bot);
+  deleteDemoAction(bot);
   showActivitiesAction(bot);
+  showDemosAction(bot);
   recordDemo(bot);
+  paginateActions(bot);
 };

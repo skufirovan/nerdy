@@ -48,3 +48,12 @@ export function getWaitingTime(hasPass: boolean): WaitingTimeResult {
 
   return { recordDemoRT };
 }
+
+export function hasCaption(message: unknown): message is { caption: string } {
+  return (
+    !!message &&
+    typeof message === "object" &&
+    "caption" in message &&
+    typeof (message as { caption: unknown }).caption === "string"
+  );
+}

@@ -1,7 +1,6 @@
-import { Markup } from "telegraf";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext } from "@bot/features/scenes";
-import { CLOSE_BUTTON } from "@bot/markup/buttons";
+import { keyboards } from "@bot/markup/keyboards";
 import { formatDateToDDMMYYYY } from "@utils/index";
 
 export const handleProfile = async (ctx: MyContext) => {
@@ -19,7 +18,7 @@ export const handleProfile = async (ctx: MyContext) => {
         `☁️ Ты зарегистрировался ${formatDateToDDMMYYYY(user!.registeredAt)}`,
         `☁️ Статус пасса: ${user!.hasPass ? "активен" : "не активен"}`,
       ].join("\n"),
-      Markup.inlineKeyboard([CLOSE_BUTTON])
+      keyboards.profile
     );
 
     userActionsLogger(
