@@ -17,3 +17,10 @@ export const MENU_BUTTONS = {
   LABEL: { text: "👬 Лейбл", callback: "MENU_LABEL" },
   DONAT: { text: "🍩 Донат", callback: "MENU_DONAT" },
 };
+
+export const ACTIVITIES_BUTTONS = {
+  RECORD_DEMO: {
+    text: "🎙 Записать демочку",
+    callback: "ACTIVITIES_RECORD_DEMO",
+  },
+};

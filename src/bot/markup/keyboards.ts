@@ -1,5 +1,5 @@
 import { Markup } from "telegraf";
-import { BUTTONS, MENU_BUTTONS } from "../../bot/markup/buttons";
+import { ACTIVITIES_BUTTONS, BUTTONS, MENU_BUTTONS } from "./buttons";
 
 type Button = {
   text: string;
@@ -17,5 +17,8 @@ export const keyboards = {
     [toButton(MENU_BUTTONS.SHOP)],
     [toButton(MENU_BUTTONS.LABEL)],
     [toButton(MENU_BUTTONS.DONAT)],
+  ]),
+  activities: Markup.inlineKeyboard([
+    [toButton(ACTIVITIES_BUTTONS.RECORD_DEMO)],
   ]),
 };
