@@ -1,10 +1,10 @@
 import { session, Telegraf } from "telegraf";
 import { config } from "dotenv";
-import { registerTelegramActions } from "@bot/actions";
-import { BUTTONS } from "@bot/markup/buttons";
-import { handleStart, handleProfile, handleMenu } from "./handlers";
-import { MyContext, stage } from "./scenes";
 import { attachUser } from "@middlewares/index";
+import { MyContext, stage } from "@bot/features/scenes";
+import { registerTelegramActions } from "@bot/features/actions";
+import { handleStart, handleProfile, handleMenu } from "@bot/handlers";
+import { BUTTONS } from "@bot/markup/buttons";
 
 config();
 

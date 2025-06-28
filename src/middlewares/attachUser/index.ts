@@ -1,4 +1,4 @@
-import { MyContext, SessionData } from "@bot/scenes";
+import { MyContext, SessionData } from "@bot/features/scenes";
 import UserController from "@controller/UserController";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 

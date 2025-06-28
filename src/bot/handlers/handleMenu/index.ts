@@ -1,7 +1,7 @@
 import path from "path";
-import { MyContext } from "@bot/scenes";
-import { keyboards } from "@bot/markup/keyboards";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { MyContext } from "@bot/features/scenes";
+import { keyboards } from "@bot/markup/keyboards";
 
 export const handleMenu = async (ctx: MyContext) => {
   const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;

@@ -1,5 +1,5 @@
 import { Telegraf } from "telegraf";
-import { MyContext } from "@bot/scenes";
+import { MyContext } from "../scenes";
 
 export const registerDeleteMessageAction = (bot: Telegraf<MyContext>) => {
   bot.action("DELETE_MESSAGE", async (ctx) => {

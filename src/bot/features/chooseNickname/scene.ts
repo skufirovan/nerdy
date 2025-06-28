@@ -1,6 +1,6 @@
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
-import { MyContext, SessionData } from "@bot/scenes";
+import { MyContext, SessionData } from "../scenes";
 import { keyboards } from "@bot/markup/keyboards";
 import UserController from "@controller/UserController";
 import { validateNickname } from "@utils/index";
@@ -18,7 +18,7 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
     await ctx.reply("⚠️  Пожалуйста, введите текст.");
     return;
   }
-    
+
   const nickname = ctx.message.text.trim();
   const session = ctx.session as SessionData;
 

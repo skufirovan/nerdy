@@ -1,6 +1,6 @@
 import { Markup } from "telegraf";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import { MyContext } from "@bot/scenes";
+import { MyContext } from "@bot/features/scenes";
 import { CLOSE_BUTTON } from "@bot/markup/buttons";
 import { formatDateToDDMMYYYY } from "@utils/index";
 
