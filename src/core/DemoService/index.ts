@@ -1,8 +1,7 @@
 import DemoRepository from "@infrastructure/repositories/DemoRepository";
-import UserRepository from "@infrastructure/repositories/UserRepository";
 import { Demo } from "@prisma/generated";
 import UserService from "@core/UserService";
-import { getWaitingTime } from "@utils/index";
+import { getWaitingTime, getRemainingTimeText } from "@utils/index";
 
 export default class DemoService {
   static async create(
@@ -11,6 +10,12 @@ export default class DemoService {
     text: string
   ): Promise<Demo> {
     try {
+      const demos = await this.findByAccountId(accountId);
+
+      if (demos.some((demo) => demo.name === name)) {
+        throw new Error("Демка с таким названием уже существует");
+      }
+
       await UserService.updateUserInfo(accountId, {
         lastDemoRecordedAt: new Date(),
       });
@@ -41,8 +46,8 @@ export default class DemoService {
     remainingTimeText?: string;
   }> {
     try {
-      const user = await UserRepository.findByAccountId(accountId);
-      if (!user) throw new Error("User not found");
+      const user = await UserService.getByAccountId(accountId);
+      if (!user) throw new Error("Пользователь не найден");
 
       const WAITING_TIME = getWaitingTime(user.hasPass).recordDemoRT;
 
@@ -53,15 +58,11 @@ export default class DemoService {
       if (timeSinceLastRecord >= WAITING_TIME) {
         return { canRecord: true };
       } else {
-        const remainingTimeMs = WAITING_TIME - timeSinceLastRecord;
-        const remainingHours = Math.floor(remainingTimeMs / (60 * 60 * 1000));
-        const remainingMinutes = Math.ceil(
-          (remainingTimeMs % (60 * 60 * 1000)) / (60 * 1000)
-        );
-
         return {
           canRecord: false,
-          remainingTimeText: `${remainingHours} ч ${remainingMinutes} мин`,
+          remainingTimeText: getRemainingTimeText(
+            WAITING_TIME - timeSinceLastRecord
+          ),
         };
       }
     } catch (error) {

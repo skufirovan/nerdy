@@ -3,7 +3,7 @@ import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { keyboards } from "@bot/markup/keyboards";
 import UserController from "@controller/UserController";
-import { validateNickname } from "@utils/index";
+import { NicknameError, validateNickname } from "@utils/index";
 
 const chooseNicknameScene = new Scenes.BaseScene<MyContext>("chooseNickname");
 
@@ -24,11 +24,9 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
 
   const validation = validateNickname(nickname);
   if (!validation.isValid) {
-    const errorMessages = {
+    const errorMessages: Record<NicknameError, string> = {
       TOO_SHORT: "Ник короткий, прям как твой..",
       TOO_LONG: "Ник слишком длинный (максимум 40 символов)",
-      CONTAINS_AT: "Никнейм не должен содержать символ @",
-      EMOJI: "Никнейм не может содержать эмодзи",
       INVALID_CHARS: "Можно использовать только буквы, цифры и _-.,!?",
     };
 
@@ -37,7 +35,10 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
   }
 
   try {
-    const existedUser = await UserController.getByNickname(nickname);
+    const existedUser = await UserController.getByNickname(
+      ctx.user!.accountId,
+      nickname
+    );
 
     if (existedUser) {
       await ctx.reply(

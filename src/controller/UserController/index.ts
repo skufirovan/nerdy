@@ -12,7 +12,7 @@ export default class UserController {
     accountId: bigint,
     username: string | null,
     nickname: string
-  ) {
+  ): Promise<UserDto> {
     try {
       const user = await UserService.register(accountId, username, nickname);
       const dto = new UserDto(user);
@@ -25,7 +25,7 @@ export default class UserController {
     }
   }
 
-  static async getByAccountId(accountId: bigint) {
+  static async getByAccountId(accountId: bigint): Promise<UserDto | null> {
     const cached = cache.get(accountId);
 
     if (cached) return cached;
@@ -44,13 +44,22 @@ export default class UserController {
     }
   }
 
-  static async getByNickname(nickname: string) {
+  static async getByNickname(
+    accountId: bigint,
+    nickname: string
+  ): Promise<UserDto | null> {
+    const cached = cache.get(accountId);
+
+    if (cached) return cached;
+
     try {
-      const user = await UserService.getByNickname(nickname);
+      const user = await UserService.getByNickname(accountId, nickname);
 
       if (!user) return null;
 
       const dto = new UserDto(user);
+      cache.set(accountId, dto);
+
       return dto;
     } catch (error) {
       throw error;
@@ -60,11 +69,9 @@ export default class UserController {
   static async updateUserInfo(
     accountId: bigint,
     data: Partial<Omit<User, NON_UPDATABLE_USER_FIELDS>>
-  ) {
+  ): Promise<UserDto> {
     try {
       const user = await UserService.updateUserInfo(accountId, data);
-
-      if (!user) return null;
 
       const dto = new UserDto(user);
       cache.set(accountId, dto);

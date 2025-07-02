@@ -7,7 +7,7 @@ export default class UserRepository {
     accountId: bigint,
     username: string | null,
     nickname: string
-  ) {
+  ): Promise<User> {
     return prisma.user.create({
       data: {
         accountId,
@@ -17,18 +17,18 @@ export default class UserRepository {
     });
   }
 
-  static async findByAccountId(accountId: bigint) {
+  static async findByAccountId(accountId: bigint): Promise<User | null> {
     return prisma.user.findUnique({ where: { accountId } });
   }
 
-  static async findByNickname(nickname: string) {
+  static async findByNickname(nickname: string): Promise<User | null> {
     return prisma.user.findUnique({ where: { nickname } });
   }
 
   static async updateUserInfo(
     accountId: bigint,
     data: Partial<Omit<User, NON_UPDATABLE_USER_FIELDS>>
-  ) {
+  ): Promise<User> {
     return prisma.user.update({
       where: { accountId },
       data,

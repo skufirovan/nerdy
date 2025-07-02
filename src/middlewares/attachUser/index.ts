@@ -32,7 +32,7 @@ export const attachUser = async (ctx: MyContext, next: () => Promise<void>) => {
     userActionsLogger(
       "error",
       "attachUser",
-      `Ошибка в attachUser: ${(error as Error).message}`,
+      `${(error as Error).message}`,
       meta
     );
     return ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");

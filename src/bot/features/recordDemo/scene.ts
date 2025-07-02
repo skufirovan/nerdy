@@ -10,10 +10,12 @@ recordDemoScene.enter(async (ctx: MyContext) => {
   const session = ctx.session as SessionData;
 
   try {
-    const { ok, message } = await DemoController.canRecord(ctx.user!.accountId);
-    if (!ok) {
+    const { canRecord, remainingTimeText } = await DemoController.canRecord(
+      ctx.user!.accountId
+    );
+    if (!canRecord) {
       await ctx.reply(
-        `☁️ Ты уже надристал стиля, брачо, приходи через ${message!}`
+        `☁️ Ты уже надристал стиля, брачо, приходи через ${remainingTimeText!}`
       );
       return ctx.scene.leave();
     }

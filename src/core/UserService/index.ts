@@ -79,9 +79,27 @@ export default class UserService {
     }
   }
 
-  static async getByNickname(nickname: string): Promise<User | null> {
+  static async getByNickname(
+    accountId: bigint,
+    nickname: string
+  ): Promise<User | null> {
+    const meta = { accountId };
+
     try {
-      return await UserRepository.findByNickname(nickname);
+      const user = await UserRepository.findByNickname(nickname);
+
+      if (user) {
+        return user;
+      }
+
+      serviceLogger(
+        "warn",
+        "UserService.getByNickname",
+        "Пользователь не найден",
+        meta
+      );
+
+      return null;
     } catch (error) {
       serviceLogger(
         "error",
@@ -101,13 +119,16 @@ export default class UserService {
     };
 
     try {
+      const updatedUser = await UserRepository.updateUserInfo(accountId, data);
+
       serviceLogger(
         "info",
         "UserService.updateUserInfo",
-        `Обновлены данные пользователя ${data}`,
+        `Обновлены данные пользователя ${JSON.stringify(data)}`,
         meta
       );
-      return await UserRepository.updateUserInfo(accountId, data);
+
+      return updatedUser;
     } catch (error) {
       serviceLogger(
         "error",

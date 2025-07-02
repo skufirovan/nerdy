@@ -1,6 +1,6 @@
-export function formatDateToDDMMYYYY(date: Date) {
+export function formatDateToDDMMYYYY(date: Date): string {
   if (isNaN(date.getTime())) {
-    throw new Error("Invalid date string");
+    return "";
   }
 
   const day = String(date.getDate()).padStart(2, "0");
@@ -10,9 +10,11 @@ export function formatDateToDDMMYYYY(date: Date) {
   return `${day}.${month}.${year}`;
 }
 
+export type NicknameError = "TOO_SHORT" | "TOO_LONG" | "INVALID_CHARS";
+
 type NicknameValidationResult = {
   isValid: boolean;
-  error?: "TOO_SHORT" | "TOO_LONG" | "INVALID_CHARS" | "EMOJI" | "CONTAINS_AT";
+  error?: NicknameError;
 };
 
 export function validateNickname(nickname: string): NicknameValidationResult {
@@ -22,14 +24,6 @@ export function validateNickname(nickname: string): NicknameValidationResult {
 
   if (nickname.length > 40) {
     return { isValid: false, error: "TOO_LONG" };
-  }
-
-  if (nickname.includes("@")) {
-    return { isValid: false, error: "CONTAINS_AT" };
-  }
-
-  if (/[\p{Extended_Pictographic}]/u.test(nickname)) {
-    return { isValid: false, error: "EMOJI" };
   }
 
   if (!/^[а-яА-ЯёЁa-zA-Z0-9_\-\.,!? ]+$/u.test(nickname)) {
@@ -47,6 +41,15 @@ export function getWaitingTime(hasPass: boolean): WaitingTimeResult {
   const recordDemoRT = hasPass ? 3 * 60 * 60 * 1000 : 6 * 60 * 60 * 1000;
 
   return { recordDemoRT };
+}
+
+export function getRemainingTimeText(remainingTimeMs: number): string {
+  const remainingHours = Math.floor(remainingTimeMs / (60 * 60 * 1000));
+  const remainingMinutes = Math.ceil(
+    (remainingTimeMs % (60 * 60 * 1000)) / (60 * 1000)
+  );
+
+  return `${remainingHours} ч ${remainingMinutes} мин`;
 }
 
 export function hasCaption(message: unknown): message is { caption: string } {
