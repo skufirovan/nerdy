@@ -3,20 +3,20 @@ import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { keyboards } from "@bot/markup/keyboards";
 import UserController from "@controller/UserController";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { NicknameError, validateNickname } from "@utils/index";
 
 const chooseNicknameScene = new Scenes.BaseScene<MyContext>("chooseNickname");
 
-chooseNicknameScene.enter((ctx: MyContext) => {
-  ctx.reply(
+chooseNicknameScene.enter(async (ctx: MyContext) => {
+  await ctx.reply(
     "👨🏿‍🏫 Введи свой никнейм. У тебя только 1 попытка\n➖ Поспешишь – оппов насмешишь, подойди к этому с умом"
   );
 });
 
 chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
   if (!ctx.message || !("text" in ctx.message)) {
-    await ctx.reply("⚠️  Пожалуйста, введите текст.");
-    return;
+    return await ctx.reply("⚠️  Пожалуйста, введите текст.");
   }
 
   const nickname = ctx.message.text.trim();
@@ -30,8 +30,9 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
       INVALID_CHARS: "Можно использовать только буквы, цифры и _-.,!?",
     };
 
-    await ctx.reply(`⚠️ ${errorMessages[validation.error!]}\n➖ Давай заново`);
-    return;
+    return await ctx.reply(
+      `⚠️ ${errorMessages[validation.error!]}\n➖ Давай заново`
+    );
   }
 
   try {
@@ -41,17 +42,24 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
     );
 
     if (existedUser) {
-      await ctx.reply(
+      return await ctx.reply(
         `❌ Оппы были быстрее и заняли этот ник, попробуй другой вариант`
       );
-      return;
     }
 
     session.nickname = nickname;
 
     await ctx.reply(`☁️ Теперь в ск на одного игрока больше`, keyboards.main);
     return ctx.scene.leave();
-  } catch (error) {}
+  } catch (error) {
+    userActionsLogger(
+      "error",
+      "chooseNicknameScene",
+      `${(error as Error).message}`,
+      { accountId: ctx.user!.accountId }
+    );
+    await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+  }
 });
 
 export default chooseNicknameScene;

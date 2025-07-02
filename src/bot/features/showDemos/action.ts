@@ -1,6 +1,7 @@
 import path from "path";
 import { Telegraf } from "telegraf";
 import DemoController from "@controller/DemoController";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext, SessionData } from "../scenes";
 import { formatPaginated } from "../pagination/action";
 import { keyboards } from "@bot/markup/keyboards";
@@ -13,7 +14,7 @@ export const showDemosAction = (bot: Telegraf<MyContext>) => {
       const demos = await DemoController.findByAccountId(ctx.user!.accountId);
 
       if (!demos) {
-        return ctx.reply("👮🏿‍♂️ Обнаружен лейм без демок");
+        return await ctx.reply("👮🏿‍♂️ Обнаружен лейм без демок");
       }
 
       const imagePath = path.resolve(
@@ -39,8 +40,13 @@ export const showDemosAction = (bot: Telegraf<MyContext>) => {
           parse_mode: "HTML",
         }
       );
-    } catch (err) {
-      console.error("Ошибка при открытии раздела активностей:", err);
+    } catch (error) {
+      userActionsLogger(
+        "error",
+        "showDemosAction",
+        `${(error as Error).message}`,
+        { accountId: ctx.user!.accountId }
+      );
       await ctx.reply("❌ Не удалось открыть раздел. Попробуй позже.");
     }
   });

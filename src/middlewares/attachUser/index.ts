@@ -35,6 +35,6 @@ export const attachUser = async (ctx: MyContext, next: () => Promise<void>) => {
       `${(error as Error).message}`,
       meta
     );
-    return ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+    await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
   }
 };

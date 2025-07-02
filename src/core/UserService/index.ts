@@ -104,9 +104,11 @@ export default class UserService {
       serviceLogger(
         "error",
         "UserService.getByNickname",
-        `Ошибка при поиске ${nickname}: ${(error as Error).message}`
+        `Ошибка получения пользователя по нику ${nickname}: ${
+          (error as Error).message
+        }`
       );
-      throw new Error("Ошибка при получении пользователя");
+      throw new Error("Ошибка при получении пользователя по нику");
     }
   }
 

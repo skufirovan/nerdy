@@ -1,5 +1,6 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../scenes";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import DemoDto from "@domain/dtos/DemoDto";
 import { keyboards } from "@bot/markup/keyboards";
 import { formatDateToDDMMYYYY, hasCaption } from "@utils/index";
@@ -63,7 +64,12 @@ export const paginateActions = (bot: Telegraf<MyContext>) => {
         session.pagination = pagination;
       }
     } catch (error) {
-      console.error(error);
+      userActionsLogger(
+        "error",
+        "paginateActions",
+        `${(error as Error).message}`,
+        { accountId: ctx.user!.accountId }
+      );
     }
   });
 
@@ -92,7 +98,12 @@ export const paginateActions = (bot: Telegraf<MyContext>) => {
         session.pagination = pagination;
       }
     } catch (error) {
-      console.error(error);
+      userActionsLogger(
+        "error",
+        "paginateActions",
+        `${(error as Error).message}`,
+        { accountId: ctx.user!.accountId }
+      );
     }
   });
 };

@@ -3,6 +3,7 @@ import { MyContext } from "../scenes";
 import { MENU_BUTTONS } from "@bot/markup/buttons";
 import { SECTION_EMOJI } from "@bot/markup/constants";
 import { keyboards } from "@bot/markup/keyboards";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
 export const showActivitiesAction = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.ACTIVITIES.callback, async (ctx) => {
@@ -11,8 +12,13 @@ export const showActivitiesAction = (bot: Telegraf<MyContext>) => {
       await ctx.reply(`${SECTION_EMOJI} Фаа, тут ты можешь раздобыть фейма..`, {
         reply_markup: keyboards.activities.reply_markup,
       });
-    } catch (err) {
-      console.error("Ошибка при открытии раздела активностей:", err);
+    } catch (error) {
+      userActionsLogger(
+        "error",
+        "showActivitiesAction",
+        `${(error as Error).message}`,
+        { accountId: ctx.user!.accountId }
+      );
       await ctx.reply("❌ Не удалось открыть раздел. Попробуй позже.");
     }
   });

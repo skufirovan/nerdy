@@ -3,6 +3,7 @@ import { Message } from "telegraf/typings/core/types/typegram";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import DemoController from "@controller/DemoController";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
 const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
 
@@ -17,14 +18,20 @@ recordDemoScene.enter(async (ctx: MyContext) => {
       await ctx.reply(
         `☁️ Ты уже надристал стиля, брачо, приходи через ${remainingTimeText!}`
       );
-      return ctx.scene.leave();
+      await ctx.scene.leave();
     }
 
     session.demo = {};
     await ctx.reply("📀 Фаа, сделал дело — рэпуй смело. Нука накидай баров");
   } catch (error) {
+    userActionsLogger(
+      "error",
+      "recordDemoScene",
+      `${(error as Error).message}`,
+      { accountId: ctx.user!.accountId }
+    );
     await ctx.reply("🚫 Произошла ошибка, попробуй позже");
-    return ctx.scene.leave();
+    await ctx.scene.leave();
   }
 });
 
@@ -34,7 +41,9 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
 
   if (!session.demo!.text) {
     session.demo!.text = msg.text.trim();
-    return await ctx.reply("💪🏿 Базару нет, ты немощь. Придумай название демки");
+    return await ctx.reply(
+      "💪🏿 Базару нет, ты немощь. Придумай название демки, оно не должно повторяться!"
+    );
   }
 
   if (!session.demo!.name) {
@@ -48,12 +57,18 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
       await DemoController.create(accountId, name, text);
 
       await ctx.reply("🧖🏿 Демочка записана, можешь скидывать ей");
-    } catch (err) {
+    } catch (error) {
+      userActionsLogger(
+        "error",
+        "recordDemoScene",
+        `${(error as Error).message}`,
+        { accountId }
+      );
       await ctx.reply("🚫 Произошла ошибка при сохранении демки.");
     }
 
     delete session.demo;
-    return ctx.scene.leave();
+    await ctx.scene.leave();
   }
 });
 

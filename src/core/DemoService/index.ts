@@ -1,4 +1,5 @@
 import DemoRepository from "@infrastructure/repositories/DemoRepository";
+import serviceLogger from "@infrastructure/logger/serviceLogger";
 import { Demo } from "@prisma/generated";
 import UserService from "@core/UserService";
 import { getWaitingTime, getRemainingTimeText } from "@utils/index";
@@ -9,6 +10,10 @@ export default class DemoService {
     name: string,
     text: string
   ): Promise<Demo> {
+    const meta = {
+      accountId,
+    };
+
     try {
       const demos = await this.findByAccountId(accountId);
 
@@ -16,27 +21,55 @@ export default class DemoService {
         throw new Error("Демка с таким названием уже существует");
       }
 
+      const demo = await DemoRepository.create(accountId, name, text);
       await UserService.updateUserInfo(accountId, {
         lastDemoRecordedAt: new Date(),
       });
-      return await DemoRepository.create(accountId, name, text);
+
+      serviceLogger("info", "DemoService.create", "Новая демка создана", meta);
+
+      return demo;
     } catch (error) {
-      throw new Error("Ошибка при записи демки");
+      serviceLogger(
+        "error",
+        "DemoService.create",
+        "Ошибка при создании демки",
+        meta
+      );
+      throw new Error("Ошибка при создании демки");
     }
   }
 
   static async findByAccountId(accountId: bigint): Promise<Demo[]> {
+    const meta = { accountId };
+
     try {
-      return await DemoRepository.findByAccountId(accountId);
+      const demos = await DemoRepository.findByAccountId(accountId);
+      return demos;
     } catch (error) {
-      throw new Error("Ошибка при поиске демок");
+      serviceLogger(
+        "error",
+        "DemoService.findByAccountId",
+        "Ошибка при получении демок",
+        meta
+      );
+      throw new Error("Ошибка при получении демок");
     }
   }
 
   static async delete(accountId: bigint, name: string): Promise<Demo> {
+    const meta = { accountId };
+
     try {
-      return await DemoRepository.delete(accountId, name);
+      const deletedDemo = await DemoRepository.delete(accountId, name);
+      return deletedDemo;
     } catch (error) {
+      serviceLogger(
+        "error",
+        "DemoService.delete",
+        "Ошибка при удалении демки",
+        meta
+      );
       throw new Error("Ошибка при удалении демки");
     }
   }
@@ -45,6 +78,8 @@ export default class DemoService {
     canRecord: boolean;
     remainingTimeText?: string;
   }> {
+    const meta = { accountId };
+
     try {
       const user = await UserService.getByAccountId(accountId);
       if (!user) throw new Error("Пользователь не найден");
@@ -66,7 +101,13 @@ export default class DemoService {
         };
       }
     } catch (error) {
-      throw new Error("Ошибка DemoService.canRecord");
+      serviceLogger(
+        "error",
+        "DemoService.canRecord",
+        "Ошибка при проверке возможности записи демки",
+        meta
+      );
+      throw new Error("Ошибка при проверке возможности записи демки");
     }
   }
 }
