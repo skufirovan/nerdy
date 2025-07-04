@@ -4,6 +4,9 @@ export default class UserDto {
   readonly accountId: bigint;
   readonly username: string | null;
   readonly nickname: string | null;
+  readonly level: number;
+  readonly fame: number;
+  readonly seasonalFame: number;
   readonly hasPass: boolean;
   readonly passExpiresAt: Date | null;
   readonly lastDemoRecordedAt: Date | null;
@@ -13,6 +16,9 @@ export default class UserDto {
     this.accountId = user.accountId;
     this.username = user.username;
     this.nickname = user.nickname;
+    this.level = user.level;
+    this.fame = user.fame;
+    this.seasonalFame = user.seasonalFame;
     this.hasPass = user.hasPass;
     this.passExpiresAt = user.passExpiresAt;
     this.lastDemoRecordedAt = user.lastDemoRecordedAt;

@@ -3,6 +3,7 @@ import { InMemoryCache } from "@infrastructure/cache";
 import UserDto from "@domain/dtos/UserDto";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
 import { User } from "@prisma/generated";
+import { calculateLevel } from "@core/GameLogic";
 
 const TTL = 0 * 60 * 60 * 1000;
 const cache = new InMemoryCache<bigint, UserDto>(TTL);
@@ -77,6 +78,31 @@ export default class UserController {
       cache.set(accountId, dto);
 
       return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async addFame(
+    accountId: bigint,
+    amount: number
+  ): Promise<UserDto | null> {
+    try {
+      const user = await this.getByAccountId(accountId);
+
+      if (!user) return null;
+
+      const updatedFame = user.fame + amount;
+      const updatedSeasonalFame = user.seasonalFame + amount;
+      const newLevel = calculateLevel(user.level, updatedFame);
+
+      const updatedUser = await this.updateUserInfo(accountId, {
+        level: newLevel,
+        fame: updatedFame,
+        seasonalFame: updatedSeasonalFame,
+      });
+
+      return updatedUser;
     } catch (error) {
       throw error;
     }

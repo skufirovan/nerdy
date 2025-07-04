@@ -11,8 +11,8 @@ config();
 export const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN!);
 
 bot.use(session());
-bot.use(stage.middleware());
 bot.use(attachUser);
+bot.use(stage.middleware());
 
 bot.start(handleStart);
 

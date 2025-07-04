@@ -15,6 +15,9 @@ export const handleProfile = async (ctx: MyContext) => {
     await ctx.reply(
       [
         `${user!.nickname ?? "игрок"}\n`,
+        `Твой уровень: ${user!.level}`,
+        `Фейм за все время: ${user!.fame}`,
+        `Фейм за сезон: ${user!.seasonalFame}\n`,
         `☁️ Ты зарегистрировался ${formatDateToDDMMYYYY(user!.registeredAt)}`,
         `☁️ Статус пасса: ${user!.hasPass ? "активен" : "не активен"}`,
       ].join("\n"),

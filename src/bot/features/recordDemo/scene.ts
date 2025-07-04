@@ -4,6 +4,7 @@ import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import DemoController from "@controller/DemoController";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import UserController from "@controller/UserController";
 
 const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
 
@@ -18,7 +19,7 @@ recordDemoScene.enter(async (ctx: MyContext) => {
       await ctx.reply(
         `☁️ Ты уже надристал стиля, брачо, приходи через ${remainingTimeText!}`
       );
-      await ctx.scene.leave();
+      return await ctx.scene.leave();
     }
 
     session.demo = {};
@@ -37,6 +38,8 @@ recordDemoScene.enter(async (ctx: MyContext) => {
 
 recordDemoScene.on(message("text"), async (ctx: MyContext) => {
   const session = ctx.session as SessionData;
+  const user = ctx.user;
+  const amount = 500;
   const msg = ctx.message as Message.TextMessage;
 
   if (!session.demo!.text) {
@@ -51,18 +54,17 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
 
     const name = session.demo!.name;
     const text = session.demo!.text;
-    const accountId = BigInt(ctx.from!.id);
 
     try {
-      await DemoController.create(accountId, name, text);
-
-      await ctx.reply("🧖🏿 Демочка записана, можешь скидывать ей");
+      await DemoController.create(user!.accountId, name, text);
+      await UserController.addFame(user!.accountId, amount);
+      await ctx.reply(`🧖🏿 Демочка записана, ты получил +${amount} фейма`);
     } catch (error) {
       userActionsLogger(
         "error",
         "recordDemoScene",
         `${(error as Error).message}`,
-        { accountId }
+        { accountId: user!.accountId }
       );
       await ctx.reply("🚫 Произошла ошибка при сохранении демки.");
     }
