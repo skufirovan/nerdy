@@ -2,7 +2,7 @@ import DemoRepository from "@infrastructure/repositories/DemoRepository";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
 import { Demo } from "@prisma/generated";
 import UserService from "@core/UserService";
-import { getWaitingTime, getRemainingTimeText } from "@utils/index";
+import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
 
 export default class DemoService {
   static async create(
