@@ -1,7 +1,7 @@
-import DemoService from "@core/DemoService";
-import DemoDto from "@domain/dtos/DemoDto";
+import { DemoService } from "@core/index";
+import { DemoDto } from "@domain/dtos";
 
-export default class DemoController {
+export class DemoController {
   static async create(
     accountId: bigint,
     name: string,

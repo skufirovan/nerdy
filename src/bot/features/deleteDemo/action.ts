@@ -1,5 +1,5 @@
 import { Markup, Telegraf } from "telegraf";
-import DemoController from "@controller/DemoController";
+import { DemoController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext } from "../scenes";
 import { DEMOS_BUTTONS } from "@bot/markup/buttons";

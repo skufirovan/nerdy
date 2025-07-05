@@ -1,5 +1,5 @@
 import { MyContext, SessionData } from "@bot/features/scenes";
-import UserController from "@controller/UserController";
+import { UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
 export const attachUser = async (ctx: MyContext, next: () => Promise<void>) => {

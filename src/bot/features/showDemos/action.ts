@@ -1,6 +1,6 @@
 import path from "path";
 import { Telegraf } from "telegraf";
-import DemoController from "@controller/DemoController";
+import { DemoController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext, SessionData } from "../scenes";
 import { formatPaginated } from "../pagination/action";

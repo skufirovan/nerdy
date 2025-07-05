@@ -1,6 +1,6 @@
 import { Demo } from "@prisma/generated";
 
-export default class DemoDto {
+export class DemoDto {
   readonly accountId: bigint;
   readonly name: string;
   readonly text: string;

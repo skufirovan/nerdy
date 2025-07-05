@@ -1,14 +1,14 @@
-import UserService from "@core/UserService";
+import { UserService } from "@core/index";
+import { calculateLevel } from "@core/GameLogic";
 import { InMemoryCache } from "@infrastructure/cache";
-import UserDto from "@domain/dtos/UserDto";
+import { UserDto } from "@domain/dtos";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
 import { User } from "@prisma/generated";
-import { calculateLevel } from "@core/GameLogic";
 
 const TTL = 0 * 60 * 60 * 1000;
 const cache = new InMemoryCache<bigint, UserDto>(TTL);
 
-export default class UserController {
+export class UserController {
   static async register(
     accountId: bigint,
     username: string | null,

@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../scenes";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import DemoDto from "@domain/dtos/DemoDto";
+import { DemoDto } from "@domain/dtos";
 import { keyboards } from "@bot/markup/keyboards";
 import { formatDateToDDMMYYYY, hasCaption } from "@utils/index";
 

@@ -2,7 +2,7 @@ import { Scenes } from "telegraf";
 import chooseNicknameScene from "./chooseNickname/scene";
 import recordDemoScene from "./recordDemo/scene";
 import { PaginationData } from "./pagination/action";
-import UserDto from "@domain/dtos/UserDto";
+import { UserDto } from "@domain/dtos";
 
 export interface SessionData extends Scenes.SceneSessionData {
   nickname?: string;

@@ -1,9 +1,9 @@
-import UserRepository from "@infrastructure/repositories/UserRepository";
+import { UserRepository } from "@infrastructure/repositories";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
 import { User } from "@prisma/generated";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
 
-export default class UserService {
+export class UserService {
   static async register(
     accountId: bigint,
     username: string | null,

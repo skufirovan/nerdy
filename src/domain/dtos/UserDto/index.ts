@@ -1,6 +1,6 @@
 import { User } from "@prisma/generated";
 
-export default class UserDto {
+export class UserDto {
   readonly accountId: bigint;
   readonly username: string | null;
   readonly nickname: string | null;

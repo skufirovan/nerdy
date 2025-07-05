@@ -2,7 +2,7 @@ import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { keyboards } from "@bot/markup/keyboards";
-import UserController from "@controller/UserController";
+import { UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { NicknameError, validateNickname } from "@utils/index";
 

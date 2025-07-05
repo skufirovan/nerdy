@@ -16,7 +16,7 @@
     "paths": {
       "@prisma/*": ["prisma/*"],
       "@bot/*": ["bot/*"],
-      "@controller/*": ["controller/*"],
+      "@controller": ["controller/index.ts"],
       "@core/*": ["core/*"],
       "@domain/*": ["domain/*"],
       "@infrastructure/*": ["infrastructure/*"],

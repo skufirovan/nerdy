@@ -1,7 +1,7 @@
 import { prisma } from "@prisma/client";
 import { Demo } from "@prisma/generated";
 
-export default class DemoRepository {
+export class DemoRepository {
   static async create(
     accountId: bigint,
     name: string,

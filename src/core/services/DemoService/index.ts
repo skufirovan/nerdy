@@ -1,10 +1,10 @@
-import DemoRepository from "@infrastructure/repositories/DemoRepository";
+import { DemoRepository } from "@infrastructure/repositories";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
 import { Demo } from "@prisma/generated";
-import UserService from "@core/UserService";
 import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
+import { UserService } from "@core/index";
 
-export default class DemoService {
+export class DemoService {
   static async create(
     accountId: bigint,
     name: string,

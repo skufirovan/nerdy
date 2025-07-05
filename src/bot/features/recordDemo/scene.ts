@@ -2,9 +2,8 @@ import { Scenes } from "telegraf";
 import { Message } from "telegraf/typings/core/types/typegram";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
-import DemoController from "@controller/DemoController";
+import { DemoController, UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import UserController from "@controller/UserController";
 
 const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
 
