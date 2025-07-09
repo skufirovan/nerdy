@@ -12,7 +12,7 @@ export const attachUser = async (ctx: MyContext, next: () => Promise<void>) => {
   const meta = { accountId, username };
 
   try {
-    let user = await UserController.getByAccountId(accountId);
+    let user = await UserController.findByAccountId(accountId);
     const session = ctx.session as SessionData;
 
     if (!user) {

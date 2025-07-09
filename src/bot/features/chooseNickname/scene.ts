@@ -36,7 +36,7 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
   }
 
   try {
-    const existedUser = await UserController.getByNickname(
+    const existedUser = await UserController.findByNickname(
       ctx.user!.accountId,
       nickname
     );

@@ -81,7 +81,7 @@ export class DemoService {
     const meta = { accountId };
 
     try {
-      const user = await UserService.getByAccountId(accountId);
+      const user = await UserService.findByAccountId(accountId);
       if (!user) throw new Error("Пользователь не найден");
 
       const WAITING_TIME = getWaitingTime(user.hasPass).recordDemoRT;
