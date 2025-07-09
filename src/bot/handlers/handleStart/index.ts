@@ -1,7 +1,7 @@
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext } from "@bot/features/scenes";
-import { keyboards } from "@bot/markup/keyboards";
-import { CHANNEL_LINK, SECTION_EMOJI } from "@bot/markup/constants";
+import { mainKeyboard } from "./keyboard";
+import { CHANNEL_LINK, SECTION_EMOJI } from "@utils/constants";
 
 export const handleStart = async (ctx: MyContext) => {
   const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
@@ -22,7 +22,7 @@ export const handleStart = async (ctx: MyContext) => {
       ].join("\n"),
       {
         parse_mode: "Markdown",
-        ...keyboards.main,
+        ...mainKeyboard,
       }
     );
   } catch (error) {

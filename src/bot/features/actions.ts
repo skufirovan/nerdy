@@ -2,7 +2,7 @@ import { Telegraf } from "telegraf";
 import { MyContext } from "./scenes";
 import { registerDeleteMessageAction } from "./deleteMessage/action";
 import { showActivitiesAction } from "./showActivities/action";
-import { recordDemo } from "./recordDemo/action";
+import { recordDemoAction } from "./recordDemo/action";
 import { paginateActions } from "./pagination/action";
 import { showDemosAction } from "./showDemos/action";
 import { deleteDemoAction } from "./deleteDemo/action";
@@ -16,6 +16,6 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   showTopAction(bot);
   showDemosAction(bot);
   showEquipmentAction(bot);
-  recordDemo(bot);
+  recordDemoAction(bot);
   paginateActions(bot);
 };

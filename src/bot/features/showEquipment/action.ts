@@ -3,8 +3,8 @@ import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../scenes";
 import { UserEquipmentController } from "@controller";
 import { formatPaginated } from "../pagination/action";
-import { keyboards } from "@bot/markup/keyboards";
-import { PROFILE_BUTTONS } from "@bot/markup/buttons";
+import { paginationKeyboard } from "../pagination/keyboard";
+import { PROFILE_BUTTONS } from "@bot/handlers";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
 export const showEquipmentAction = (bot: Telegraf<MyContext>) => {
@@ -24,7 +24,7 @@ export const showEquipmentAction = (bot: Telegraf<MyContext>) => {
         "../../assets/images/EQUIPMENT.png"
       );
       const replyMarkup =
-        equipment.length > 1 ? keyboards.pagination.reply_markup : undefined;
+        equipment.length > 1 ? paginationKeyboard.reply_markup : undefined;
       const session = ctx.session as SessionData;
       session.pagination = {
         items: equipment,

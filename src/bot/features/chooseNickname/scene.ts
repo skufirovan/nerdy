@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
-import { keyboards } from "@bot/markup/keyboards";
+import { mainKeyboard } from "@bot/handlers/handleStart/keyboard";
 import { UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { NicknameError, validateNickname } from "@utils/index";
@@ -49,7 +49,7 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
 
     session.nickname = nickname;
 
-    await ctx.reply(`☁️ Теперь в ск на одного игрока больше`, keyboards.main);
+    await ctx.reply(`☁️ Теперь в ск на одного игрока больше`, mainKeyboard);
     return ctx.scene.leave();
   } catch (error) {
     userActionsLogger(

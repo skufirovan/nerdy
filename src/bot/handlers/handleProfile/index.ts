@@ -1,6 +1,7 @@
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext } from "@bot/features/scenes";
-import { keyboards } from "@bot/markup/keyboards";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { UserDto } from "@domain/dtos";
+import { profileKeyboard } from "./keyboard";
 import { formatDateToDDMMYYYY } from "@utils/index";
 
 export const handleProfile = async (ctx: MyContext) => {
@@ -10,7 +11,7 @@ export const handleProfile = async (ctx: MyContext) => {
   const meta = { accountId, username };
 
   try {
-    const user = ctx.user;
+    const user = ctx.user as UserDto;
 
     await ctx.reply(
       [
@@ -21,7 +22,7 @@ export const handleProfile = async (ctx: MyContext) => {
         `☁️ Ты зарегистрировался ${formatDateToDDMMYYYY(user!.registeredAt)}`,
         `☁️ Статус пасса: ${user!.hasPass ? "активен" : "не активен"}`,
       ].join("\n"),
-      keyboards.profile
+      profileKeyboard
     );
 
     userActionsLogger(

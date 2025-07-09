@@ -3,8 +3,12 @@ import { config } from "dotenv";
 import { attachUser, initUserMeta } from "@middlewares/index";
 import { MyContext, stage } from "@bot/features/scenes";
 import { registerTelegramActions } from "@bot/features/actions";
-import { handleStart, handleProfile, handleMenu } from "@bot/handlers";
-import { BUTTONS } from "@bot/markup/buttons";
+import {
+  handleStart,
+  handleProfile,
+  handleMenu,
+  MAIN_BUTTONS,
+} from "@bot/handlers";
 
 config();
 
@@ -17,7 +21,7 @@ bot.use(attachUser);
 
 bot.start(handleStart);
 
-bot.hears(BUTTONS.PROFILE, handleProfile);
-bot.hears(BUTTONS.MENU, handleMenu);
+bot.hears(MAIN_BUTTONS.PROFILE, handleProfile);
+bot.hears(MAIN_BUTTONS.MENU, handleMenu);
 
 registerTelegramActions(bot);

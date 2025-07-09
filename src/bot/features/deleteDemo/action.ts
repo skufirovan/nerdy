@@ -1,8 +1,8 @@
 import { Markup, Telegraf } from "telegraf";
-import { DemoController } from "@controller";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext } from "../scenes";
-import { DEMOS_BUTTONS } from "@bot/markup/buttons";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { DEMOS_BUTTONS } from "../showDemos/keyboard";
+import { DemoController } from "@controller";
 import { hasCaption } from "@utils/index";
 
 function extractDemoNameFromCaption(caption: string): string | null {

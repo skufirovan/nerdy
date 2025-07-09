@@ -1,11 +1,11 @@
 import path from "path";
 import { Telegraf } from "telegraf";
+import { MyContext, SessionData } from "../scenes";
 import { DemoController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import { MyContext, SessionData } from "../scenes";
 import { formatPaginated } from "../pagination/action";
-import { keyboards } from "@bot/markup/keyboards";
-import { PROFILE_BUTTONS } from "@bot/markup/buttons";
+import { PROFILE_BUTTONS } from "@bot/handlers";
+import { demosKeyboard } from "./keyboard";
 
 export const showDemosAction = (bot: Telegraf<MyContext>) => {
   bot.action(PROFILE_BUTTONS.DEMOS.callback, async (ctx) => {
@@ -22,7 +22,7 @@ export const showDemosAction = (bot: Telegraf<MyContext>) => {
         "../../assets/images/DEMOS.png"
       );
       const replyMarkup =
-        demos.length > 1 ? keyboards.demos.reply_markup : undefined;
+        demos.length > 1 ? demosKeyboard.reply_markup : undefined;
       const session = ctx.session as SessionData;
       session.pagination = {
         items: demos,

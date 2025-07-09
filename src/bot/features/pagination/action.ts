@@ -4,6 +4,7 @@ import { MyContext, SessionData } from "../scenes";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { DemoDto, UserEquipmentDto } from "@domain/dtos";
 import { formatDateToDDMMYYYY, hasCaption } from "@utils/index";
+import { PAGINATE_BUTTONS } from "./keyboard";
 
 export interface PaginationData<T> {
   items: T[];
@@ -59,7 +60,7 @@ export function paginate<T>(
 }
 
 export const paginateActions = (bot: Telegraf<MyContext>) => {
-  bot.action("PAGINATE_NEXT", async (ctx) => {
+  bot.action(PAGINATE_BUTTONS.NEXT.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();
 
@@ -93,7 +94,7 @@ export const paginateActions = (bot: Telegraf<MyContext>) => {
     }
   });
 
-  bot.action("PAGINATE_PREV", async (ctx) => {
+  bot.action(PAGINATE_BUTTONS.PREV.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();
 

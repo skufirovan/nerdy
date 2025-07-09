@@ -2,9 +2,9 @@ import { Telegraf } from "telegraf";
 import { MyContext } from "../scenes";
 import { UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import { MENU_BUTTONS, TOP_BUTTONS } from "@bot/markup/buttons";
-import { SECTION_EMOJI } from "@bot/markup/constants";
-import { keyboards } from "@bot/markup/keyboards";
+import { MENU_BUTTONS } from "@bot/handlers";
+import { SECTION_EMOJI } from "@utils/constants";
+import { TOP_BUTTONS, topKeyboard } from "./keyboard";
 
 export const showTopAction = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.TOP.callback, async (ctx) => {
@@ -29,7 +29,7 @@ export const showTopAction = (bot: Telegraf<MyContext>) => {
           link_preview_options: {
             is_disabled: true,
           },
-          reply_markup: keyboards.top.reply_markup,
+          reply_markup: topKeyboard.reply_markup,
         }
       );
     } catch (error) {

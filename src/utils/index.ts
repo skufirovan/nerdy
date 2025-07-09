@@ -1,3 +1,5 @@
+import { Markup } from "telegraf";
+
 export function formatDateToDDMMYYYY(date: Date): string {
   if (isNaN(date.getTime())) {
     return "";
@@ -41,3 +43,11 @@ export function hasCaption(message: unknown): message is { caption: string } {
     typeof (message as { caption: unknown }).caption === "string"
   );
 }
+
+type Button = {
+  text: string;
+  callback: string;
+};
+
+export const toButton = ({ text, callback }: Button) =>
+  Markup.button.callback(text, callback);

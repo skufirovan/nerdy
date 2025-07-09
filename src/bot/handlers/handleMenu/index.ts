@@ -1,7 +1,7 @@
 import path from "path";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext } from "@bot/features/scenes";
-import { keyboards } from "@bot/markup/keyboards";
+import { menuKeyboard } from "./keyboard";
 
 export const handleMenu = async (ctx: MyContext) => {
   const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
@@ -15,7 +15,7 @@ export const handleMenu = async (ctx: MyContext) => {
       { source: imagePath },
       {
         caption: "",
-        ...keyboards.menu,
+        ...menuKeyboard,
       }
     );
   } catch (error) {
