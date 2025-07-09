@@ -25,6 +25,16 @@ export class UserRepository {
     return prisma.user.findUnique({ where: { nickname } });
   }
 
+  static async findTopUsersByField(
+    field: keyof Pick<User, "fame" | "seasonalFame">,
+    limit: number = 10
+  ): Promise<User[]> {
+    return prisma.user.findMany({
+      orderBy: { [field]: "desc" },
+      take: limit,
+    });
+  }
+
   static async updateUserInfo(
     accountId: bigint,
     data: Partial<Omit<User, NON_UPDATABLE_USER_FIELDS>>

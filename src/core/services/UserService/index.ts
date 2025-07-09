@@ -16,7 +16,7 @@ export class UserService {
     };
 
     try {
-      const existingUser = await this.getByAccountId(accountId);
+      const existingUser = await this.findByAccountId(accountId);
 
       if (existingUser) {
         if (existingUser.username !== username) {
@@ -54,7 +54,7 @@ export class UserService {
     }
   }
 
-  static async getByAccountId(accountId: bigint): Promise<User | null> {
+  static async findByAccountId(accountId: bigint): Promise<User | null> {
     const meta = { accountId };
 
     try {
@@ -83,7 +83,7 @@ export class UserService {
     }
   }
 
-  static async getByNickname(
+  static async findByNickname(
     accountId: bigint,
     nickname: string
   ): Promise<User | null> {
@@ -109,6 +109,25 @@ export class UserService {
         "error",
         "UserService.getByNickname",
         `Ошибка получения пользователя по нику ${nickname}: ${
+          (error as Error).message
+        }`
+      );
+      throw new Error("Ошибка при получении пользователя по нику");
+    }
+  }
+
+  static async findTopUsersByField(
+    field: keyof Pick<User, "fame" | "seasonalFame">,
+    limit: number = 10
+  ): Promise<User[]> {
+    try {
+      const topUsers = await UserRepository.findTopUsersByField(field, limit);
+      return topUsers;
+    } catch (error) {
+      serviceLogger(
+        "error",
+        "UserService.findTopUsersByField",
+        `Ошибка получения рейтинга по полю ${field}: ${
           (error as Error).message
         }`
       );

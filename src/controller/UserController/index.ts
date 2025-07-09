@@ -26,13 +26,13 @@ export class UserController {
     }
   }
 
-  static async getByAccountId(accountId: bigint): Promise<UserDto | null> {
+  static async findByAccountId(accountId: bigint): Promise<UserDto | null> {
     const cached = cache.get(accountId);
 
     if (cached) return cached;
 
     try {
-      const user = await UserService.getByAccountId(accountId);
+      const user = await UserService.findByAccountId(accountId);
 
       if (!user) return null;
 
@@ -45,7 +45,7 @@ export class UserController {
     }
   }
 
-  static async getByNickname(
+  static async findByNickname(
     accountId: bigint,
     nickname: string
   ): Promise<UserDto | null> {
@@ -54,7 +54,7 @@ export class UserController {
     if (cached) return cached;
 
     try {
-      const user = await UserService.getByNickname(accountId, nickname);
+      const user = await UserService.findByNickname(accountId, nickname);
 
       if (!user) return null;
 
@@ -62,6 +62,18 @@ export class UserController {
       cache.set(accountId, dto);
 
       return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async findTopUsersByField(
+    field: keyof Pick<User, "fame" | "seasonalFame">,
+    limit: number = 10
+  ): Promise<UserDto[]> {
+    try {
+      const users = await UserService.findTopUsersByField(field, limit);
+      return users.map((user) => new UserDto(user));
     } catch (error) {
       throw error;
     }
@@ -88,7 +100,7 @@ export class UserController {
     amount: number
   ): Promise<UserDto | null> {
     try {
-      const user = await this.getByAccountId(accountId);
+      const user = await this.findByAccountId(accountId);
 
       if (!user) return null;
 
