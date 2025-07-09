@@ -1,4 +1,5 @@
 import { UserRepository } from "@infrastructure/repositories";
+import { UserEquipmentService } from "../UserEquipmentService";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
 import { User } from "@prisma/generated";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
@@ -30,6 +31,9 @@ export class UserService {
         username,
         nickname
       );
+      await UserEquipmentService.create(accountId, BigInt(1), true);
+      await UserEquipmentService.create(accountId, BigInt(2), true);
+      await UserEquipmentService.create(accountId, BigInt(3), true);
 
       serviceLogger(
         "info",
