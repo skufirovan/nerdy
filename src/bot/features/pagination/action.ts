@@ -1,23 +1,43 @@
 import { Telegraf } from "telegraf";
+import { InlineKeyboardMarkup } from "telegraf/typings/core/types/typegram";
 import { MyContext, SessionData } from "../scenes";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import { DemoDto } from "@domain/dtos";
-import { keyboards } from "@bot/markup/keyboards";
+import { DemoDto, UserEquipmentDto } from "@domain/dtos";
 import { formatDateToDDMMYYYY, hasCaption } from "@utils/index";
 
 export interface PaginationData<T> {
   items: T[];
   currentIndex: number;
   type: string;
+  replyMarkup?: InlineKeyboardMarkup;
 }
 
 export function formatPaginated(item: unknown, type: string): string {
   switch (type) {
     case "demos":
       const demo = item as DemoDto;
-      return `🎤 <b>${demo.name}</b>\n🕓 ${formatDateToDDMMYYYY(
-        demo.recordedAt
-      )}\n\n${demo.text}`;
+      return [
+        `🎤 <b>${demo.name}</b>`,
+        `🕓 ${formatDateToDDMMYYYY(demo.recordedAt)}`,
+        "",
+        demo.text,
+      ].join("\n");
+    case "equipment":
+      const userEquipment = item as UserEquipmentDto;
+      const equipment = userEquipment.equipment;
+      const emoji =
+        equipment.type === "MICROPHONE"
+          ? "🎤"
+          : equipment.type === "HEADPHONES"
+          ? "🎧"
+          : "🎛";
+      return [
+        `${emoji} <b>${equipment.brand} ${equipment.model}</b>`,
+        "",
+        `Множитель: ${equipment.multiplier}`,
+        `Цена: ${equipment.price}`,
+        `Дата приобретения: ${formatDateToDDMMYYYY(userEquipment.createdAt)}`,
+      ].join("\n");
     default:
       return "❌ Неизвестный формат";
   }
@@ -58,7 +78,7 @@ export const paginateActions = (bot: Telegraf<MyContext>) => {
       if (currentCaption !== newCaption) {
         await ctx.editMessageCaption(newCaption, {
           parse_mode: "HTML",
-          reply_markup: keyboards.demos.reply_markup,
+          reply_markup: pagination.replyMarkup,
         });
 
         session.pagination = pagination;
@@ -92,7 +112,7 @@ export const paginateActions = (bot: Telegraf<MyContext>) => {
       if (currentCaption !== newCaption) {
         await ctx.editMessageCaption(newCaption, {
           parse_mode: "HTML",
-          reply_markup: keyboards.demos.reply_markup,
+          reply_markup: pagination.replyMarkup,
         });
 
         session.pagination = pagination;

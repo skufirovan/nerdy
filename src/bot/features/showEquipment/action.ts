@@ -1,42 +1,44 @@
 import path from "path";
 import { Telegraf } from "telegraf";
-import { DemoController } from "@controller";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext, SessionData } from "../scenes";
+import { UserEquipmentController } from "@controller";
 import { formatPaginated } from "../pagination/action";
 import { keyboards } from "@bot/markup/keyboards";
 import { PROFILE_BUTTONS } from "@bot/markup/buttons";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
-export const showDemosAction = (bot: Telegraf<MyContext>) => {
-  bot.action(PROFILE_BUTTONS.DEMOS.callback, async (ctx) => {
+export const showEquipmentAction = (bot: Telegraf<MyContext>) => {
+  bot.action(PROFILE_BUTTONS.EQUIPMENT.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();
-      const demos = await DemoController.findByAccountId(ctx.user!.accountId);
+      const equipment = await UserEquipmentController.findByAccountId(
+        ctx.user!.accountId
+      );
 
-      if (!demos || demos.length === 0) {
-        return await ctx.reply("👮🏿‍♂️ Обнаружен лейм без демок");
+      if (!equipment || equipment.length === 0) {
+        return await ctx.reply("👮🏿‍♂️ Обнаружен лейм без оборудки");
       }
 
       const imagePath = path.resolve(
         __dirname,
-        "../../assets/images/DEMOS.png"
+        "../../assets/images/EQUIPMENT.png"
       );
       const replyMarkup =
-        demos.length > 1 ? keyboards.demos.reply_markup : undefined;
+        equipment.length > 1 ? keyboards.pagination.reply_markup : undefined;
       const session = ctx.session as SessionData;
       session.pagination = {
-        items: demos,
+        items: equipment,
         currentIndex: 0,
-        type: "demos",
+        type: "equipment",
         replyMarkup,
       };
 
-      const first = demos[0];
+      const first = equipment[0];
 
       await ctx.replyWithPhoto(
         { source: imagePath },
         {
-          caption: formatPaginated(first, "demos"),
+          caption: formatPaginated(first, "equipment"),
           reply_markup: replyMarkup,
           parse_mode: "HTML",
         }
@@ -44,7 +46,7 @@ export const showDemosAction = (bot: Telegraf<MyContext>) => {
     } catch (error) {
       userActionsLogger(
         "error",
-        "showDemosAction",
+        "showEquipmentAction",
         `${(error as Error).message}`,
         { accountId: ctx.user!.accountId }
       );

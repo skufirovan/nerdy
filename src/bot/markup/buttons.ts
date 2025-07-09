@@ -25,6 +25,7 @@ export const MENU_BUTTONS = {
 
 export const PROFILE_BUTTONS = {
   DEMOS: { text: "💽 Дискография", callback: "PROFILE_DEMOS" },
+  EQUIPMENT: { text: "🎙 Оборудка", callback: "PROFILE_EQUIPMENT" },
 };
 
 export const DEMOS_BUTTONS = {

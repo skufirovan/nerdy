@@ -29,6 +29,7 @@ export const keyboards = {
   ]),
   profile: Markup.inlineKeyboard([
     [toButton(PROFILE_BUTTONS.DEMOS)],
+    [toButton(PROFILE_BUTTONS.EQUIPMENT)],
     [CLOSE_BUTTON],
   ]),
   demos: Markup.inlineKeyboard([
@@ -38,8 +39,7 @@ export const keyboards = {
   activities: Markup.inlineKeyboard([
     [toButton(ACTIVITIES_BUTTONS.RECORD_DEMO)],
   ]),
-  confirm: Markup.inlineKeyboard([
-    toButton(CONFIRM_BUTTONS.CONFIRM),
-    toButton(CONFIRM_BUTTONS.CANCEL),
+  pagination: Markup.inlineKeyboard([
+    [toButton(PAGINATE_BUTTONS.PREV), toButton(PAGINATE_BUTTONS.NEXT)],
   ]),
 };
