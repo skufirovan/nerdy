@@ -10,11 +10,6 @@ export const CLOSE_BUTTON = Markup.button.callback(
   "DELETE_MESSAGE"
 );
 
-export const CONFIRM_BUTTONS = {
-  CONFIRM: { text: "✅ Да", callback: "CONFIRM_CONFIRM" },
-  CANCEL: { text: "❌ Нет", callback: "CONFIRM_CANCEL" },
-};
-
 export const MENU_BUTTONS = {
   TOP: { text: "🏆 Billboard", callback: "MENU_TOP" },
   ACTIVITIES: { text: "🎧 Темки", callback: "MENU_ACTIVITIES" },
@@ -42,4 +37,8 @@ export const ACTIVITIES_BUTTONS = {
     text: "🎙 Записать демочку",
     callback: "ACTIVITIES_RECORD_DEMO",
   },
+};
+
+export const TOP_BUTTONS = {
+  ALL_TIME_TOP: { text: "🏆 Зал славы", callback: "TOP_ALL_TIME_TOP" },
 };

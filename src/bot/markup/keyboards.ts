@@ -7,7 +7,7 @@ import {
   MENU_BUTTONS,
   PROFILE_BUTTONS,
   DEMOS_BUTTONS,
-  CONFIRM_BUTTONS,
+  TOP_BUTTONS,
 } from "./buttons";
 
 type Button = {
@@ -42,4 +42,5 @@ export const keyboards = {
   pagination: Markup.inlineKeyboard([
     [toButton(PAGINATE_BUTTONS.PREV), toButton(PAGINATE_BUTTONS.NEXT)],
   ]),
+  top: Markup.inlineKeyboard([[toButton(TOP_BUTTONS.ALL_TIME_TOP)]]),
 };
