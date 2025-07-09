@@ -3,6 +3,7 @@ import chooseNicknameScene from "./chooseNickname/scene";
 import recordDemoScene from "./recordDemo/scene";
 import { PaginationData } from "./pagination/action";
 import { UserDto } from "@domain/dtos";
+import { RawUser } from "@domain/types";
 
 export interface SessionData extends Scenes.SceneSessionData {
   nickname?: string;
@@ -11,7 +12,7 @@ export interface SessionData extends Scenes.SceneSessionData {
 }
 
 export interface MyContext extends Scenes.SceneContext<SessionData> {
-  user?: UserDto;
+  user?: RawUser | UserDto;
 }
 
 export const stage = new Scenes.Stage<MyContext>([

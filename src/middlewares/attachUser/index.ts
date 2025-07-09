@@ -3,12 +3,13 @@ import { UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
 export const attachUser = async (ctx: MyContext, next: () => Promise<void>) => {
-  const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
-  const username = ctx.from?.username ?? null;
+  if (!ctx.user || !ctx.user.accountId) {
+    return ctx.reply("⚠️ Не удалось определить Telegram ID");
+  }
 
+  const accountId = ctx.user.accountId;
+  const username = ctx.user.username;
   const meta = { accountId, username };
-
-  if (!accountId) return ctx.reply("⚠️ Не удалось определить Telegram ID");
 
   try {
     let user = await UserController.getByAccountId(accountId);
