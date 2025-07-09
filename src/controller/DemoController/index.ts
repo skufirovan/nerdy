@@ -17,14 +17,28 @@ export class DemoController {
     }
   }
 
-  static async findByAccountId(accountId: bigint): Promise<DemoDto[] | null> {
+  static async findByAccountId(accountId: bigint): Promise<DemoDto[]> {
     try {
       const demos = await DemoService.findByAccountId(accountId);
 
-      if (!demos) return null;
-
       const dtos: DemoDto[] = demos.map((demo) => new DemoDto(demo));
       return dtos;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async findByName(
+    accountId: bigint,
+    name: string
+  ): Promise<DemoDto | null> {
+    try {
+      const demo = await DemoService.findByName(accountId, name);
+
+      if (!demo) return null;
+
+      const dto = new DemoDto(demo);
+      return dto;
     } catch (error) {
       throw error;
     }

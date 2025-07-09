@@ -22,9 +22,7 @@ export class UserEquipmentController {
     }
   }
 
-  static async findByAccountId(
-    accountId: bigint
-  ): Promise<UserEquipmentDto[] | null> {
+  static async findByAccountId(accountId: bigint): Promise<UserEquipmentDto[]> {
     try {
       const equipment = await UserEquipmentService.findByAccountId(accountId);
 
@@ -37,9 +35,7 @@ export class UserEquipmentController {
     }
   }
 
-  static async findEquipped(
-    accountId: bigint
-  ): Promise<UserEquipmentDto[] | null> {
+  static async findEquipped(accountId: bigint): Promise<UserEquipmentDto[]> {
     try {
       const equipment = await UserEquipmentService.findEquipped(accountId);
 
@@ -55,7 +51,7 @@ export class UserEquipmentController {
   static async findByType(
     accountId: bigint,
     type: EQUIPMENT_TYPE
-  ): Promise<UserEquipmentDto[] | null> {
+  ): Promise<UserEquipmentDto[]> {
     try {
       const equipment = await UserEquipmentService.findByType(accountId, type);
 

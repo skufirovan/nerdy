@@ -57,6 +57,26 @@ export class DemoService {
     }
   }
 
+  static async findByName(
+    accountId: bigint,
+    name: string
+  ): Promise<Demo | null> {
+    const meta = { accountId };
+
+    try {
+      const demo = await DemoRepository.findByName(accountId, name);
+      return demo;
+    } catch (error) {
+      serviceLogger(
+        "error",
+        "DemoService.findByName",
+        "Ошибка при получении демок",
+        meta
+      );
+      throw new Error("Ошибка при получении демок");
+    }
+  }
+
   static async delete(accountId: bigint, name: string): Promise<Demo> {
     const meta = { accountId };
 

@@ -23,6 +23,15 @@ export class DemoRepository {
     });
   }
 
+  static async findByName(
+    accountId: bigint,
+    name: string
+  ): Promise<Demo | null> {
+    return prisma.demo.findUnique({
+      where: { accountId_name: { accountId, name } },
+    });
+  }
+
   static async delete(accountId: bigint, name: string): Promise<Demo> {
     return prisma.demo.delete({
       where: {
