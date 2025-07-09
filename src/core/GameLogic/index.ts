@@ -2,12 +2,14 @@ import { levelThresholds } from "@domain/config/levelThresholds";
 
 type WaitingTimeResult = {
   recordDemoRT: number;
+  recordVideoRT: number;
 };
 
 export function getWaitingTime(hasPass: boolean): WaitingTimeResult {
   const recordDemoRT = hasPass ? 4 * 60 * 60 * 1000 : 6 * 60 * 60 * 1000;
+  const recordVideoRT = hasPass ? 4 * 60 * 60 * 1000 : 6 * 60 * 60 * 1000;
 
-  return { recordDemoRT };
+  return { recordDemoRT, recordVideoRT };
 }
 
 export function getRemainingTimeText(remainingTimeMs: number): string {
