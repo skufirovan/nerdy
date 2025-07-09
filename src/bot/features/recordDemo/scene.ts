@@ -2,7 +2,11 @@ import { Scenes } from "telegraf";
 import { Message } from "telegraf/typings/core/types/typegram";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
-import { DemoController, UserController } from "@controller";
+import {
+  DemoController,
+  UserController,
+  UserEquipmentController,
+} from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
 const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
@@ -22,7 +26,7 @@ recordDemoScene.enter(async (ctx: MyContext) => {
     }
 
     session.demo = {};
-    await ctx.reply("📀 Фаа, сделал дело — рэпуй смело. Нука накидай баров");
+    await ctx.reply("📀 Фаа, сделал дело — рэпуй смело. Ну-ка накидай баров");
   } catch (error) {
     userActionsLogger(
       "error",
@@ -55,9 +59,18 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
     const text = session.demo!.text;
 
     try {
+      const equipment = await UserEquipmentController.findEquipped(
+        user!.accountId
+      );
+      const multiplier = equipment.reduce(
+        (acc, item) => acc * item.equipment.multiplier,
+        1
+      );
       await DemoController.create(user!.accountId, name, text);
-      await UserController.addFame(user!.accountId, amount);
-      await ctx.reply(`🧖🏿 Демочка записана, ты получил +${amount} фейма`);
+      await UserController.addFame(user!.accountId, amount * multiplier);
+      await ctx.reply(
+        `🧖🏿 Демочка записана, ты получил +${amount * multiplier} фейма`
+      );
     } catch (error) {
       userActionsLogger(
         "error",
@@ -65,7 +78,7 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
         `${(error as Error).message}`,
         { accountId: user!.accountId }
       );
-      await ctx.reply("🚫 Произошла ошибка при сохранении демки.");
+      await ctx.reply("🚫 Произошла ошибка при сохранении демки");
     }
 
     delete session.demo;
