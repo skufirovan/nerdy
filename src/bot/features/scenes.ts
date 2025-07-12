@@ -2,6 +2,8 @@ import { Scenes } from "telegraf";
 import chooseNicknameScene from "./chooseNickname/scene";
 import recordDemoScene from "./recordDemo/scene";
 import recordVideoScene from "./recordVideo/scene";
+import battleScene from "./battle/scene";
+import comboScene from "./combo/scene";
 import { PaginationData } from "./pagination/action";
 import { UserDto, DemoDto } from "@domain/dtos";
 import { RawUser } from "@domain/types";
@@ -11,6 +13,7 @@ export interface SessionData extends Scenes.SceneSessionData {
   demo?: { name?: string; text?: string };
   video?: { description?: string; demo?: DemoDto };
   pagination?: PaginationData<unknown>;
+  battleId?: string;
 }
 
 export interface MyContext extends Scenes.SceneContext<SessionData> {
@@ -21,4 +24,6 @@ export const stage = new Scenes.Stage<MyContext>([
   chooseNicknameScene,
   recordDemoScene,
   recordVideoScene,
+  battleScene,
+  comboScene,
 ]);

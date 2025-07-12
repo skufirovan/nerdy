@@ -9,6 +9,7 @@ import { deleteDemoAction } from "./deleteDemo/action";
 import { showEquipmentAction } from "./showEquipment/action";
 import { showTopAction } from "./showTop/action";
 import { recordVideoAction } from "./recordVideo/action";
+import { battleActions } from "./battle/action";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   registerDeleteMessageAction(bot);
@@ -20,4 +21,5 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   recordDemoAction(bot);
   recordVideoAction(bot);
   paginateActions(bot);
+  battleActions(bot);
 };

@@ -51,3 +51,7 @@ type Button = {
 
 export const toButton = ({ text, callback }: Button) =>
   Markup.button.callback(text, callback);
+
+export const isValidCombo = (combo: string): boolean => {
+  return /^[1-4]{4}$/.test(combo);
+};
