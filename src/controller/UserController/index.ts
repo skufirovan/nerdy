@@ -49,17 +49,13 @@ export class UserController {
     accountId: bigint,
     nickname: string
   ): Promise<UserDto | null> {
-    const cached = cache.get(accountId);
-
-    if (cached) return cached;
-
     try {
       const user = await UserService.findByNickname(accountId, nickname);
 
       if (!user) return null;
 
       const dto = new UserDto(user);
-      cache.set(accountId, dto);
+      cache.set(user.accountId, dto);
 
       return dto;
     } catch (error) {

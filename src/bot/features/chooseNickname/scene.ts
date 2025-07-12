@@ -16,7 +16,7 @@ chooseNicknameScene.enter(async (ctx: MyContext) => {
 
 chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
   if (!ctx.message || !("text" in ctx.message)) {
-    return await ctx.reply("⚠️  Пожалуйста, введите текст.");
+    return await ctx.reply("⚠️ Отправь текст ТЕКСТ #ТЕКСТ");
   }
 
   const nickname = ctx.message.text.trim();

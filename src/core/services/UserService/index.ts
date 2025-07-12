@@ -99,7 +99,7 @@ export class UserService {
       serviceLogger(
         "warn",
         "UserService.getByNickname",
-        "Пользователь не найден",
+        `Пользователь не найден по нику ${nickname}`,
         meta
       );
 
