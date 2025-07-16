@@ -1,12 +1,17 @@
 import { Scenes } from "telegraf";
-import chooseNicknameScene from "./chooseNickname/scene";
-import recordDemoScene from "./recordDemo/scene";
-import recordVideoScene from "./recordVideo/scene";
-import battleScene from "./battle/scene";
-import comboScene from "./combo/scene";
-import { PaginationData } from "./pagination/action";
+import {
+  PaginationData,
+  createSquadScene,
+  inviteMemberScene,
+  chooseNicknameScene,
+  recordDemoScene,
+  recordVideoScene,
+  battleScene,
+  comboScene,
+} from ".";
 import { UserDto, DemoDto } from "@domain/dtos";
 import { RawUser } from "@domain/types";
+import { SquadData } from "./squad/types";
 
 export interface SessionData extends Scenes.SceneSessionData {
   nickname?: string;
@@ -14,6 +19,7 @@ export interface SessionData extends Scenes.SceneSessionData {
   video?: { description?: string; demo?: DemoDto };
   pagination?: PaginationData<unknown>;
   battleId?: string;
+  squadData?: SquadData;
 }
 
 export interface MyContext extends Scenes.SceneContext<SessionData> {
@@ -26,4 +32,6 @@ export const stage = new Scenes.Stage<MyContext>([
   recordVideoScene,
   battleScene,
   comboScene,
+  createSquadScene,
+  inviteMemberScene,
 ]);

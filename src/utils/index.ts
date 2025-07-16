@@ -1,6 +1,6 @@
+import { Markup } from "telegraf";
 import { SquadMemberDto } from "@domain/dtos";
 import { SquadMemberRole } from "@prisma/generated";
-import { Markup } from "telegraf";
 
 export function formatDateToDDMMYYYY(date: Date): string {
   if (isNaN(date.getTime())) {
@@ -77,4 +77,56 @@ export function formatSquadMembers(members: SquadMemberDto[]): string[] {
       member.user.nickname
     }](${username}) — ${member.user.seasonalFame} Fame`;
   });
+}
+
+export function getSquadKeyboardByRole(
+  role: SquadMemberRole,
+  squadName: string
+) {
+  const BUTTONS = {
+    KICK_MEMBER: {
+      text: "👨🏿‍⚖️ Выгнать",
+      callback: `KICK_MEMBER_${squadName}`,
+    },
+    INVITE_MEMBER: {
+      text: "👶🏿 Пригласить",
+      callback: `INVITE_MEMBER_${squadName}`,
+    },
+    LEAVE_SQUAD: {
+      text: "🏃🏿 Покинуть объединение",
+      callback: `LEAVE_SQUAD_${squadName}`,
+    },
+    CHANGE_ROLE: {
+      text: "👨🏿‍💼 Настроить роли",
+      callback: `CHANGE_ROLE_${squadName}`,
+    },
+    DELETE_SQUAD: {
+      text: "👊🏿 Распустить",
+      callback: `DELETE_SQUAD_${squadName}`,
+    },
+    TRANSFER_OWNERSHIP: {
+      text: "👏🏿 Передать объединение",
+      callback: `TRANSFER_OWNERSHIP_${squadName}`,
+    },
+  };
+
+  switch (role) {
+    case SquadMemberRole.ADMIN:
+      return Markup.inlineKeyboard([
+        [toButton(BUTTONS.KICK_MEMBER)],
+        [toButton(BUTTONS.INVITE_MEMBER)],
+        [toButton(BUTTONS.LEAVE_SQUAD)],
+        [toButton(BUTTONS.CHANGE_ROLE)],
+        [toButton(BUTTONS.DELETE_SQUAD)],
+        [toButton(BUTTONS.TRANSFER_OWNERSHIP)],
+      ]);
+    case SquadMemberRole.RECRUITER:
+      return Markup.inlineKeyboard([
+        [toButton(BUTTONS.INVITE_MEMBER)],
+        [toButton(BUTTONS.LEAVE_SQUAD)],
+      ]);
+    case SquadMemberRole.MEMBER:
+    default:
+      return Markup.inlineKeyboard([[toButton(BUTTONS.LEAVE_SQUAD)]]);
+  }
 }

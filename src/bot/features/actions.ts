@@ -1,15 +1,20 @@
 import { Telegraf } from "telegraf";
 import { MyContext } from "./scenes";
-import { registerDeleteMessageAction } from "./deleteMessage/action";
-import { showActivitiesAction } from "./showActivities/action";
-import { recordDemoAction } from "./recordDemo/action";
-import { paginateActions } from "./pagination/action";
-import { showDemosAction } from "./showDemos/action";
-import { deleteDemoAction } from "./deleteDemo/action";
-import { showEquipmentAction } from "./showEquipment/action";
-import { showTopAction } from "./showTop/action";
-import { recordVideoAction } from "./recordVideo/action";
-import { battleActions } from "./battle/action";
+import {
+  battleActions,
+  createSquadAction,
+  deleteDemoAction,
+  inviteMemberActions,
+  paginateActions,
+  recordDemoAction,
+  recordVideoAction,
+  registerDeleteMessageAction,
+  showActivitiesAction,
+  showDemosAction,
+  showEquipmentAction,
+  showSquadAction,
+  showTopAction,
+} from ".";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   registerDeleteMessageAction(bot);
@@ -22,4 +27,7 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   recordVideoAction(bot);
   paginateActions(bot);
   battleActions(bot);
+  showSquadAction(bot);
+  createSquadAction(bot);
+  inviteMemberActions(bot);
 };
