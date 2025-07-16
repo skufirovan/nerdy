@@ -13,3 +13,7 @@ export type RawUser = {
 export type UserEquipmentWithEquipment = Prisma.UserEquipmentGetPayload<{
   include: { equipment: true };
 }>;
+
+export type SquadMemberWithUser = Prisma.SquadMemberGetPayload<{
+  include: { user: true };
+}>;
