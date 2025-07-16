@@ -10,7 +10,7 @@ import {
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { isValidCombo } from "@utils/index";
 
-const comboScene = new Scenes.BaseScene<MyContext>("combo");
+export const comboScene = new Scenes.BaseScene<MyContext>("combo");
 
 comboScene.enter(async (ctx: MyContext) => {
   const session = ctx.session as SessionData;
@@ -103,5 +103,3 @@ comboScene.leave((ctx) => {
   const session = ctx.session as SessionData;
   delete session.battleId;
 });
-
-export default comboScene;

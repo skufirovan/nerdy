@@ -6,7 +6,7 @@ import { battleManager, battleTimeoutService } from "@core/GameLogic/battle";
 import { UserDto } from "@domain/dtos";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
-const battleScene = new Scenes.BaseScene<MyContext>("battle");
+export const battleScene = new Scenes.BaseScene<MyContext>("battle");
 
 battleScene.enter(async (ctx: MyContext) => {
   if ((ctx.session as SessionData).battleId) {
@@ -31,7 +31,8 @@ battleScene.on(message("text"), async (ctx: MyContext) => {
     );
 
     if (!user2) {
-      return await ctx.reply("❌ МС с таким ником не найден, попробуй еще раз");
+      await ctx.reply("❌ МС с таким ником не найден");
+      return await ctx.scene.leave();
     }
     if (user2.accountId === user!.accountId) {
       return await ctx.reply("❌ Ты не можешь вызвать сам себя");
@@ -85,5 +86,3 @@ battleScene.on(message("text"), async (ctx: MyContext) => {
 
   await ctx.scene.leave();
 });
-
-export default battleScene;

@@ -4,9 +4,11 @@ import { MyContext, SessionData } from "../scenes";
 import { mainKeyboard } from "@bot/handlers/handleStart/keyboard";
 import { UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import { NicknameError, validateNickname } from "@utils/index";
+import { ValidationError, validate } from "@utils/index";
 
-const chooseNicknameScene = new Scenes.BaseScene<MyContext>("chooseNickname");
+export const chooseNicknameScene = new Scenes.BaseScene<MyContext>(
+  "chooseNickname"
+);
 
 chooseNicknameScene.enter(async (ctx: MyContext) => {
   await ctx.reply(
@@ -22,9 +24,9 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
   const nickname = ctx.message.text.trim();
   const session = ctx.session as SessionData;
 
-  const validation = validateNickname(nickname);
+  const validation = validate(nickname);
   if (!validation.isValid) {
-    const errorMessages: Record<NicknameError, string> = {
+    const errorMessages: Record<ValidationError, string> = {
       TOO_SHORT: "Ник короткий, прям как твой..",
       TOO_LONG: "Ник слишком длинный (максимум 40 символов)",
       INVALID_CHARS: "Можно использовать только буквы, цифры и _-.,!?",
@@ -61,5 +63,3 @@ chooseNicknameScene.on(message("text"), async (ctx: MyContext) => {
     await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
   }
 });
-
-export default chooseNicknameScene;

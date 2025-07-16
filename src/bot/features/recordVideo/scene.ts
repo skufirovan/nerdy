@@ -5,7 +5,7 @@ import { MyContext, SessionData } from "../scenes";
 import { VideoController, DemoController, UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
-const recordVideoScene = new Scenes.BaseScene<MyContext>("recordVideo");
+export const recordVideoScene = new Scenes.BaseScene<MyContext>("recordVideo");
 
 recordVideoScene.enter(async (ctx: MyContext) => {
   const session = ctx.session as SessionData;
@@ -83,5 +83,3 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
     await ctx.scene.leave();
   }
 });
-
-export default recordVideoScene;

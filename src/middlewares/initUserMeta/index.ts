@@ -1,4 +1,4 @@
-import { MyContext, SessionData } from "@bot/features/scenes";
+import { MyContext } from "@bot/features/scenes";
 
 export const initUserMeta = async (
   ctx: MyContext,

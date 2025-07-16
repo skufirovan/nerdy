@@ -1,6 +1,6 @@
 import { UserEquipmentWithEquipment } from "@domain/types";
 import { prisma } from "@prisma/client";
-import { EQUIPMENT_TYPE, UserEquipment } from "@prisma/generated";
+import { EQUIPMENT_TYPE } from "@prisma/generated";
 
 export class UserEquipmentRepository {
   static async create(

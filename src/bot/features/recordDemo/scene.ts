@@ -9,7 +9,7 @@ import {
 } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 
-const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
+export const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
 
 recordDemoScene.enter(async (ctx: MyContext) => {
   const session = ctx.session as SessionData;
@@ -85,5 +85,3 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
     await ctx.scene.leave();
   }
 });
-
-export default recordDemoScene;
