@@ -12,6 +12,7 @@ export const showTopAction = (bot: Telegraf<MyContext>) => {
       await ctx.answerCbQuery();
 
       const seasonTop = await UserController.findTopUsersByField(
+        ctx.user!.accountId,
         "seasonalFame"
       );
 
@@ -47,7 +48,10 @@ export const showTopAction = (bot: Telegraf<MyContext>) => {
     try {
       await ctx.answerCbQuery();
 
-      const allTimeTop = await UserController.findTopUsersByField("fame");
+      const allTimeTop = await UserController.findTopUsersByField(
+        ctx.user!.accountId,
+        "fame"
+      );
 
       const text = allTimeTop
         .map(

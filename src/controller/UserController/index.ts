@@ -64,11 +64,16 @@ export class UserController {
   }
 
   static async findTopUsersByField(
+    accountId: bigint,
     field: keyof Pick<User, "fame" | "seasonalFame">,
     limit: number = 10
   ): Promise<UserDto[]> {
     try {
-      const users = await UserService.findTopUsersByField(field, limit);
+      const users = await UserService.findTopUsersByField(
+        accountId,
+        field,
+        limit
+      );
       return users.map((user) => new UserDto(user));
     } catch (error) {
       throw error;
