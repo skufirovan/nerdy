@@ -4,10 +4,6 @@ import { MyContext } from "@bot/features/scenes";
 import { menuKeyboard } from "./keyboard";
 
 export const handleMenu = async (ctx: MyContext) => {
-  const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
-  const username = ctx.from?.username ?? null;
-
-  const meta = { accountId, username };
   const imagePath = path.resolve(__dirname, "../../assets/images/MENU.png");
 
   try {
@@ -25,7 +21,7 @@ export const handleMenu = async (ctx: MyContext) => {
       "error",
       "handleProfile",
       `Произошла ошибка при переходе в профиль: ${(error as Error).message}`,
-      meta
+      { accountId: ctx.user!.accountId, username: ctx.user!.username }
     );
   }
 };

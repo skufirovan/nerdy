@@ -1,6 +1,6 @@
 export * from "./battle/action";
 export * from "./battle/scene";
-export * from "./chooseNickname/scene";
+export * from "./userInit/scene";
 export * from "./combo/scene";
 export * from "./deleteDemo/action";
 export * from "./deleteMessage/action";

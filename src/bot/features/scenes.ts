@@ -4,19 +4,18 @@ import {
   createSquadScene,
   inviteMemberScene,
   kickMemberScene,
-  chooseNicknameScene,
+  userInitScene,
   recordDemoScene,
   recordVideoScene,
   battleScene,
   comboScene,
   changeSquadMemberRoleScene,
 } from ".";
-import { UserDto, DemoDto } from "@domain/dtos";
+import { DemoDto } from "@domain/dtos";
 import { RawUser } from "@domain/types";
 import { SquadData } from "./squad/types";
 
 export interface SessionData extends Scenes.SceneSessionData {
-  nickname?: string;
   demo?: { name?: string; text?: string };
   video?: { description?: string; demo?: DemoDto };
   pagination?: PaginationData<unknown>;
@@ -25,11 +24,11 @@ export interface SessionData extends Scenes.SceneSessionData {
 }
 
 export interface MyContext extends Scenes.SceneContext<SessionData> {
-  user?: RawUser | UserDto;
+  user?: RawUser;
 }
 
 export const stage = new Scenes.Stage<MyContext>([
-  chooseNicknameScene,
+  userInitScene,
   recordDemoScene,
   recordVideoScene,
   battleScene,

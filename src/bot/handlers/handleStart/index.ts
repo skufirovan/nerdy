@@ -1,19 +1,15 @@
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext } from "@bot/features/scenes";
+import { UserController } from "@controller";
+import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { mainKeyboard } from "./keyboard";
 import { CHANNEL_LINK, SECTION_EMOJI } from "@utils/constants";
 
 export const handleStart = async (ctx: MyContext) => {
-  const accountId = ctx.from?.id ? BigInt(ctx.from.id) : null;
-  const username = ctx.from?.username ?? null;
-
-  const meta = {
-    accountId,
-    username,
-  };
+  const accountId = ctx.user!.accountId;
+  const username = ctx.user!.username;
 
   try {
-    return await ctx.reply(
+    await ctx.reply(
       [
         `${SECTION_EMOJI} Ты в [NERDY](${CHANNEL_LINK}) — игре, где тебе предстоит подняться с самого дна ск айсберга\n`,
         `➖ Тут все просто — закупай оборудку, пиши демочки, записывай диссы на леймов\n`,
@@ -25,6 +21,11 @@ export const handleStart = async (ctx: MyContext) => {
         ...mainKeyboard,
       }
     );
+
+    let user = await UserController.findByAccountId(accountId);
+    if (!user) {
+      await ctx.scene.enter("userInit");
+    }
   } catch (error) {
     await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
 
@@ -32,7 +33,7 @@ export const handleStart = async (ctx: MyContext) => {
       "error",
       "handleStart",
       `Произошла ошибка при выполнении /start: ${(error as Error).message}`,
-      meta
+      { accountId, username }
     );
   }
 };
