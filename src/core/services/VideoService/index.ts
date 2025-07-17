@@ -10,10 +10,6 @@ export class VideoService {
     demoId: bigint,
     description: string
   ): Promise<Video> {
-    const meta = {
-      accountId,
-    };
-
     try {
       const videos = await this.findByAccountId(accountId);
 
@@ -30,49 +26,50 @@ export class VideoService {
         lastVideoRecordedAt: new Date(),
       });
 
-      serviceLogger("info", "VideoService.create", "Создано новое видео", meta);
+      serviceLogger("info", "VideoService.create", "Создано новое видео", {
+        accountId,
+      });
 
       return video;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "VideoService.create",
-        "Ошибка при создании видео",
-        meta
+        `Ошибка при создании видео: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при создании видео");
     }
   }
 
   static async findByAccountId(accountId: bigint): Promise<Video[]> {
-    const meta = { accountId };
-
     try {
       const videos = await VideoRepository.findByAccountId(accountId);
       return videos;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "VideoService.findByAccountId",
-        "Ошибка при получении видео",
-        meta
+        `Ошибка при поиске видео: ${err}`,
+        { accountId }
       );
-      throw new Error("Ошибка при получении видео");
+      throw new Error("Ошибка при поиске видео");
     }
   }
 
   static async delete(accountId: bigint, description: string): Promise<Video> {
-    const meta = { accountId };
-
     try {
       const deletedVideo = await VideoRepository.delete(accountId, description);
       return deletedVideo;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "VideoService.delete",
-        "Ошибка при удалении видео",
-        meta
+        `Ошибка при удалении видео: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при удалении видео");
     }
@@ -82,8 +79,6 @@ export class VideoService {
     canRecord: boolean;
     remainingTimeText?: string;
   }> {
-    const meta = { accountId };
-
     try {
       const user = await UserService.findByAccountId(accountId);
       if (!user) throw new Error("Пользователь не найден");
@@ -105,11 +100,12 @@ export class VideoService {
         };
       }
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "VideoService.canRecord",
-        "Ошибка при проверке возможности записи видео",
-        meta
+        `Ошибка при проверке возможности записи видео: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при проверке возможности записи видео");
     }

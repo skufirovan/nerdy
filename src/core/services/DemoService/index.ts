@@ -10,10 +10,6 @@ export class DemoService {
     name: string,
     text: string
   ): Promise<Demo> {
-    const meta = {
-      accountId,
-    };
-
     try {
       const demos = await this.findByAccountId(accountId);
 
@@ -26,34 +22,38 @@ export class DemoService {
         lastDemoRecordedAt: new Date(),
       });
 
-      serviceLogger("info", "DemoService.create", "Новая демка создана", meta);
+      serviceLogger("info", "DemoService.create", "Новая демка создана", {
+        accountId,
+      });
 
       return demo;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "DemoService.create",
-        "Ошибка при создании демки",
-        meta
+        `Ошибка при создании демки: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при создании демки");
     }
   }
 
   static async findByAccountId(accountId: bigint): Promise<Demo[]> {
-    const meta = { accountId };
-
     try {
       const demos = await DemoRepository.findByAccountId(accountId);
       return demos;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "DemoService.findByAccountId",
-        "Ошибка при получении демок",
-        meta
+        `Ошибка при поиске демок: ${err}`,
+        {
+          accountId,
+        }
       );
-      throw new Error("Ошибка при получении демок");
+      throw new Error("Ошибка при поиске демок");
     }
   }
 
@@ -61,34 +61,35 @@ export class DemoService {
     accountId: bigint,
     name: string
   ): Promise<Demo | null> {
-    const meta = { accountId };
-
     try {
       const demo = await DemoRepository.findByName(accountId, name);
       return demo;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "DemoService.findByName",
-        "Ошибка при получении демок",
-        meta
+        `Ошибка при поиске демки: ${err}`,
+        { accountId }
       );
-      throw new Error("Ошибка при получении демок");
+      throw new Error("Ошибка при поиске демки");
     }
   }
 
   static async delete(accountId: bigint, name: string): Promise<Demo> {
-    const meta = { accountId };
-
     try {
       const deletedDemo = await DemoRepository.delete(accountId, name);
+      serviceLogger("info", "DemoService.delete", "Демка удалена", {
+        accountId,
+      });
       return deletedDemo;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "DemoService.delete",
-        "Ошибка при удалении демки",
-        meta
+        `Ошибка при удалении демки: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при удалении демки");
     }
@@ -98,8 +99,6 @@ export class DemoService {
     canRecord: boolean;
     remainingTimeText?: string;
   }> {
-    const meta = { accountId };
-
     try {
       const user = await UserService.findByAccountId(accountId);
       if (!user) throw new Error("Пользователь не найден");
@@ -121,11 +120,12 @@ export class DemoService {
         };
       }
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "DemoService.canRecord",
-        "Ошибка при проверке возможности записи демки",
-        meta
+        `Ошибка при проверке возможности записи демки: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при проверке возможности записи демки");
     }

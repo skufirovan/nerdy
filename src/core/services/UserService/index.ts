@@ -44,10 +44,11 @@ export class UserService {
 
       return newUser;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserService.register",
-        `Ошибка регистрации: ${(error as Error).message}`,
+        `Ошибка регистрации: ${err}`,
         meta
       );
       throw new Error("Ошибка при регистрации пользователя");
@@ -55,8 +56,6 @@ export class UserService {
   }
 
   static async findByAccountId(accountId: bigint): Promise<User | null> {
-    const meta = { accountId };
-
     try {
       const user = await UserRepository.findByAccountId(accountId);
 
@@ -68,16 +67,17 @@ export class UserService {
         "warn",
         "UserService.getByAccountId",
         "Пользователь не найден",
-        meta
+        { accountId }
       );
 
       return null;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserService.getByAccountId",
-        `Ошибка получения пользователя: ${(error as Error).message}`,
-        meta
+        `Ошибка получения пользователя: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при получении пользователя");
     }
@@ -87,8 +87,6 @@ export class UserService {
     accountId: bigint,
     nickname: string
   ): Promise<User | null> {
-    const meta = { accountId };
-
     try {
       const user = await UserRepository.findByNickname(nickname);
 
@@ -100,23 +98,24 @@ export class UserService {
         "warn",
         "UserService.getByNickname",
         `Пользователь не найден по нику ${nickname}`,
-        meta
+        { accountId }
       );
 
       return null;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserService.getByNickname",
-        `Ошибка получения пользователя по нику ${nickname}: ${
-          (error as Error).message
-        }`
+        `Ошибка получения пользователя по нику ${nickname}: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при получении пользователя по нику");
     }
   }
 
   static async findTopUsersByField(
+    accountId: bigint,
     field: keyof Pick<User, "fame" | "seasonalFame">,
     limit: number = 10
   ): Promise<User[]> {
@@ -124,14 +123,14 @@ export class UserService {
       const topUsers = await UserRepository.findTopUsersByField(field, limit);
       return topUsers;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserService.findTopUsersByField",
-        `Ошибка получения рейтинга по полю ${field}: ${
-          (error as Error).message
-        }`
+        `Ошибка получения рейтинга по полю ${field}: ${err}`,
+        { accountId }
       );
-      throw new Error("Ошибка при получении пользователя по нику");
+      throw new Error(`Ошибка получения рейтинга по полю ${field}`);
     }
   }
 
@@ -139,10 +138,6 @@ export class UserService {
     accountId: bigint,
     data: Partial<Omit<User, NON_UPDATABLE_USER_FIELDS>>
   ): Promise<User> {
-    const meta = {
-      accountId,
-    };
-
     try {
       const updatedUser = await UserRepository.updateUserInfo(accountId, data);
 
@@ -150,18 +145,19 @@ export class UserService {
         "info",
         "UserService.updateUserInfo",
         `Обновлены данные пользователя ${JSON.stringify(data)}`,
-        meta
+        { accountId }
       );
 
       return updatedUser;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserService.updateUserInfo",
-        `Ошибка при обновлении данных пользователя ${JSON.stringify(data)}: ${
-          (error as Error).message
-        }`,
-        meta
+        `Ошибка при обновлении данных пользователя ${JSON.stringify(
+          data
+        )}: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при обновлении данных пользователя");
     }

@@ -9,10 +9,6 @@ export class UserEquipmentService {
     equipmentId: bigint,
     isEquipped: boolean = false
   ): Promise<UserEquipmentWithEquipment> {
-    const meta = {
-      accountId,
-    };
-
     try {
       const equipment = await UserEquipmentRepository.create(
         accountId,
@@ -20,13 +16,21 @@ export class UserEquipmentService {
         isEquipped
       );
 
+      serviceLogger(
+        "info",
+        "UserEquipmentService.create",
+        `Полученая новая оборудка: ${equipmentId}`,
+        { accountId }
+      );
+
       return equipment;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserEquipmentService.create",
-        "Ошибка при создании оборудования",
-        meta
+        `Ошибка при создании оборудования: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при создании оборудования");
     }
@@ -35,21 +39,18 @@ export class UserEquipmentService {
   static async findByAccountId(
     accountId: bigint
   ): Promise<UserEquipmentWithEquipment[]> {
-    const meta = {
-      accountId,
-    };
-
     try {
       const equipment = await UserEquipmentRepository.findByAccountId(
         accountId
       );
       return equipment;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserEquipmentService.findByAccountId",
-        "Ошибка при поиске оборудования",
-        meta
+        `Ошибка при поиске оборудования: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при поиске оборудования");
     }
@@ -58,19 +59,16 @@ export class UserEquipmentService {
   static async findEquipped(
     accountId: bigint
   ): Promise<UserEquipmentWithEquipment[]> {
-    const meta = {
-      accountId,
-    };
-
     try {
       const equipment = await UserEquipmentRepository.findEquipped(accountId);
       return equipment;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserEquipmentService.findEquipped",
-        "Ошибка при поиске выбранного оборудования",
-        meta
+        `Ошибка при поиске выбранного оборудования: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при поиске выбранного оборудования");
     }
@@ -80,10 +78,6 @@ export class UserEquipmentService {
     accountId: bigint,
     type: EQUIPMENT_TYPE
   ): Promise<UserEquipmentWithEquipment[]> {
-    const meta = {
-      accountId,
-    };
-
     try {
       const equipment = await UserEquipmentRepository.findByType(
         accountId,
@@ -91,11 +85,12 @@ export class UserEquipmentService {
       );
       return equipment;
     } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
         "error",
         "UserEquipmentService.findByType",
-        "Ошибка при поиске оборудования по типу",
-        meta
+        `Ошибка при поиске оборудования по типу: ${err}`,
+        { accountId }
       );
       throw new Error("Ошибка при поиске оборудования по типу");
     }

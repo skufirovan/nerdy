@@ -1,7 +1,7 @@
 import { UserService } from "../UserService";
 import { SquadRepository } from "@infrastructure/repositories";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
-import { Squad, SquadMember, SquadMemberRole } from "@prisma/generated";
+import { Squad, SquadMemberRole } from "@prisma/generated";
 import { SquadMemberWithUser } from "@domain/types";
 
 export class SquadService {
@@ -17,7 +17,17 @@ export class SquadService {
         throw new Error(
           `${accountId} уже состоит в объединении ${existing.squadName}`
         );
-      return await SquadRepository.createSquad(accountId, name);
+
+      const squad = await SquadRepository.createSquad(accountId, name);
+
+      serviceLogger(
+        "info",
+        "SquadService.createSquad",
+        `Создано объединение: ${name}`,
+        { accountId }
+      );
+
+      return squad;
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
@@ -58,7 +68,16 @@ export class SquadService {
           `${userId} уже состоит в объединении ${existing.squadName}`
         );
 
-      return await SquadRepository.addMember(squadName, userId);
+      const member = await SquadRepository.addMember(squadName, userId);
+
+      serviceLogger(
+        "info",
+        "SquadService.addMember",
+        `Новый подписант в объединении: ${squadName}`,
+        { accountId }
+      );
+
+      return member;
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
@@ -138,7 +157,19 @@ export class SquadService {
       if (user.role !== SquadMemberRole.ADMIN)
         throw new Error("Только администратор может удалить объединение");
 
-      return await SquadRepository.deleteSquad(accountId, squadName);
+      const deletedSquad = await SquadRepository.deleteSquad(
+        accountId,
+        squadName
+      );
+
+      serviceLogger(
+        "info",
+        "SquadService.deleteSquad",
+        `Удалено объединение: ${squadName}`,
+        { accountId }
+      );
+
+      return deletedSquad;
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
@@ -169,13 +200,37 @@ export class SquadService {
 
       if (isSelfLeave) {
         if (requester.role !== SquadMemberRole.ADMIN) {
-          return await SquadRepository.deleteSquadMember(squadName, userId);
+          const deletedMember = await SquadRepository.deleteSquadMember(
+            squadName,
+            userId
+          );
+
+          serviceLogger(
+            "info",
+            "SquadService.deleteSquadMember",
+            `Участник покинул объединение: ${squadName}`,
+            { accountId }
+          );
+
+          return deletedMember;
         }
 
         const members = await SquadRepository.findSquadMembers(squadName);
 
         if (members.length <= 1) {
-          return await SquadRepository.deleteSquad(accountId, squadName);
+          const deletedSquad = await SquadRepository.deleteSquad(
+            accountId,
+            squadName
+          );
+
+          serviceLogger(
+            "info",
+            "SquadService.deleteSquad",
+            `Удалено объединение: ${squadName}`,
+            { accountId }
+          );
+
+          return deletedSquad;
         }
 
         const nextOwner =
@@ -194,7 +249,20 @@ export class SquadService {
           "ADMIN"
         );
         await SquadRepository.transferOwnership(squadName, nextOwner.accountId);
-        return await SquadRepository.deleteSquadMember(squadName, userId);
+
+        const deletedMember = await SquadRepository.deleteSquadMember(
+          squadName,
+          userId
+        );
+
+        serviceLogger(
+          "info",
+          "SquadService.deleteSquadMember",
+          `Админ передал права и покинул объединение: ${squadName}`,
+          { accountId }
+        );
+
+        return deletedMember;
       }
 
       if (requester.role !== SquadMemberRole.ADMIN)
@@ -209,7 +277,19 @@ export class SquadService {
           "Администратора или рекрутера нельзя удалить из объединения"
         );
 
-      return await SquadRepository.deleteSquadMember(squadName, userId);
+      const deletedMember = await SquadRepository.deleteSquadMember(
+        squadName,
+        userId
+      );
+
+      serviceLogger(
+        "info",
+        "SquadService.deleteSquadMember",
+        `Удален участник объединения: ${squadName}`,
+        { accountId }
+      );
+
+      return deletedMember;
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
@@ -281,7 +361,16 @@ export class SquadService {
 
       await SquadRepository.changeMemberRole(squadName, accountId, "MEMBER");
       await SquadRepository.changeMemberRole(squadName, userId, "ADMIN");
-      return await SquadRepository.transferOwnership(squadName, userId);
+      const squad = await SquadRepository.transferOwnership(squadName, userId);
+
+      serviceLogger(
+        "info",
+        "SquadService.deleteSquadMember",
+        `Админ передал права на объединение: ${squadName}`,
+        { accountId }
+      );
+
+      return squad;
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
