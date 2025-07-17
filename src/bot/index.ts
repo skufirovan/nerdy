@@ -1,6 +1,10 @@
 import { session, Telegraf } from "telegraf";
 import { config } from "dotenv";
-import { attachUser, initUserMeta } from "@middlewares/index";
+import {
+  attachUser,
+  checkSubscription,
+  initUserMeta,
+} from "@middlewares/index";
 import { MyContext, stage } from "@bot/features/scenes";
 import { registerTelegramActions } from "@bot/features/actions";
 import {
@@ -18,6 +22,7 @@ bot.use(session());
 bot.use(initUserMeta);
 bot.use(stage.middleware());
 bot.use(attachUser);
+bot.use(checkSubscription);
 
 bot.start(handleStart);
 
