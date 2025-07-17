@@ -188,6 +188,11 @@ export class SquadService {
           throw new Error("Не удалось передать права на объединение");
         }
 
+        await SquadRepository.changeMemberRole(
+          squadName,
+          nextOwner.accountId,
+          "ADMIN"
+        );
         await SquadRepository.transferOwnership(squadName, nextOwner.accountId);
         return await SquadRepository.deleteSquadMember(squadName, userId);
       }
@@ -274,6 +279,8 @@ export class SquadService {
       if (!nextAdmin || nextAdmin.squadName !== squadName)
         throw new Error(`${userId} не состоит в объединении ${squadName}`);
 
+      await SquadRepository.changeMemberRole(squadName, accountId, "MEMBER");
+      await SquadRepository.changeMemberRole(squadName, userId, "ADMIN");
       return await SquadRepository.transferOwnership(squadName, userId);
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);

@@ -53,7 +53,8 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
       session.video!.demo = demo;
       return await ctx.reply("💪🏿 Демочка выбрана, накидай описание для видоса");
     } else {
-      return await ctx.reply("😣 Нема демки (( проверь название..");
+      await ctx.reply("😣 Нема демки (( проверь название..");
+      return await ctx.scene.leave();
     }
   }
 

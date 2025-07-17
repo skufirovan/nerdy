@@ -24,8 +24,7 @@ export const deleteDemoAction = (bot: Telegraf<MyContext>) => {
 
       return await ctx.reply(`🗑️ Удалить демку <b>${demoName}</b>?`, {
         reply_markup: Markup.inlineKeyboard([
-          Markup.button.callback("✅ Да", `CONFIRM_DELETE_${demoName}`),
-          Markup.button.callback("❌ Нет", `CANCEL_DELETE`),
+          Markup.button.callback("✅ Да", `CONFIRM_DELETE_DEMO_${demoName}`),
         ]).reply_markup,
         parse_mode: "HTML",
       });
@@ -40,7 +39,7 @@ export const deleteDemoAction = (bot: Telegraf<MyContext>) => {
     }
   });
 
-  bot.action(/^CONFIRM_DELETE_(.+)$/, async (ctx) => {
+  bot.action(/^CONFIRM_DELETE_DEMO_(.+)$/, async (ctx) => {
     await ctx.answerCbQuery();
     const demoName = ctx.match[1];
     const accountId = ctx.user!.accountId;
@@ -59,10 +58,5 @@ export const deleteDemoAction = (bot: Telegraf<MyContext>) => {
       );
       await ctx.reply("🚫 Ошибка при удалении демки");
     }
-  });
-
-  bot.action("CANCEL_DELETE", async (ctx) => {
-    await ctx.answerCbQuery();
-    await ctx.reply("❌ Демка не удалена");
   });
 };

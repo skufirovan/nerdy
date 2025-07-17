@@ -98,15 +98,11 @@ export function getSquadKeyboardByRole(
     },
     CHANGE_ROLE: {
       text: "👨🏿‍💼 Настроить роли",
-      callback: `CHANGE_ROLE_${squadName}`,
+      callback: `PRE-CHANGE_ROLE_${squadName}`,
     },
     DELETE_SQUAD: {
       text: "👊🏿 Распустить",
       callback: `DELETE_SQUAD_${squadName}`,
-    },
-    TRANSFER_OWNERSHIP: {
-      text: "👏🏿 Передать объединение",
-      callback: `TRANSFER_OWNERSHIP_${squadName}`,
     },
   };
 
@@ -118,7 +114,6 @@ export function getSquadKeyboardByRole(
         [toButton(BUTTONS.LEAVE_SQUAD)],
         [toButton(BUTTONS.CHANGE_ROLE)],
         [toButton(BUTTONS.DELETE_SQUAD)],
-        [toButton(BUTTONS.TRANSFER_OWNERSHIP)],
       ]);
     case SquadMemberRole.RECRUITER:
       return Markup.inlineKeyboard([
