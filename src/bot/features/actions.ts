@@ -2,9 +2,13 @@ import { Telegraf } from "telegraf";
 import { MyContext } from "./scenes";
 import {
   battleActions,
+  changeSquadMemberRoleAction,
   createSquadAction,
   deleteDemoAction,
+  deleteSquadAction,
   inviteMemberActions,
+  kickMemberAction,
+  leaveSquadAction,
   paginateActions,
   recordDemoAction,
   recordVideoAction,
@@ -30,4 +34,8 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   showSquadAction(bot);
   createSquadAction(bot);
   inviteMemberActions(bot);
+  leaveSquadAction(bot);
+  deleteSquadAction(bot);
+  kickMemberAction(bot);
+  changeSquadMemberRoleAction(bot);
 };

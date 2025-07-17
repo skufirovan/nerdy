@@ -2,6 +2,7 @@ import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { SquadController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { SECTION_EMOJI } from "@utils/constants";
 
 export const inviteMemberActions = (bot: Telegraf<MyContext>) => {
   bot.action(/^INVITE_MEMBER_(.+)$/, async (ctx) => {
@@ -36,10 +37,19 @@ export const inviteMemberActions = (bot: Telegraf<MyContext>) => {
         return;
       }
 
-      await SquadController.addMember(requesterId, squadName, targetId);
+      const member = await SquadController.addMember(
+        requesterId,
+        squadName,
+        targetId
+      );
       await ctx.editMessageText(`✅ Ты подписан на лейбл <b>${squadName}</b>`, {
         parse_mode: "HTML",
       });
+      await ctx.telegram.sendMessage(
+        String(requesterId),
+        `${SECTION_EMOJI} Теперь <b>${member.user.nickname}</b> — новый подписант лейбла <b>${squadName}</b>`,
+        { parse_mode: "HTML" }
+      );
     } catch (error) {
       userActionsLogger(
         "error",

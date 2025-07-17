@@ -3,11 +3,13 @@ import {
   PaginationData,
   createSquadScene,
   inviteMemberScene,
+  kickMemberScene,
   chooseNicknameScene,
   recordDemoScene,
   recordVideoScene,
   battleScene,
   comboScene,
+  changeSquadMemberRoleScene,
 } from ".";
 import { UserDto, DemoDto } from "@domain/dtos";
 import { RawUser } from "@domain/types";
@@ -34,4 +36,6 @@ export const stage = new Scenes.Stage<MyContext>([
   comboScene,
   createSquadScene,
   inviteMemberScene,
+  kickMemberScene,
+  changeSquadMemberRoleScene,
 ]);
