@@ -1,3 +1,4 @@
+import path from "path";
 import { Telegraf } from "telegraf";
 import { MyContext } from "../../scenes";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
@@ -5,7 +6,11 @@ import { MENU_BUTTONS } from "@bot/handlers";
 import { SquadController, UserController } from "@controller";
 import { SECTION_EMOJI } from "@utils/constants";
 import { createSquadKeyboard } from "./keyboard";
-import { formatSquadMembers, getSquadKeyboardByRole } from "@utils/index";
+import {
+  formatSquadMembers,
+  getRandomImage,
+  getSquadKeyboardByRole,
+} from "@utils/index";
 
 export const showSquadAction = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.SQUAD.callback, async (ctx) => {
@@ -43,13 +48,19 @@ export const showSquadAction = (bot: Telegraf<MyContext>) => {
         membership.squadName
       );
 
-      return await ctx.reply(squadText.join("\n"), {
-        parse_mode: "Markdown",
-        link_preview_options: {
-          is_disabled: true,
-        },
-        reply_markup: squadKeyboard.reply_markup,
-      });
+      const imagePath = await getRandomImage(
+        path.resolve(__dirname, `../../../assets/images/SQUAD`),
+        path.resolve(__dirname, `../../../assets/images/SQUAD/1.jpg`)
+      );
+
+      return await ctx.replyWithPhoto(
+        { source: imagePath },
+        {
+          caption: squadText.join("\n"),
+          parse_mode: "Markdown",
+          reply_markup: squadKeyboard.reply_markup,
+        }
+      );
     } catch (error) {
       userActionsLogger(
         "error",

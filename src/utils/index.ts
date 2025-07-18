@@ -1,6 +1,9 @@
+import fs from "fs/promises";
+import path from "path";
 import { Markup } from "telegraf";
 import { SquadMemberDto } from "@domain/dtos";
 import { SquadMemberRole } from "@prisma/generated";
+import serviceLogger from "@infrastructure/logger/serviceLogger";
 
 export function formatDateToDDMMYYYY(date: Date): string {
   if (isNaN(date.getTime())) {
@@ -123,5 +126,30 @@ export function getSquadKeyboardByRole(
     case SquadMemberRole.MEMBER:
     default:
       return Markup.inlineKeyboard([[toButton(BUTTONS.LEAVE_SQUAD)]]);
+  }
+}
+
+export async function getRandomImage(
+  folderPath: string,
+  fallbackImagePath: string
+): Promise<string> {
+  try {
+    const files = await fs.readdir(folderPath);
+
+    const imageFiles = files.filter((file) =>
+      /\.(jpg|jpeg|png|webp)$/i.test(file)
+    );
+
+    if (imageFiles.length === 0) {
+      return fallbackImagePath;
+    }
+
+    const randomImage =
+      imageFiles[Math.floor(Math.random() * imageFiles.length)];
+    return path.join(folderPath, randomImage);
+  } catch (error) {
+    const err = error instanceof Error ? error.message : String(error);
+    serviceLogger("error", "getRandomImage", err);
+    return fallbackImagePath;
   }
 }
