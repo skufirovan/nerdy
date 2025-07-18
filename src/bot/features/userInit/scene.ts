@@ -1,6 +1,6 @@
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
-import { MyContext } from "../scenes";
+import { MyContext, SessionData } from "../scenes";
 import { mainKeyboard } from "@bot/handlers/handleStart/keyboard";
 import { UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
@@ -51,7 +51,9 @@ userInitScene.on(message("text"), async (ctx: MyContext) => {
     const existedUser = await UserController.findByAccountId(accountId);
 
     if (!existedUser) {
-      await UserController.register(accountId, username, nickname);
+      const session = ctx.session as SessionData;
+      const referralId = session.referral ?? null;
+      await UserController.register(accountId, username, nickname, referralId);
     } else {
       await UserController.updateUserInfo(accountId, { nickname });
     }

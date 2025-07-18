@@ -12,10 +12,16 @@ export class UserController {
   static async register(
     accountId: bigint,
     username: string | null,
-    nickname: string
+    nickname: string,
+    invitedById: bigint | null
   ): Promise<UserDto> {
     try {
-      const user = await UserService.register(accountId, username, nickname);
+      const user = await UserService.register(
+        accountId,
+        username,
+        nickname,
+        invitedById
+      );
       const dto = new UserDto(user);
 
       cache.set(accountId, dto);

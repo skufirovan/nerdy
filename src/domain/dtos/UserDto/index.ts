@@ -8,6 +8,7 @@ export class UserDto {
   readonly fame: number;
   readonly seasonalFame: number;
   readonly hasPass: boolean;
+  readonly invitedUsersCount: number;
   readonly passExpiresAt: Date | null;
   readonly lastDemoRecordedAt: Date | null;
   readonly registeredAt: Date;
@@ -20,6 +21,7 @@ export class UserDto {
     this.fame = user.fame;
     this.seasonalFame = user.seasonalFame;
     this.hasPass = user.hasPass;
+    this.invitedUsersCount = user.invitedUsersCount;
     this.passExpiresAt = user.passExpiresAt;
     this.lastDemoRecordedAt = user.lastDemoRecordedAt;
     this.registeredAt = user.registeredAt;

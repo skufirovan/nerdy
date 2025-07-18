@@ -1,4 +1,4 @@
-import { MyContext } from "@bot/features/scenes";
+import { MyContext, SessionData } from "@bot/features/scenes";
 import { UserController } from "@controller";
 import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { mainKeyboard } from "./keyboard";
@@ -24,6 +24,10 @@ export const handleStart = async (ctx: MyContext) => {
 
     let user = await UserController.findByAccountId(accountId);
     if (!user) {
+      const session = ctx.session as SessionData;
+      const rawPayload = ctx.startPayload;
+      session.referral =
+        rawPayload && /^\d+$/.test(rawPayload) ? BigInt(rawPayload) : null;
       await ctx.scene.enter("userInit");
     }
   } catch (error) {

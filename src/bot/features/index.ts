@@ -12,6 +12,7 @@ export * from "./recordVideo/scene";
 export * from "./showActivities/action";
 export * from "./showDemos/action";
 export * from "./showEquipment/action";
+export * from "./showReferral/action";
 export * from "./showTop/action";
 export * from "./squad/createSquad/action";
 export * from "./squad/createSquad/scene";

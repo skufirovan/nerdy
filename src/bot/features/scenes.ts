@@ -16,6 +16,7 @@ import { RawUser } from "@domain/types";
 import { SquadData } from "./squad/types";
 
 export interface SessionData extends Scenes.SceneSessionData {
+  referral?: bigint | null;
   demo?: { name?: string; text?: string };
   video?: { description?: string; demo?: DemoDto };
   pagination?: PaginationData<unknown>;
@@ -24,6 +25,7 @@ export interface SessionData extends Scenes.SceneSessionData {
 }
 
 export interface MyContext extends Scenes.SceneContext<SessionData> {
+  startPayload?: string;
   user?: RawUser;
 }
 

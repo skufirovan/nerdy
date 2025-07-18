@@ -16,6 +16,7 @@ import {
   showActivitiesAction,
   showDemosAction,
   showEquipmentAction,
+  showReferralAction,
   showSquadAction,
   showTopAction,
 } from ".";
@@ -38,4 +39,5 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   deleteSquadAction(bot);
   kickMemberAction(bot);
   changeSquadMemberRoleAction(bot);
+  showReferralAction(bot);
 };

@@ -8,7 +8,8 @@ export class UserService {
   static async register(
     accountId: bigint,
     username: string | null,
-    nickname: string
+    nickname: string,
+    invitedById: bigint | null
   ): Promise<User> {
     const meta = {
       accountId,
@@ -18,18 +19,22 @@ export class UserService {
     try {
       const existingUser = await this.findByAccountId(accountId);
 
-      if (existingUser) {
-        if (existingUser.username !== username) {
-          await this.updateUserInfo(accountId, { username });
-          return { ...existingUser, username };
+      if (existingUser) return existingUser;
+
+      if (invitedById && invitedById !== accountId) {
+        const inviting = await UserRepository.findByAccountId(invitedById);
+        if (inviting) {
+          await UserRepository.updateUserInfo(invitedById, {
+            invitedUsersCount: inviting.invitedUsersCount + 1,
+          });
         }
-        return existingUser;
       }
 
       const newUser = await UserRepository.create(
         accountId,
         username,
-        nickname
+        nickname,
+        invitedById
       );
       await UserEquipmentService.create(accountId, BigInt(1), true);
       await UserEquipmentService.create(accountId, BigInt(2), true);

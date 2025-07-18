@@ -6,13 +6,15 @@ export class UserRepository {
   static async create(
     accountId: bigint,
     username: string | null,
-    nickname: string
+    nickname: string,
+    invitedById: bigint | null
   ): Promise<User> {
     return prisma.user.create({
       data: {
         accountId,
         username,
         nickname,
+        invitedById,
       },
     });
   }
