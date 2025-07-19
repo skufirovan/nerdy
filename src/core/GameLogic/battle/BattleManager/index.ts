@@ -1,4 +1,5 @@
 import { MyContext } from "@bot/features/scenes";
+import { serviceLogger } from "@infrastructure/logger";
 
 export type Player = {
   accountId: bigint;
@@ -37,6 +38,12 @@ class BattleManager {
     };
     this.battles.set(id, battle);
 
+    serviceLogger(
+      "info",
+      "BattleManager.createBattle",
+      `${battle?.id} - ${battle?.player1.username}`
+    );
+
     return battle;
   }
 
@@ -47,6 +54,12 @@ class BattleManager {
     battle.player2 = player2;
     battle.status = "preparing_combos";
 
+    serviceLogger(
+      "info",
+      "BattleManager.acceptBattle",
+      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+    );
+
     return battle;
   }
 
@@ -56,6 +69,12 @@ class BattleManager {
 
     battle.status = "canceled";
     this.battles.delete(id);
+
+    serviceLogger(
+      "info",
+      "BattleManager.cancelBattle",
+      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+    );
   }
 
   setCombo(id: string, accountId: bigint, combo: string): Battle | null {
@@ -72,6 +91,12 @@ class BattleManager {
       battle.status = "resolving_battle";
     }
 
+    serviceLogger(
+      "info",
+      "BattleManager.setCombo",
+      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+    );
+
     return battle;
   }
 
@@ -81,13 +106,34 @@ class BattleManager {
 
     battle.status = "finished";
     this.battles.delete(id);
+
+    serviceLogger(
+      "info",
+      "BattleManager.finishBattle",
+      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+    );
   }
 
   getBattle(id: string): Battle | undefined {
-    return this.battles.get(id);
+    const battle = this.battles.get(id);
+
+    serviceLogger(
+      "info",
+      "BattleManager.getBattle",
+      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+    );
+    return battle;
   }
 
   deleteBattle(id: string) {
+    const battle = this.battles.get(id);
+
+    serviceLogger(
+      "info",
+      "BattleManager.getBattle",
+      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+    );
+
     this.battles.delete(id);
   }
 }
