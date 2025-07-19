@@ -1,9 +1,10 @@
+import path from "path";
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { UserController } from "@controller";
 import { battleManager, battleTimeoutService } from "@core/GameLogic/battle";
-import { requireUser, handleError } from "@utils/index";
+import { getRandomImage, requireUser, handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
 export const battleScene = new Scenes.BaseScene<MyContext>("battle");
@@ -21,8 +22,15 @@ battleScene.enter(async (ctx: MyContext) => {
       return ctx.scene.leave();
     }
 
-    await ctx.reply(
-      `${SECTION_EMOJI} МС справа — ${user.nickname}, введи ник МС слева`
+    const imagePath = await getRandomImage(
+      path.resolve(__dirname, `../../assets/images/BATTLE`),
+      path.resolve(__dirname, `../../assets/images/BATTLE/1.jpg`)
+    );
+    await ctx.replyWithPhoto(
+      { source: imagePath },
+      {
+        caption: `${SECTION_EMOJI} МС справа — ${user.nickname}, введи ник МС слева`,
+      }
     );
   } catch (error) {
     await handleError(ctx, error, "battleScene.enter");

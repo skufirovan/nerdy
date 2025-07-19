@@ -5,13 +5,8 @@ import { getRandomImage, handleError } from "@utils/index";
 
 export const handleMenu = async (ctx: MyContext) => {
   try {
-    const imagePath = await getRandomImage(
-      path.resolve(__dirname, `../../assets/images/MENU`),
-      path.resolve(__dirname, `../../assets/images/MENU/1.jpg`)
-    );
-
     return await ctx.replyWithPhoto(
-      { source: imagePath },
+      { source: path.resolve(__dirname, `../../assets/images/MENU/4.jpg`) },
       {
         caption: "",
         ...menuKeyboard,

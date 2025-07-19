@@ -1,8 +1,9 @@
+import path from "path";
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { VideoController, DemoController, UserController } from "@controller";
-import { handleError } from "@utils/index";
+import { getRandomImage, handleError } from "@utils/index";
 
 export const recordVideoScene = new Scenes.BaseScene<MyContext>("recordVideo");
 
@@ -16,8 +17,13 @@ recordVideoScene.enter(async (ctx: MyContext) => {
     );
 
     if (!canRecord) {
-      await ctx.reply(
-        `☁️ Охлади траханье, приходи через ${remainingTimeText!}`
+      const imagePath = await getRandomImage(
+        path.resolve(__dirname, `../../assets/images/REMAINING`),
+        path.resolve(__dirname, `../../assets/images/REMAINING/1.jpg`)
+      );
+      await ctx.replyWithPhoto(
+        { source: imagePath },
+        { caption: `☁️ Охлади траханье, приходи через ${remainingTimeText!}` }
       );
       return ctx.scene.leave();
     }
@@ -62,8 +68,11 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
       await VideoController.create(accountId, demoId, description);
       await UserController.addFame(accountId, amount);
 
-      await ctx.reply(
-        `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${amount} фейма`
+      await ctx.replyWithAnimation(
+        { source: path.resolve(__dirname, `../../assets/images/VIDEO/1.gif`) },
+        {
+          caption: `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${amount} фейма`,
+        }
       );
       delete session.video;
       await ctx.scene.leave();
