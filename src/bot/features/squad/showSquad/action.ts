@@ -1,7 +1,6 @@
 import path from "path";
 import { Telegraf } from "telegraf";
 import { MyContext } from "../../scenes";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MENU_BUTTONS } from "@bot/handlers";
 import { SquadController, UserController } from "@controller";
 import { SECTION_EMOJI } from "@utils/constants";
@@ -10,13 +9,16 @@ import {
   formatSquadMembers,
   getRandomImage,
   getSquadKeyboardByRole,
+  handleError,
 } from "@utils/index";
 
 export const showSquadAction = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.SQUAD.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();
+
       const accountId = ctx.user!.accountId;
+
       const user = await UserController.findByAccountId(accountId);
       const membership = await SquadController.findMembershipByUserId(
         accountId
@@ -53,7 +55,7 @@ export const showSquadAction = (bot: Telegraf<MyContext>) => {
         path.resolve(__dirname, `../../../assets/images/SQUAD/1.jpg`)
       );
 
-      return await ctx.replyWithPhoto(
+      await ctx.replyWithPhoto(
         { source: imagePath },
         {
           caption: squadText.join("\n"),
@@ -62,13 +64,7 @@ export const showSquadAction = (bot: Telegraf<MyContext>) => {
         }
       );
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "showSquadAction",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("❌ Не удалось открыть раздел. Попробуй позже.");
+      await handleError(ctx, error, "showSquadAction");
     }
   });
 };

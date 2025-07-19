@@ -7,39 +7,43 @@ import {
   formatResult,
   simulateBattle,
 } from "@core/GameLogic/battle";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import { isValidCombo } from "@utils/index";
+import { handleError, isValidCombo } from "@utils/index";
 
 export const comboScene = new Scenes.BaseScene<MyContext>("combo");
 
 comboScene.enter(async (ctx: MyContext) => {
-  const session = ctx.session as SessionData;
-  const battle = battleManager.getBattle(session.battleId!);
+  try {
+    const session = ctx.session as SessionData;
+    const battle = battleManager.getBattle(session.battleId!);
 
-  if (!battle) {
-    await ctx.reply("❌ Баттл не найден или уже завершен");
+    if (!battle) {
+      await ctx.reply("❌ Баттл не найден или уже завершен");
+      return ctx.scene.leave();
+    }
+
+    battleTimeoutService.startComboTimeout(battle!.id, async () => {
+      await battle.player1.ctx.reply(
+        `❌ Один из игроков не отправил комбо вовремя. Баттл отменен`
+      );
+      await battle.player2!.ctx.reply(
+        `❌ Один из игроков не отправил комбо вовремя. Баттл отменен`
+      );
+      return ctx.scene.leave();
+    });
+
+    await ctx.reply(
+      [
+        "🕸 Введи комбо из 4 команд\n",
+        "1. Включить оппу макана",
+        "2. Въебать со спины",
+        "3. Надеть беруши",
+        "4. Резко обернуться",
+      ].join("\n")
+    );
+  } catch (error) {
+    await handleError(ctx, error, "comboScene.enter");
     return ctx.scene.leave();
   }
-
-  battleTimeoutService.startComboTimeout(battle!.id, async () => {
-    await battle.player1.ctx.reply(
-      `❌ Один из игроков не отправил комбо вовремя. Баттл отменен`
-    );
-    await battle.player2!.ctx.reply(
-      `❌ Один из игроков не отправил комбо вовремя. Баттл отменен`
-    );
-    return ctx.scene.leave();
-  });
-
-  await ctx.reply(
-    [
-      "🕸 Введи комбо из 4 команд\n",
-      "1. Включить оппу макана",
-      "2. Въебать со спины",
-      "3. Надеть беруши",
-      "4. Резко обернуться",
-    ].join("\n")
-  );
 });
 
 comboScene.on(message("text"), async (ctx: MyContext) => {
@@ -47,9 +51,9 @@ comboScene.on(message("text"), async (ctx: MyContext) => {
     return await ctx.reply("⚠️ Отправь текст ТЕКСТ #ТЕКСТ");
   }
 
-  const combo = ctx.message.text.trim();
   const user = ctx.user;
   const session = ctx.session as SessionData;
+  const combo = ctx.message.text.trim();
 
   try {
     if (!isValidCombo(combo)) {
@@ -69,6 +73,7 @@ comboScene.on(message("text"), async (ctx: MyContext) => {
 
     if (battle.status === "resolving_battle") {
       battleTimeoutService.clearComboTimeout(battle.id);
+
       const result = simulateBattle(
         battle.player1.combo!,
         battle.player2!.combo!
@@ -90,12 +95,13 @@ comboScene.on(message("text"), async (ctx: MyContext) => {
       });
 
       battleManager.finishBattle(battle.id);
+
+      await battle.player1.ctx.scene.leave();
+      await battle.player2!.ctx.scene.leave();
     }
   } catch (error) {
-    userActionsLogger("error", "comboScene", `${(error as Error).message}`, {
-      accountId: ctx.user!.accountId,
-    });
-    return await ctx.reply("🚫 Произошла ошибка");
+    await handleError(ctx, error, "comboScene.on");
+    return ctx.scene.leave();
   }
 });
 

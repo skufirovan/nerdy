@@ -1,12 +1,11 @@
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { UserController } from "@controller";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { mainKeyboard } from "./keyboard";
 import { CHANNEL_LINK, SECTION_EMOJI } from "@utils/constants";
+import { handleError } from "@utils/index";
 
 export const handleStart = async (ctx: MyContext) => {
   const accountId = ctx.user!.accountId;
-  const username = ctx.user!.username;
 
   try {
     await ctx.reply(
@@ -31,13 +30,6 @@ export const handleStart = async (ctx: MyContext) => {
       await ctx.scene.enter("userInit");
     }
   } catch (error) {
-    await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
-
-    userActionsLogger(
-      "error",
-      "handleStart",
-      `Произошла ошибка при выполнении /start: ${(error as Error).message}`,
-      { accountId, username }
-    );
+    await handleError(ctx, error, "handleStart");
   }
 };

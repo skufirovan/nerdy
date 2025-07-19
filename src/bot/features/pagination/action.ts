@@ -1,9 +1,8 @@
 import { Telegraf } from "telegraf";
 import { InlineKeyboardMarkup } from "telegraf/typings/core/types/typegram";
 import { MyContext, SessionData } from "../scenes";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { DemoDto, UserEquipmentDto } from "@domain/dtos";
-import { formatDateToDDMMYYYY, hasCaption } from "@utils/index";
+import { formatDateToDDMMYYYY, hasCaption, handleError } from "@utils/index";
 import { PAGINATE_BUTTONS } from "./keyboard";
 
 export interface PaginationData<T> {
@@ -17,6 +16,7 @@ export function formatPaginated(item: unknown, type: string): string {
   switch (type) {
     case "demos":
       const demo = item as DemoDto;
+
       return [
         `🎤 <b>${demo.name}</b>`,
         `🕓 ${formatDateToDDMMYYYY(demo.recordedAt)}`,
@@ -32,6 +32,7 @@ export function formatPaginated(item: unknown, type: string): string {
           : equipment.type === "HEADPHONES"
           ? "🎧"
           : "🎛";
+
       return [
         `${emoji} <b>${equipment.brand} ${equipment.model}</b>`,
         "",
@@ -85,12 +86,7 @@ export const paginateActions = (bot: Telegraf<MyContext>) => {
         session.pagination = pagination;
       }
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "paginateActions",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
+      await handleError(ctx, error, "paginateActions_next");
     }
   });
 
@@ -119,12 +115,7 @@ export const paginateActions = (bot: Telegraf<MyContext>) => {
         session.pagination = pagination;
       }
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "paginateActions",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
+      await handleError(ctx, error, "paginateActions_prev");
     }
   });
 };

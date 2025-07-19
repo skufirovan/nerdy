@@ -7,12 +7,12 @@ import {
   deleteDemoAction,
   deleteSquadAction,
   inviteMemberActions,
+  deleteMessageAction,
   kickMemberAction,
   leaveSquadAction,
   paginateActions,
   recordDemoAction,
   recordVideoAction,
-  registerDeleteMessageAction,
   showActivitiesAction,
   showDemosAction,
   showEquipmentAction,
@@ -22,7 +22,7 @@ import {
 } from ".";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
-  registerDeleteMessageAction(bot);
+  deleteMessageAction(bot);
   deleteDemoAction(bot);
   showActivitiesAction(bot);
   showTopAction(bot);

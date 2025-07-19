@@ -1,13 +1,15 @@
 import path from "path";
 import { MyContext } from "@bot/features/scenes";
 import { UserController } from "@controller";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { profileKeyboard } from "./keyboard";
-import { formatDateToDDMMYYYY, getRandomImage } from "@utils/index";
+import {
+  formatDateToDDMMYYYY,
+  getRandomImage,
+  handleError,
+} from "@utils/index";
 
 export const handleProfile = async (ctx: MyContext) => {
   const accountId = ctx.user!.accountId;
-  const username = ctx.user!.username;
 
   try {
     const user = await UserController.findByAccountId(accountId);
@@ -31,12 +33,6 @@ export const handleProfile = async (ctx: MyContext) => {
       }
     );
   } catch (error) {
-    await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
-    userActionsLogger(
-      "error",
-      "handleProfile",
-      `Произошла ошибка при переходе в профиль: ${(error as Error).message}`,
-      { accountId, username }
-    );
+    await handleError(ctx, error, "handleProfile");
   }
 };

@@ -2,7 +2,7 @@ import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { UserController, SquadController } from "@controller";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
 export const inviteMemberScene = new Scenes.BaseScene<MyContext>(
@@ -14,9 +14,8 @@ inviteMemberScene.enter(async (ctx: MyContext) => {
 });
 
 inviteMemberScene.on(message("text"), async (ctx: MyContext) => {
-  if (!ctx.message || !("text" in ctx.message)) {
+  if (!ctx.message || !("text" in ctx.message))
     return await ctx.reply("⚠️ Отправь текст ТЕКСТ #ТЕКСТ");
-  }
 
   const accountId = ctx.user!.accountId;
   const session = ctx.session as SessionData;
@@ -24,7 +23,7 @@ inviteMemberScene.on(message("text"), async (ctx: MyContext) => {
 
   if (!session.squadData) {
     await ctx.reply("🚫 Данные объединения не найдены. Попробуй снова.");
-    return await ctx.scene.leave();
+    return ctx.scene.leave();
   }
 
   try {
@@ -37,7 +36,7 @@ inviteMemberScene.on(message("text"), async (ctx: MyContext) => {
       await ctx.reply(`❌ <b>${newMemberNickname}</b> это вообще КТО?`, {
         parse_mode: "HTML",
       });
-      return await ctx.scene.leave();
+      return ctx.scene.leave();
     }
 
     const existMembership = await SquadController.findMembershipByUserId(
@@ -48,7 +47,7 @@ inviteMemberScene.on(message("text"), async (ctx: MyContext) => {
       await ctx.reply(`❌ <b>${newMemberNickname}</b> уже подписан на лейбл`, {
         parse_mode: "HTML",
       });
-      return await ctx.scene.leave();
+      return ctx.scene.leave();
     }
 
     ctx.telegram.sendMessage(
@@ -63,10 +62,6 @@ inviteMemberScene.on(message("text"), async (ctx: MyContext) => {
                 text: "✅ Принять",
                 callback_data: `SQUAD_INVITE_ACCEPT_${session.squadData.name}_${session.squadData.requesterId}_${newMember.accountId}`,
               },
-              {
-                text: "❌ Отклонить",
-                callback_data: `SQUAD_INVITE_DECLINE`,
-              },
             ],
           ],
         },
@@ -78,12 +73,7 @@ inviteMemberScene.on(message("text"), async (ctx: MyContext) => {
     );
     await ctx.scene.leave();
   } catch (error) {
-    userActionsLogger(
-      "error",
-      "inviteMemberScene",
-      `${(error as Error).message}`,
-      { accountId }
-    );
-    await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+    await handleError(ctx, error, "inviteMemberScene.on");
+    return ctx.scene.leave();
   }
 });

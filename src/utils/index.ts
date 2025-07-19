@@ -1,9 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
 import { Markup } from "telegraf";
-import { SquadMemberDto } from "@domain/dtos";
+import { MyContext } from "@bot/features/scenes";
+import { UserController } from "@controller";
+import { UserDto, SquadMemberDto } from "@domain/dtos";
 import { SquadMemberRole } from "@prisma/generated";
-import serviceLogger from "@infrastructure/logger/serviceLogger";
+import { userActionsLogger, serviceLogger } from "@infrastructure/logger";
 
 export function formatDateToDDMMYYYY(date: Date): string {
   if (isNaN(date.getTime())) {
@@ -152,4 +154,35 @@ export async function getRandomImage(
     serviceLogger("error", "getRandomImage", err);
     return fallbackImagePath;
   }
+}
+
+export async function requireUser(ctx: MyContext): Promise<UserDto | null> {
+  const accountId = ctx.user?.accountId;
+  if (!accountId) {
+    await ctx.reply("⚠️ Не удалось определить твой Telegram ID");
+    return null;
+  }
+
+  const user = await UserController.findByAccountId(accountId);
+  if (!user) {
+    await ctx.reply(
+      "🚫 Ты не зарегистрирован. Пропиши /start или обратись к администратору"
+    );
+    return null;
+  }
+
+  return user;
+}
+
+export async function handleError(
+  ctx: MyContext,
+  error: unknown,
+  scope: string
+) {
+  const err = error instanceof Error ? error.message : String(error);
+  userActionsLogger("error", scope, err, {
+    accountId: ctx.user!.accountId,
+    username: ctx.user!.username,
+  });
+  await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
 }

@@ -1,8 +1,7 @@
 import path from "path";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MyContext } from "@bot/features/scenes";
 import { menuKeyboard } from "./keyboard";
-import { getRandomImage } from "@utils/index";
+import { getRandomImage, handleError } from "@utils/index";
 
 export const handleMenu = async (ctx: MyContext) => {
   try {
@@ -19,13 +18,6 @@ export const handleMenu = async (ctx: MyContext) => {
       }
     );
   } catch (error) {
-    await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
-
-    userActionsLogger(
-      "error",
-      "handleProfile",
-      `Произошла ошибка при переходе в профиль: ${(error as Error).message}`,
-      { accountId: ctx.user!.accountId, username: ctx.user!.username }
-    );
+    await handleError(ctx, error, "handleProfile");
   }
 };

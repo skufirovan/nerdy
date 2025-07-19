@@ -1,8 +1,8 @@
 import { Telegraf } from "telegraf";
 import { MyContext } from "../scenes";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MENU_BUTTONS } from "@bot/handlers";
 import { activitiesKeyboard } from "./keyboard";
+import { handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
 export const showActivitiesAction = (bot: Telegraf<MyContext>) => {
@@ -13,13 +13,7 @@ export const showActivitiesAction = (bot: Telegraf<MyContext>) => {
         reply_markup: activitiesKeyboard.reply_markup,
       });
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "showActivitiesAction",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("❌ Не удалось открыть раздел. Попробуй позже.");
+      await handleError(ctx, error, "showActivitiesAction");
     }
   });
 };

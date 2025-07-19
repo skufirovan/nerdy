@@ -1,13 +1,13 @@
 import { Telegraf, Markup } from "telegraf";
 import { MyContext, SessionData } from "@bot/features/scenes";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
-import { toButton } from "@utils/index";
+import { toButton, handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
 export const changeSquadMemberRoleAction = (bot: Telegraf<MyContext>) => {
   bot.action(/^PRE-CHANGE_ROLE_(.+)$/, async (ctx) => {
     try {
       await ctx.answerCbQuery();
+
       const squadName = ctx.match[1];
 
       const PRE_CHANGE_ROLE_BUTTONS = {
@@ -34,39 +34,30 @@ export const changeSquadMemberRoleAction = (bot: Telegraf<MyContext>) => {
         }
       );
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "changeSquadMemberRoleAction",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("❌ Не удалось выполнить действие. Попробуй позже.");
+      await handleError(ctx, error, "changeSquadMemberRoleAction");
     }
   });
 
   bot.action(/^CHANGE_ROLE_(.+)$/, async (ctx) => {
     try {
       await ctx.answerCbQuery();
+
       const session = ctx.session as SessionData;
       session.squadData = {
         requesterId: ctx.user!.accountId,
         name: ctx.match[1],
       };
+
       await ctx.scene.enter("changeSquadMemberRole");
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "changeSquadMemberRoleAction_change",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("❌ Не удалось выполнить действие. Попробуй позже.");
+      await handleError(ctx, error, "changeSquadMemberRoleAction");
     }
   });
 
   bot.action("PRE_CHANGE_ROLE_INFO", async (ctx) => {
     try {
       await ctx.answerCbQuery();
+
       const text = [
         "👨🏿‍✈️ <b>CEO</b>",
         "➖ Доступна только владельцу лейбла",
@@ -82,13 +73,7 @@ export const changeSquadMemberRoleAction = (bot: Telegraf<MyContext>) => {
 
       await ctx.reply(text.join("\n"), { parse_mode: "HTML" });
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "changeSquadMemberRoleAction_info",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("❌ Не удалось выполнить действие. Попробуй позже.");
+      await handleError(ctx, error, "changeSquadMemberRoleAction");
     }
   });
 };

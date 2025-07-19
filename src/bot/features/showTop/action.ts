@@ -1,10 +1,10 @@
 import { Telegraf } from "telegraf";
 import { MyContext } from "../scenes";
 import { UserController } from "@controller";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { MENU_BUTTONS } from "@bot/handlers";
-import { SECTION_EMOJI } from "@utils/constants";
 import { TOP_BUTTONS, topKeyboard } from "./keyboard";
+import { handleError } from "@utils/index";
+import { SECTION_EMOJI } from "@utils/constants";
 
 export const showTopAction = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.TOP.callback, async (ctx) => {
@@ -34,13 +34,7 @@ export const showTopAction = (bot: Telegraf<MyContext>) => {
         }
       );
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "showTopAction",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("❌ Не удалось открыть раздел. Попробуй позже.");
+      await handleError(ctx, error, "showTopAction");
     }
   });
 
@@ -70,13 +64,7 @@ export const showTopAction = (bot: Telegraf<MyContext>) => {
         }
       );
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "showTopAction",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("❌ Не удалось открыть раздел. Попробуй позже.");
+      await handleError(ctx, error, "showTopAction_allTime");
     }
   });
 };

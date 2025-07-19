@@ -1,8 +1,8 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../scenes";
-import { ACTIVITIES_BUTTONS } from "../showActivities/keyboard";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
 import { battleManager, battleTimeoutService } from "@core/GameLogic/battle";
+import { ACTIVITIES_BUTTONS } from "../showActivities/keyboard";
+import { handleError } from "@utils/index";
 
 export const battleActions = (bot: Telegraf<MyContext>) => {
   bot.action(ACTIVITIES_BUTTONS.BATTLE.callback, async (ctx) => {
@@ -10,62 +10,54 @@ export const battleActions = (bot: Telegraf<MyContext>) => {
       await ctx.answerCbQuery();
       await ctx.scene.enter("battle");
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "battleAction",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+      await handleError(ctx, error, "battleAction");
     }
   });
 
   bot.action(/^BATTLE_ACCEPT_(.+)$/, async (ctx) => {
     try {
       await ctx.answerCbQuery();
+
       const battleId = ctx.match[1];
       const user = ctx.user!;
       const battle = battleManager.getBattle(battleId);
 
-      if (!battle) {
+      if (!battle)
         return await ctx.reply("❌ Баттл не найден или уже завершен");
-      }
 
-      const acceptedBattle = battleManager.acceptBattle(battleId, {
+      const accepted = battleManager.acceptBattle(battleId, {
         accountId: user.accountId,
         username: user.username,
         ctx,
       });
 
-      if (!acceptedBattle) {
-        return await ctx.reply("❌ Баттл не найден");
-      }
+      if (!accepted) return await ctx.reply("❌ Баттл не найден");
 
       battleTimeoutService.clearInvitationTimeout(battleId);
-      (ctx.session as SessionData).battleId = battleId;
 
+      const session = ctx.session as SessionData;
+      session.battleId = battleId;
+
+      await ctx.deleteMessage();
       await ctx.scene.enter("combo");
-      await acceptedBattle.player1.ctx.scene.enter("combo");
+
+      const player1Session = accepted.player1.ctx.session as SessionData;
+      player1Session.battleId = battleId;
+      await accepted.player1.ctx.scene.enter("combo");
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "battleAction_ACCEPT",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+      await handleError(ctx, error, "battleAction_accept");
     }
   });
 
   bot.action(/^BATTLE_DECLINE_(.+)$/, async (ctx) => {
     try {
       await ctx.answerCbQuery();
+
       const battleId = ctx.match[1];
       const battle = battleManager.getBattle(battleId);
 
-      if (!battle) {
+      if (!battle)
         return await ctx.answerCbQuery("❌ Баттл не найден или уже завершен");
-      }
 
       await ctx.telegram.sendMessage(
         String(battle.player1.accountId),
@@ -75,15 +67,9 @@ export const battleActions = (bot: Telegraf<MyContext>) => {
       battleManager.cancelBattle(battleId);
       battleTimeoutService.clearInvitationTimeout(battleId);
 
-      await ctx.reply("👎🏿 Ты дал заднюю.. лейм мув..");
+      await ctx.editMessageText("👎🏿 Ты дал заднюю.. лейм мув..");
     } catch (error) {
-      userActionsLogger(
-        "error",
-        "battleAction_DECLINE",
-        `${(error as Error).message}`,
-        { accountId: ctx.user!.accountId }
-      );
-      await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+      await handleError(ctx, error, "battleAction_decline");
     }
   });
 };

@@ -2,7 +2,7 @@ import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { UserController, SquadController } from "@controller";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
 export const kickMemberScene = new Scenes.BaseScene<MyContext>("kickMember");
@@ -12,9 +12,8 @@ kickMemberScene.enter(async (ctx: MyContext) => {
 });
 
 kickMemberScene.on(message("text"), async (ctx: MyContext) => {
-  if (!ctx.message || !("text" in ctx.message)) {
+  if (!ctx.message || !("text" in ctx.message))
     return await ctx.reply("⚠️ Отправь текст ТЕКСТ #ТЕКСТ");
-  }
 
   const accountId = ctx.user!.accountId;
   const session = ctx.session as SessionData;
@@ -22,7 +21,7 @@ kickMemberScene.on(message("text"), async (ctx: MyContext) => {
 
   if (!session.squadData) {
     await ctx.reply("🚫 Данные объединения не найдены. Попробуй снова.");
-    return await ctx.scene.leave();
+    return ctx.scene.leave();
   }
 
   try {
@@ -32,7 +31,7 @@ kickMemberScene.on(message("text"), async (ctx: MyContext) => {
       await ctx.reply(`❌ <b>${nickname}</b> это вообще КТО?`, {
         parse_mode: "HTML",
       });
-      return await ctx.scene.leave();
+      return ctx.scene.leave();
     }
 
     const existMembership = await SquadController.findMembershipByUserId(
@@ -46,7 +45,7 @@ kickMemberScene.on(message("text"), async (ctx: MyContext) => {
       await ctx.reply(`❌ <b>${nickname}</b> не подписан на твой лейбл`, {
         parse_mode: "HTML",
       });
-      return await ctx.scene.leave();
+      return ctx.scene.leave();
     }
 
     await SquadController.deleteSquadMember(
@@ -60,17 +59,13 @@ kickMemberScene.on(message("text"), async (ctx: MyContext) => {
       `🫵🏿 Ты больше не подписан на лейбл <b>${session.squadData.name}</b>`,
       { parse_mode: "HTML" }
     );
+
     await ctx.reply(`👨🏿‍⚖️ <b>${nickname}</b> больше не подписан на твой лейбл`, {
       parse_mode: "HTML",
     });
     await ctx.scene.leave();
   } catch (error) {
-    userActionsLogger(
-      "error",
-      "kickMemberScene",
-      `${(error as Error).message}`,
-      { accountId }
-    );
-    await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+    await handleError(ctx, error, "kickMemberScene.on");
+    return ctx.scene.leave();
   }
 });

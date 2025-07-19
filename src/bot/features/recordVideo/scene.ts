@@ -1,86 +1,75 @@
 import { Scenes } from "telegraf";
-import { Message } from "telegraf/typings/core/types/typegram";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { VideoController, DemoController, UserController } from "@controller";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { handleError } from "@utils/index";
 
 export const recordVideoScene = new Scenes.BaseScene<MyContext>("recordVideo");
 
 recordVideoScene.enter(async (ctx: MyContext) => {
-  const session = ctx.session as SessionData;
-
   try {
+    const accountId = ctx.user!.accountId;
+    const session = ctx.session as SessionData;
+
     const { canRecord, remainingTimeText } = await VideoController.canRecord(
-      ctx.user!.accountId
+      accountId
     );
+
     if (!canRecord) {
       await ctx.reply(
         `☁️ Охлади траханье, приходи через ${remainingTimeText!}`
       );
-      return await ctx.scene.leave();
+      return ctx.scene.leave();
     }
 
     session.video = {};
     await ctx.reply("📱 Напиши название демки, под которую снимешь ТТ");
   } catch (error) {
-    userActionsLogger(
-      "error",
-      "recordVideoScene",
-      `${(error as Error).message}`,
-      {
-        accountId: ctx.user!.accountId,
-      }
-    );
-    await ctx.reply("🚫 Произошла ошибка, попробуй позже");
-    await ctx.scene.leave();
+    await handleError(ctx, error, "recordVideoScene.enter");
+    return ctx.scene.leave();
   }
 });
 
 recordVideoScene.on(message("text"), async (ctx: MyContext) => {
+  if (!ctx.message || !("text" in ctx.message))
+    return await ctx.reply("⚠️ Отправь текст ТЕКСТ #ТЕКСТ");
+
+  const accountId = ctx.user!.accountId;
   const session = ctx.session as SessionData;
-  const user = ctx.user;
   const amount = 500;
-  const msg = ctx.message as Message.TextMessage;
+  const msg = ctx.message.text.trim();
 
-  if (!session.video!.demo) {
-    const demo = await DemoController.findByName(
-      user!.accountId,
-      msg.text.trim()
-    );
+  try {
+    if (!session.video!.demo) {
+      const demo = await DemoController.findByName(accountId, msg);
 
-    if (demo) {
-      session.video!.demo = demo;
-      return await ctx.reply("💪🏿 Демочка выбрана, накидай описание для видоса");
-    } else {
-      await ctx.reply("😣 Нема демки (( проверь название..");
-      return await ctx.scene.leave();
+      if (demo) {
+        session.video!.demo = demo;
+        return await ctx.reply(
+          "💪🏿 Демочка выбрана, накидай описание для видоса"
+        );
+      } else {
+        await ctx.reply("😣 Нема демки (( проверь название..");
+        return ctx.scene.leave();
+      }
     }
-  }
 
-  if (!session.video!.description) {
-    session.video!.description = msg.text.trim();
+    if (!session.video!.description) {
+      session.video!.description = msg;
+      const demoId = session.video!.demo!.id;
+      const description = session.video!.description;
 
-    const demoId = session.video!.demo!.id;
-    const description = session.video!.description;
+      await VideoController.create(accountId, demoId, description);
+      await UserController.addFame(accountId, amount);
 
-    try {
-      await VideoController.create(user!.accountId, demoId, description);
-      await UserController.addFame(user!.accountId, amount);
       await ctx.reply(
         `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${amount} фейма`
       );
-    } catch (error) {
-      userActionsLogger(
-        "error",
-        "recordVideoScene",
-        `${(error as Error).message}`,
-        { accountId: user!.accountId }
-      );
-      await ctx.reply("🚫 Произошла ошибка при записи тиктока");
+      delete session.video;
+      await ctx.scene.leave();
     }
-
-    delete session.demo;
-    await ctx.scene.leave();
+  } catch (error) {
+    await handleError(ctx, error, "recordVideoScene.enter");
+    return ctx.scene.leave();
   }
 });
