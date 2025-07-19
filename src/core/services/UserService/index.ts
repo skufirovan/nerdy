@@ -1,6 +1,6 @@
 import { UserRepository } from "@infrastructure/repositories";
 import { UserEquipmentService } from "../UserEquipmentService";
-import serviceLogger from "@infrastructure/logger/serviceLogger";
+import { serviceLogger } from "@infrastructure/logger";
 import { User } from "@prisma/generated";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
 

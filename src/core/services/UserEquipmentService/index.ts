@@ -1,5 +1,5 @@
 import { UserEquipmentRepository } from "@infrastructure/repositories";
-import serviceLogger from "@infrastructure/logger/serviceLogger";
+import { serviceLogger } from "@infrastructure/logger";
 import { EQUIPMENT_TYPE } from "@prisma/generated";
 import { UserEquipmentWithEquipment } from "@domain/types";
 

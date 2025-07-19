@@ -1,5 +1,5 @@
 import { VideoRepository } from "@infrastructure/repositories";
-import serviceLogger from "@infrastructure/logger/serviceLogger";
+import { serviceLogger } from "@infrastructure/logger";
 import { UserService } from "@core/index";
 import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
 import { Video } from "@prisma/generated";

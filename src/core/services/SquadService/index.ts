@@ -1,6 +1,6 @@
 import { UserService } from "../UserService";
 import { SquadRepository } from "@infrastructure/repositories";
-import serviceLogger from "@infrastructure/logger/serviceLogger";
+import { serviceLogger } from "@infrastructure/logger";
 import { Squad, SquadMemberRole } from "@prisma/generated";
 import { SquadMemberWithUser } from "@domain/types";
 

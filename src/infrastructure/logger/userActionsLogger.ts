@@ -1,7 +1,7 @@
 import logWithContext, { LogMeta } from "./logWithContext";
-import { userActionsLoggerInstance } from "./index";
+import { userActionsLoggerInstance } from "./instance";
 
-const userActionsLogger = (
+export const userActionsLogger = (
   level: "info" | "warn" | "error",
   scope: string,
   message: string,
@@ -9,5 +9,3 @@ const userActionsLogger = (
 ) => {
   logWithContext(userActionsLoggerInstance, level, scope, message, meta);
 };
-
-export default userActionsLogger;

@@ -1,7 +1,7 @@
 import logWithContext, { LogMeta } from "./logWithContext";
-import { serviceLoggerInstance } from "./index";
+import { serviceLoggerInstance } from "./instance";
 
-const serviceLogger = (
+export const serviceLogger = (
   level: "info" | "warn" | "error",
   scope: string,
   message: string,
@@ -9,5 +9,3 @@ const serviceLogger = (
 ) => {
   logWithContext(serviceLoggerInstance, level, scope, message, meta);
 };
-
-export default serviceLogger;

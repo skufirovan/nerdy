@@ -1,5 +1,5 @@
 import { DemoRepository } from "@infrastructure/repositories";
-import serviceLogger from "@infrastructure/logger/serviceLogger";
+import { serviceLogger } from "@infrastructure/logger";
 import { Demo } from "@prisma/generated";
 import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
 import { UserService } from "@core/index";
