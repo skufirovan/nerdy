@@ -1,5 +1,6 @@
 import { UserRepository } from "@infrastructure/repositories";
 import { UserEquipmentService } from "../UserEquipmentService";
+import { calculateLevelAndRacks } from "@core/GameLogic";
 import { serviceLogger } from "@infrastructure/logger";
 import { User } from "@prisma/generated";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
@@ -17,7 +18,7 @@ export class UserService {
     };
 
     try {
-      const existingUser = await this.findByAccountId(accountId);
+      const existingUser = await UserRepository.findByAccountId(accountId);
 
       if (existingUser) return existingUser;
 
@@ -165,6 +166,67 @@ export class UserService {
         { accountId }
       );
       throw new Error("Ошибка при обновлении данных пользователя");
+    }
+  }
+
+  static async addFame(accountId: bigint, amount: number): Promise<User> {
+    try {
+      const user = await UserRepository.findByAccountId(accountId);
+
+      if (!user) throw new Error(`Пользователь не найден`);
+
+      const updatedFame = user.fame + amount;
+      const updatedSeasonalFame = user.seasonalFame + amount;
+      const { level, racks } = calculateLevelAndRacks(user.level, updatedFame);
+
+      if (level !== user.level) {
+        const updatedUser = await UserRepository.updateUserInfo(accountId, {
+          level,
+          fame: updatedFame,
+          seasonalFame: updatedSeasonalFame,
+          racks: user.racks + racks,
+        });
+
+        serviceLogger(
+          "info",
+          "UserService.addFame",
+          `Обновлены данные пользователя ${JSON.stringify({
+            level,
+            fame: updatedFame,
+            seasonalFame: updatedSeasonalFame,
+            racks: user.racks + racks,
+          })}`,
+          { accountId }
+        );
+
+        return updatedUser;
+      }
+
+      const updatedUser = await UserRepository.updateUserInfo(accountId, {
+        fame: updatedFame,
+        seasonalFame: updatedSeasonalFame,
+      });
+
+      serviceLogger(
+        "info",
+        "UserService.addFame",
+        `Обновлены данные пользователя ${JSON.stringify({
+          fame: updatedFame,
+          seasonalFame: updatedSeasonalFame,
+        })}`,
+        { accountId }
+      );
+
+      return updatedUser;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "UserService.addFame",
+        `Ошибка при добавлении фейма: ${err}`,
+        { accountId }
+      );
+      throw new Error("Ошибка при добавлении фейма");
     }
   }
 }

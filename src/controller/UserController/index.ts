@@ -1,5 +1,4 @@
 import { UserService } from "@core/index";
-import { calculateLevel } from "@core/GameLogic";
 import { InMemoryCache } from "@infrastructure/cache";
 import { UserDto } from "@domain/dtos";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
@@ -102,26 +101,14 @@ export class UserController {
     }
   }
 
-  static async addFame(
-    accountId: bigint,
-    amount: number
-  ): Promise<UserDto | null> {
+  static async addFame(accountId: bigint, amount: number): Promise<UserDto> {
     try {
-      const user = await this.findByAccountId(accountId);
+      const user = await UserService.addFame(accountId, amount);
 
-      if (!user) return null;
+      const dto = new UserDto(user);
+      cache.set(accountId, dto);
 
-      const updatedFame = user.fame + amount;
-      const updatedSeasonalFame = user.seasonalFame + amount;
-      const newLevel = calculateLevel(user.level, updatedFame);
-
-      const updatedUser = await this.updateUserInfo(accountId, {
-        level: newLevel,
-        fame: updatedFame,
-        seasonalFame: updatedSeasonalFame,
-      });
-
-      return updatedUser;
+      return dto;
     } catch (error) {
       throw error;
     }
