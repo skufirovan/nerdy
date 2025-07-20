@@ -7,7 +7,9 @@ import {
   formatResult,
   simulateBattle,
 } from "@core/GameLogic/battle";
+import { UserController } from "@controller";
 import { handleError, isValidCombo } from "@utils/index";
+import { FAME_TO_BATTLE, RACKS_TO_BATTLE } from "@utils/constants";
 
 export const comboScene = new Scenes.BaseScene<MyContext>("combo");
 
@@ -28,16 +30,20 @@ comboScene.enter(async (ctx: MyContext) => {
       await battle.player2!.ctx.reply(
         `❌ Один из игроков не отправил комбо вовремя. Баттл отменен`
       );
-      return ctx.scene.leave();
+
+      await battle.player1.ctx.scene.leave();
+      await battle.player2!.ctx.scene.leave();
     });
 
     await ctx.reply(
       [
-        "🕸 Введи комбо из 4 команд\n",
+        "🕸 Введи комбо из 6 команд\n",
         "1. Включить оппу макана",
-        "2. Въебать со спины",
-        "3. Надеть беруши",
+        "2. Надеть беруши",
+        "3. Въебать со спины",
         "4. Резко обернуться",
+        "5. Написать донос",
+        "6. Улететь в Дубай",
       ].join("\n")
     );
   } catch (error) {
@@ -57,7 +63,7 @@ comboScene.on(message("text"), async (ctx: MyContext) => {
 
   try {
     if (!isValidCombo(combo)) {
-      return await ctx.reply("❌ Введи 4 цифры от 1 до 4 без пробелов");
+      return await ctx.reply("❌ Введи 6 цифр от 1 до 6 без пробелов");
     }
 
     const battle = battleManager.setCombo(
@@ -70,6 +76,13 @@ comboScene.on(message("text"), async (ctx: MyContext) => {
       await ctx.reply("❌ Баттл не найден");
       return ctx.scene.leave();
     }
+
+    const player1 = await UserController.findByAccountId(
+      battle.player1.accountId
+    );
+    const player2 = await UserController.findByAccountId(
+      battle.player2!.accountId
+    );
 
     if (battle.status === "resolving_battle") {
       battleTimeoutService.clearComboTimeout(battle.id);
@@ -95,6 +108,40 @@ comboScene.on(message("text"), async (ctx: MyContext) => {
       });
 
       battleManager.finishBattle(battle.id);
+      const delay = Math.max(results1.length, results2.length) * 1500;
+
+      setTimeout(async () => {
+        if (result.winner !== "draw") {
+          const winner = result.winner === "player1" ? player1 : player2;
+          const loser = result.winner === "player1" ? player2 : player1;
+          const winnerCtx =
+            result.winner === "player1"
+              ? battle.player1.ctx
+              : battle.player2!.ctx;
+          const loserCtx =
+            result.winner === "player1"
+              ? battle.player2!.ctx
+              : battle.player1.ctx;
+
+          await UserController.updateUserInfo(winner!.accountId, {
+            racks: winner!.racks + RACKS_TO_BATTLE,
+          });
+          await UserController.addFame(winner!.accountId, FAME_TO_BATTLE);
+
+          await UserController.updateUserInfo(loser!.accountId, {
+            fame: loser!.fame - FAME_TO_BATTLE,
+            seasonalFame: loser!.seasonalFame - FAME_TO_BATTLE,
+            racks: loser!.racks - RACKS_TO_BATTLE,
+          });
+
+          await winnerCtx.reply(
+            `✅ Обоссано\n\n🧌 +${FAME_TO_BATTLE} фейма\n🪙 +${RACKS_TO_BATTLE} рэксов`
+          );
+          await loserCtx.reply(
+            `👎🏿 Пасасал\n\n🧌 -${FAME_TO_BATTLE} фейма\n🪙 -${RACKS_TO_BATTLE} рэксов`
+          );
+        }
+      }, delay);
 
       await battle.player1.ctx.scene.leave();
       await battle.player2!.ctx.scene.leave();

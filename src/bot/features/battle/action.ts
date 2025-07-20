@@ -1,13 +1,26 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../scenes";
 import { battleManager, battleTimeoutService } from "@core/GameLogic/battle";
+import { UserController } from "@controller";
 import { ACTIVITIES_BUTTONS } from "../showActivities/keyboard";
 import { handleError } from "@utils/index";
+import { FAME_TO_BATTLE, RACKS_TO_BATTLE } from "@utils/constants";
 
 export const battleActions = (bot: Telegraf<MyContext>) => {
   bot.action(ACTIVITIES_BUTTONS.BATTLE.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();
+
+      const user = await UserController.findByAccountId(ctx.user!.accountId);
+      if (
+        !user ||
+        user.seasonalFame < FAME_TO_BATTLE ||
+        user.racks < RACKS_TO_BATTLE
+      )
+        return ctx.reply(
+          "🤚🏿 Для участия в баттле нужно 500 фейма и 300 рексов"
+        );
+
       await ctx.scene.enter("battle");
     } catch (error) {
       await handleError(ctx, error, "battleAction");
@@ -24,6 +37,9 @@ export const battleActions = (bot: Telegraf<MyContext>) => {
 
       if (!battle)
         return await ctx.reply("❌ Баттл не найден или уже завершен");
+
+      if (battleManager.getBattleByPlayer(user.accountId))
+        return await ctx.reply("❌ Ты уже баттлишься");
 
       const accepted = battleManager.acceptBattle(battleId, {
         accountId: user.accountId,

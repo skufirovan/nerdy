@@ -5,7 +5,11 @@ import { MyContext, SessionData } from "../scenes";
 import { UserController } from "@controller";
 import { battleManager, battleTimeoutService } from "@core/GameLogic/battle";
 import { getRandomImage, requireUser, handleError } from "@utils/index";
-import { SECTION_EMOJI } from "@utils/constants";
+import {
+  SECTION_EMOJI,
+  FAME_TO_BATTLE,
+  RACKS_TO_BATTLE,
+} from "@utils/constants";
 
 export const battleScene = new Scenes.BaseScene<MyContext>("battle");
 
@@ -29,7 +33,8 @@ battleScene.enter(async (ctx: MyContext) => {
     await ctx.replyWithPhoto(
       { source: imagePath },
       {
-        caption: `${SECTION_EMOJI} МС справа — ${user.nickname}, введи ник МС слева`,
+        caption: `${SECTION_EMOJI} МС справа — <b>${user.nickname}</b>, введи ник МС слева\n\nПобедитель получает 500 фейма и 300 рексов проигравшего`,
+        parse_mode: "HTML",
       }
     );
   } catch (error) {
@@ -51,12 +56,24 @@ battleScene.on(message("text"), async (ctx: MyContext) => {
 
     if (!user2) {
       await ctx.reply("❌ МС с таким ником не найден");
-      return await ctx.scene.leave();
+      return ctx.scene.leave();
+    }
+
+    if (user2.seasonalFame < FAME_TO_BATTLE || user2.racks < RACKS_TO_BATTLE) {
+      await ctx.reply(`❌ <b>${user2.nickname}</b> слишком лейм..`, {
+        parse_mode: "HTML",
+      });
+      return ctx.scene.leave();
+    }
+
+    if (battleManager.getBattleByPlayer(user2.accountId)) {
+      await ctx.reply("❌ <b>${user2.nickname}</b> уже баттлится");
+      return ctx.scene.leave();
     }
 
     if (user2.accountId === user!.accountId) {
       await ctx.reply("❌ Ты не можешь вызвать сам себя");
-      return await ctx.scene.leave();
+      return ctx.scene.leave();
     }
 
     const battle = battleManager.createBattle({

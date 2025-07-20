@@ -60,7 +60,7 @@ export const toButton = ({ text, callback }: Button) =>
   Markup.button.callback(text, callback);
 
 export const isValidCombo = (combo: string): boolean => {
-  return /^[1-4]{4}$/.test(combo);
+  return /^[1-6]{6}$/.test(combo);
 };
 
 export const emojiMap: Record<SquadMemberRole, string> = {

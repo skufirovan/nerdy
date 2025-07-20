@@ -125,6 +125,18 @@ class BattleManager {
     return battle;
   }
 
+  getBattleByPlayer(accountId: bigint): Battle | undefined {
+    for (const [, battle] of this.battles) {
+      if (
+        battle.player1.accountId === accountId ||
+        (battle.player2 && battle.player2.accountId === accountId)
+      ) {
+        return battle;
+      }
+    }
+    return undefined;
+  }
+
   deleteBattle(id: string) {
     const battle = this.battles.get(id);
 
