@@ -21,12 +21,14 @@ export const handleProfile = async (ctx: MyContext) => {
     await ctx.replyWithPhoto(
       { source: imagePath },
       {
+        parse_mode: "HTML",
         caption: [
-          `${user!.nickname}\n`,
-          `Твой уровень: ${user!.level}`,
-          `Фейм за все время: ${user!.fame}`,
-          `Фейм за сезон: ${user!.seasonalFame}\n`,
-          `☁️ Ты зарегистрировался ${formatDateToDDMMYYYY(user!.registeredAt)}`,
+          `<b>${user!.nickname}</b>\n`,
+          `🪙 Уровень сваги: ${user!.level}`,
+          `🪙 Рэксы: ${user!.racks}\n`,
+          `🧌 Фейм за все время: ${user!.fame}`,
+          `🧌 Фейм за сезон: ${user!.seasonalFame}\n`,
+          `☁️ В статусе игрока с ${formatDateToDDMMYYYY(user!.registeredAt)}`,
           `☁️ Статус пасса: ${user!.hasPass ? "активен" : "не активен"}`,
         ].join("\n"),
         ...profileKeyboard,

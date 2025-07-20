@@ -7,6 +7,7 @@ export class UserDto {
   readonly level: number;
   readonly fame: number;
   readonly seasonalFame: number;
+  readonly racks: number;
   readonly hasPass: boolean;
   readonly invitedUsersCount: number;
   readonly passExpiresAt: Date | null;
@@ -20,6 +21,7 @@ export class UserDto {
     this.level = user.level;
     this.fame = user.fame;
     this.seasonalFame = user.seasonalFame;
+    this.racks = user.racks;
     this.hasPass = user.hasPass;
     this.invitedUsersCount = user.invitedUsersCount;
     this.passExpiresAt = user.passExpiresAt;

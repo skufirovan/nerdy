@@ -1,4 +1,4 @@
-import { levelThresholds } from "@domain/config/levelThresholds";
+import { levelThresholds, racksPerLevel } from "@domain/config/levelThresholds";
 
 type WaitingTimeResult = {
   recordDemoRT: number;
@@ -21,18 +21,20 @@ export function getRemainingTimeText(remainingTimeMs: number): string {
   return `${remainingHours} ч ${remainingMinutes} мин`;
 }
 
-export function calculateLevel(
+export function calculateLevelAndRacks(
   currentLevel: number,
   currentFame: number
-): number {
+): { level: number; racks: number } {
   let newLevel = currentLevel;
+  let racks = 0;
 
   while (
     newLevel < levelThresholds.length &&
     currentFame >= levelThresholds[newLevel]
   ) {
+    racks += racksPerLevel[newLevel];
     newLevel++;
   }
 
-  return newLevel;
+  return { level: newLevel, racks };
 }
