@@ -7,7 +7,9 @@ import {
   UserController,
   UserEquipmentController,
 } from "@controller";
-import { getRandomImage, handleError } from "@utils/index";
+import { UserDto } from "@domain/dtos";
+import { getRandomImage, requireUser, handleError } from "@utils/index";
+import { SECTION_EMOJI } from "@utils/constants";
 
 export const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
 
@@ -56,10 +58,13 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
 
   const accountId = ctx.user!.accountId;
   const session = ctx.session as SessionData;
-  const amount = 500;
   const msg = ctx.message.text.trim();
 
   try {
+    const user = await requireUser(ctx);
+
+    if (!user) return ctx.scene.leave();
+
     if (!session.demo!.text) {
       session.demo!.text = msg;
       const secondVideoPath = path.resolve(
@@ -87,27 +92,51 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
         (acc, item) => acc * item.equipment.multiplier,
         1
       );
+
+      const fameReward = Math.floor(500 * multiplier);
+      const racksReward = Math.floor(300 * multiplier);
+
+      await DemoController.create(accountId, name, text);
+      await UserController.updateUserInfo(accountId, {
+        racks: user.racks + racksReward,
+      });
+
       const imagePath = await getRandomImage(
         path.resolve(__dirname, `../../assets/images/DEMO`),
         path.resolve(__dirname, `../../assets/images/DEMO/1.jpg`)
       );
 
-      await DemoController.create(accountId, name, text);
-      await UserController.addFame(accountId, amount * multiplier);
-
       await ctx.replyWithPhoto(
         { source: imagePath },
         {
-          caption: `🧖🏿 Демочка записана, ты получил +${
-            amount * multiplier
-          } фейма`,
+          caption: `🧖🏿 Демочка записана, ты получил +${fameReward} фейма и +${racksReward} рексов`,
         }
       );
+
+      await updateUserRewards(ctx, user, accountId, fameReward, racksReward);
+
+      delete session.demo;
+      return ctx.scene.leave();
     }
-    delete session.demo;
-    return ctx.scene.leave();
   } catch (error) {
     await handleError(ctx, error, "recordDemoScene.on");
     return ctx.scene.leave();
   }
 });
+
+async function updateUserRewards(
+  ctx: MyContext,
+  user: UserDto,
+  accountId: bigint,
+  fameReward: number,
+  racksReward: number
+) {
+  const updatedUser = await UserController.addFame(accountId, fameReward);
+
+  if (user.level !== updatedUser.level) {
+    const racksGained = updatedUser.racks - user.racks - racksReward;
+    await ctx.reply(
+      `${SECTION_EMOJI} Уровень сваги подрос, ты залутал +${racksGained} рексов`
+    );
+  }
+}

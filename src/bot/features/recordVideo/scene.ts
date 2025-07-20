@@ -3,7 +3,9 @@ import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { VideoController, DemoController, UserController } from "@controller";
-import { getRandomImage, handleError } from "@utils/index";
+import { UserDto } from "@domain/dtos";
+import { getRandomImage, requireUser, handleError } from "@utils/index";
+import { SECTION_EMOJI } from "@utils/constants";
 
 export const recordVideoScene = new Scenes.BaseScene<MyContext>("recordVideo");
 
@@ -42,10 +44,13 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
 
   const accountId = ctx.user!.accountId;
   const session = ctx.session as SessionData;
-  const amount = 500;
   const msg = ctx.message.text.trim();
 
   try {
+    const user = await requireUser(ctx);
+
+    if (!user) return ctx.scene.leave();
+
     if (!session.video!.demo) {
       const demo = await DemoController.findByName(accountId, msg);
 
@@ -62,18 +67,27 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
 
     if (!session.video!.description) {
       session.video!.description = msg;
+
       const demoId = session.video!.demo!.id;
       const description = session.video!.description;
 
+      const fameReward = 500;
+      const racksReward = 300;
+
       await VideoController.create(accountId, demoId, description);
-      await UserController.addFame(accountId, amount);
+      await UserController.updateUserInfo(accountId, {
+        racks: user.racks + racksReward,
+      });
 
       await ctx.replyWithAnimation(
         { source: path.resolve(__dirname, `../../assets/images/VIDEO/1.gif`) },
         {
-          caption: `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${amount} фейма`,
+          caption: `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${fameReward} фейма и +${racksReward} рексов`,
         }
       );
+
+      await updateUserRewards(ctx, user, accountId, fameReward, racksReward);
+
       delete session.video;
       await ctx.scene.leave();
     }
@@ -82,3 +96,20 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
     return ctx.scene.leave();
   }
 });
+
+async function updateUserRewards(
+  ctx: MyContext,
+  user: UserDto,
+  accountId: bigint,
+  fameReward: number,
+  racksReward: number
+) {
+  const updatedUser = await UserController.addFame(accountId, fameReward);
+
+  if (user.level !== updatedUser.level) {
+    const racksGained = updatedUser.racks - user.racks - racksReward;
+    await ctx.reply(
+      `${SECTION_EMOJI} Уровень сваги подрос, ты залутал +${racksGained} рексов`
+    );
+  }
+}
