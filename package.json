@@ -4,6 +4,8 @@
   "main": "src/main.ts",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec tsx src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
     "prisma:mig": "npx prisma migrate dev --schema src/prisma/schema.prisma",
     "test": "jest"
   },
