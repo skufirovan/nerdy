@@ -20,7 +20,7 @@ export const showReferralAction = (bot: Telegraf<MyContext>) => {
       const user = await UserController.findByAccountId(accountId);
 
       const text = [
-        `${SECTION_EMOJI} Подтягивай своих кентов в игру и получай за это ништяки (скоро)\n`,
+        `${SECTION_EMOJI} Подтягивай своих кентов в игру и получай за каждого 1000 рексов\n`,
         `Твоя рефка: ${REFERRAL_LINK}\n`,
         `Количество подтянутых кентов: ${user?.invitedUsersCount ?? 0}`,
       ].join("\n");

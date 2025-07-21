@@ -27,6 +27,7 @@ export class UserService {
         if (inviting) {
           await UserRepository.updateUserInfo(invitedById, {
             invitedUsersCount: inviting.invitedUsersCount + 1,
+            racks: inviting.racks + 1000,
           });
         }
       }
