@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { InlineKeyboardMarkup } from "telegraf/typings/core/types/typegram";
 import { MyContext, SessionData } from "../scenes";
-import { DemoDto, UserEquipmentDto } from "@domain/dtos";
+import { DemoDto, EquipmentDto } from "@domain/dtos";
 import { formatDateToDDMMYYYY, hasCaption, handleError } from "@utils/index";
 import { PAGINATE_BUTTONS } from "./keyboard";
 
@@ -24,8 +24,8 @@ export function formatPaginated(item: unknown, type: string): string {
         demo.text,
       ].join("\n");
     case "equipment":
-      const userEquipment = item as UserEquipmentDto;
-      const equipment = userEquipment.equipment;
+      const equipment = item as EquipmentDto;
+      const separator = "\u200B";
       const emoji =
         equipment.type === "MICROPHONE"
           ? "🎤"
@@ -34,11 +34,10 @@ export function formatPaginated(item: unknown, type: string): string {
           : "🎛";
 
       return [
-        `${emoji} <b>${equipment.brand} ${equipment.model}</b>`,
+        `${emoji} <b>${equipment.brand} ${separator}${equipment.model}</b>`,
         "",
         `Множитель: ${equipment.multiplier}`,
         `Цена: ${equipment.price}`,
-        `Дата приобретения: ${formatDateToDDMMYYYY(userEquipment.createdAt)}`,
       ].join("\n");
     default:
       return "❌ Неизвестный формат";

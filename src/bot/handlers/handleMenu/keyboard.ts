@@ -4,7 +4,7 @@ import { toButton } from "@utils/index";
 export const MENU_BUTTONS = {
   TOP: { text: "🏆 Billboard", callback: "MENU_TOP" },
   ACTIVITIES: { text: "🎧 Темки", callback: "MENU_ACTIVITIES" },
-  SHOP: { text: "🛍 Taobao", callback: "MENU_SHOP" },
+  SHOP: { text: "🛍 Авито", callback: "MENU_SHOP" },
   SQUAD: { text: "👬 Лейбл", callback: "MENU_SQUAD" },
   DONAT: { text: "🍩 Донат", callback: "MENU_DONAT" },
 };
