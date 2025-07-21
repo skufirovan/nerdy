@@ -1,7 +1,7 @@
 import path from "path";
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../scenes";
-import { UserEquipmentController } from "@controller";
+import { EquipmentController } from "@controller";
 import { formatPaginated } from "../pagination/action";
 import { paginationKeyboard } from "../pagination/keyboard";
 import { PROFILE_BUTTONS } from "@bot/handlers";
@@ -12,13 +12,15 @@ export const showEquipmentAction = (bot: Telegraf<MyContext>) => {
     try {
       await ctx.answerCbQuery();
 
-      const equipment = await UserEquipmentController.findByAccountId(
+      const userEquipment = await EquipmentController.findByAccountId(
         ctx.user!.accountId
       );
 
-      if (!equipment || equipment.length === 0) {
+      if (!userEquipment || userEquipment.length === 0) {
         return await ctx.reply("👮🏿‍♂️ Обнаружен лейм без оборудки");
       }
+
+      const equipment = userEquipment.map((e) => e.equipment);
 
       const replyMarkup =
         equipment.length > 1 ? paginationKeyboard.reply_markup : undefined;

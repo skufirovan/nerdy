@@ -5,7 +5,7 @@ import { MyContext, SessionData } from "../scenes";
 import {
   DemoController,
   UserController,
-  UserEquipmentController,
+  EquipmentController,
 } from "@controller";
 import { UserDto } from "@domain/dtos";
 import { getRandomImage, requireUser, handleError } from "@utils/index";
@@ -87,7 +87,7 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
       const name = session.demo!.name;
       const text = session.demo!.text;
 
-      const equipment = await UserEquipmentController.findEquipped(accountId);
+      const equipment = await EquipmentController.findEquipped(accountId);
       const multiplier = equipment.reduce(
         (acc, item) => acc * item.equipment.multiplier,
         1

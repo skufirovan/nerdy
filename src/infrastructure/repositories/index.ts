@@ -1,5 +1,5 @@
 export * from "./UserRepository";
 export * from "./DemoRepository";
-export * from "./UserEquipmentRepository";
+export * from "./EquipmentRepository";
 export * from "./VideoRepository";
 export * from "./SquadRepository";

@@ -1,8 +1,8 @@
 import { UserEquipmentWithEquipment } from "@domain/types";
 import { prisma } from "@prisma/client";
-import { EQUIPMENT_TYPE } from "@prisma/generated";
+import { Equipment, EQUIPMENT_TYPE } from "@prisma/generated";
 
-export class UserEquipmentRepository {
+export class EquipmentRepository {
   static async create(
     accountId: bigint,
     equipmentId: bigint,
@@ -20,7 +20,20 @@ export class UserEquipmentRepository {
     });
   }
 
-  static async findByAccountId(
+  static async findShopEquipment(): Promise<Equipment[]> {
+    return prisma.equipment.findMany({ where: { inShop: true } });
+  }
+
+  static async findEquipmentByBrandAndModel(
+    brand: string,
+    model: string
+  ): Promise<Equipment | null> {
+    return prisma.equipment.findUnique({
+      where: { brand_model: { brand, model } },
+    });
+  }
+
+  static async findUserEquipmentByAccountId(
     accountId: bigint
   ): Promise<UserEquipmentWithEquipment[]> {
     return prisma.userEquipment.findMany({
@@ -42,7 +55,7 @@ export class UserEquipmentRepository {
     });
   }
 
-  static async findByType(
+  static async findUserEquipmentByType(
     accountId: bigint,
     type: EQUIPMENT_TYPE
   ): Promise<UserEquipmentWithEquipment[]> {
