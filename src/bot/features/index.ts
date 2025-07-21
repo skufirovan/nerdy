@@ -14,6 +14,7 @@ export * from "./shop/equipmentShop/action";
 export * from "./shop/buyEquipment/action";
 export * from "./showActivities/action";
 export * from "./showDemos/action";
+export * from "./showDonation/action";
 export * from "./userEquipment/showEquipment/action";
 export * from "./userEquipment/equipEquipment/action";
 export * from "./showReferral/action";

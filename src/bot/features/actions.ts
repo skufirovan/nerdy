@@ -23,6 +23,7 @@ import {
   equipmentShopAction,
   buyEquipmentAction,
   equipEquipmentAction,
+  showDonationAction,
 } from ".";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
@@ -48,4 +49,5 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   equipmentShopAction(bot);
   buyEquipmentAction(bot);
   equipEquipmentAction(bot);
+  showDonationAction(bot);
 };
