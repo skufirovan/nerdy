@@ -93,8 +93,11 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
         1
       );
 
-      const fameReward = Math.floor(500 * multiplier);
-      const racksReward = Math.floor(300 * multiplier);
+      const baseFameReward = user.hasPass ? 1000 : 500;
+      const baseRacksReward = user.hasPass ? 600 : 300;
+
+      const fameReward = Math.floor(baseFameReward * multiplier);
+      const racksReward = Math.floor(baseRacksReward * multiplier);
 
       await DemoController.create(accountId, name, text);
       await UserController.updateUserInfo(accountId, {

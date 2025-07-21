@@ -71,8 +71,8 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
       const demoId = session.video!.demo!.id;
       const description = session.video!.description;
 
-      const fameReward = 500;
-      const racksReward = 300;
+      const fameReward = user.hasPass ? 1000 : 500;
+      const racksReward = user.hasPass ? 600 : 300;
 
       await VideoController.create(accountId, demoId, description);
       await UserController.updateUserInfo(accountId, {
