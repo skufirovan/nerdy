@@ -113,4 +113,21 @@ export class UserController {
       throw error;
     }
   }
+
+  static async buyEquipment(
+    accountId: bigint,
+    brand: string,
+    model: string
+  ): Promise<UserDto> {
+    try {
+      const user = await UserService.buyEquipment(accountId, brand, model);
+
+      const dto = new UserDto(user);
+      cache.set(accountId, dto);
+
+      return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

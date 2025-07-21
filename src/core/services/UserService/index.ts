@@ -1,5 +1,5 @@
 import { UserRepository } from "@infrastructure/repositories";
-import { UserEquipmentService } from "../UserEquipmentService";
+import { EquipmentService } from "../EquipmentService";
 import { calculateLevelAndRacks } from "@core/GameLogic";
 import { serviceLogger } from "@infrastructure/logger";
 import { User } from "@prisma/generated";
@@ -37,9 +37,9 @@ export class UserService {
         nickname,
         invitedById
       );
-      await UserEquipmentService.create(accountId, BigInt(1), true);
-      await UserEquipmentService.create(accountId, BigInt(2), true);
-      await UserEquipmentService.create(accountId, BigInt(3), true);
+      await EquipmentService.create(accountId, BigInt(1), true);
+      await EquipmentService.create(accountId, BigInt(2), true);
+      await EquipmentService.create(accountId, BigInt(3), true);
 
       serviceLogger(
         "info",
@@ -173,7 +173,7 @@ export class UserService {
     try {
       const user = await UserRepository.findByAccountId(accountId);
 
-      if (!user) throw new Error(`Пользователь не найден`);
+      if (!user) throw new Error(`Пользователь ${accountId} не найден`);
 
       const updatedFame = user.fame + amount;
       const updatedSeasonalFame = user.seasonalFame + amount;
@@ -227,6 +227,46 @@ export class UserService {
         { accountId }
       );
       throw new Error("Ошибка при добавлении фейма");
+    }
+  }
+
+  static async buyEquipment(
+    accountId: bigint,
+    brand: string,
+    model: string
+  ): Promise<User> {
+    try {
+      const user = await UserRepository.findByAccountId(accountId);
+
+      if (!user) throw new Error(`Пользователь ${accountId} не найден`);
+
+      const equipment = await EquipmentService.findEquipmentByBrandAndModel(
+        accountId,
+        brand,
+        model
+      );
+
+      if (!equipment)
+        throw new Error(`Оборудование ${brand} ${model} не найдено`);
+
+      if (user.racks < equipment.price)
+        throw new Error("Не хватает рексов для покупки");
+
+      await EquipmentService.create(accountId, equipment.id);
+      const updatedUser = await UserRepository.updateUserInfo(accountId, {
+        racks: user.racks - equipment.price,
+      });
+
+      return updatedUser;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "UserService.buyEquipment",
+        `Ошибка при покупке оборудования: ${err}`,
+        { accountId }
+      );
+      throw new Error("Ошибка при покупке оборудования");
     }
   }
 }
