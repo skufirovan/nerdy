@@ -87,7 +87,7 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
       const name = session.demo!.name;
       const text = session.demo!.text;
 
-      const equipment = await EquipmentController.findEquipped(accountId);
+      const equipment = await EquipmentController.findUserEquipped(accountId);
       const multiplier = equipment.reduce(
         (acc, item) => acc * item.equipment.multiplier,
         1

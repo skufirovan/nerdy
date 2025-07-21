@@ -27,21 +27,6 @@ export class EquipmentController {
     }
   }
 
-  static async findByAccountId(accountId: bigint): Promise<UserEquipmentDto[]> {
-    try {
-      const equipment = await EquipmentService.findUserEquipmentByAccountId(
-        accountId
-      );
-
-      const dtos: UserEquipmentDto[] = equipment.map(
-        (e) => new UserEquipmentDto(e)
-      );
-      return dtos;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   static async findShopEquipment(accountId: bigint): Promise<EquipmentDto[]> {
     try {
       const cacheKey = "shop_equipment";
@@ -82,9 +67,32 @@ export class EquipmentController {
     }
   }
 
-  static async findEquipped(accountId: bigint): Promise<UserEquipmentDto[]> {
+  static async findUserEquipment(
+    accountId: bigint,
+    equipmentId: bigint
+  ): Promise<UserEquipmentDto | null> {
     try {
-      const equipment = await EquipmentService.findEquipped(accountId);
+      const equipment = await EquipmentService.findUserEquipment(
+        accountId,
+        equipmentId
+      );
+
+      if (!equipment) return null;
+
+      const dto = new UserEquipmentDto(equipment);
+      return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async findUserEquipmentsByAccountId(
+    accountId: bigint
+  ): Promise<UserEquipmentDto[]> {
+    try {
+      const equipment = await EquipmentService.findUserEquipmentsByAccountId(
+        accountId
+      );
 
       const dtos: UserEquipmentDto[] = equipment.map(
         (e) => new UserEquipmentDto(e)
@@ -95,12 +103,27 @@ export class EquipmentController {
     }
   }
 
-  static async findUserEquipmentByType(
+  static async findUserEquipped(
+    accountId: bigint
+  ): Promise<UserEquipmentDto[]> {
+    try {
+      const equipment = await EquipmentService.findUserEquipped(accountId);
+
+      const dtos: UserEquipmentDto[] = equipment.map(
+        (e) => new UserEquipmentDto(e)
+      );
+      return dtos;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async findUserEquipmentsByType(
     accountId: bigint,
     type: EQUIPMENT_TYPE
   ): Promise<UserEquipmentDto[]> {
     try {
-      const equipment = await EquipmentService.findUserEquipmentByType(
+      const equipment = await EquipmentService.findUserEquipmentsByType(
         accountId,
         type
       );
@@ -109,6 +132,23 @@ export class EquipmentController {
         (e) => new UserEquipmentDto(e)
       );
       return dtos;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async equipUserEquipment(
+    accountId: bigint,
+    equipmentId: bigint
+  ): Promise<UserEquipmentDto> {
+    try {
+      const equipment = await EquipmentService.equipUserEquipment(
+        accountId,
+        equipmentId
+      );
+
+      const dto = new UserEquipmentDto(equipment);
+      return dto;
     } catch (error) {
       throw error;
     }

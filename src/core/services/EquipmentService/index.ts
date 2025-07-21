@@ -77,11 +77,34 @@ export class EquipmentService {
     }
   }
 
-  static async findUserEquipmentByAccountId(
+  static async findUserEquipment(
+    accountId: bigint,
+    equipmentId: bigint
+  ): Promise<UserEquipmentWithEquipment | null> {
+    try {
+      const equipment = await EquipmentRepository.findUserEquipment(
+        accountId,
+        equipmentId
+      );
+
+      return equipment;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "EquipmentService.findUserEquipment",
+        `Ошибка при поиске оборудования пользователя: ${err}`,
+        { accountId }
+      );
+      throw new Error("Ошибка при поиске оборудования пользователя");
+    }
+  }
+
+  static async findUserEquipmentsByAccountId(
     accountId: bigint
   ): Promise<UserEquipmentWithEquipment[]> {
     try {
-      const equipment = await EquipmentRepository.findUserEquipmentByAccountId(
+      const equipment = await EquipmentRepository.findUserEquipmentsByAccountId(
         accountId
       );
       return equipment;
@@ -97,11 +120,11 @@ export class EquipmentService {
     }
   }
 
-  static async findEquipped(
+  static async findUserEquipped(
     accountId: bigint
   ): Promise<UserEquipmentWithEquipment[]> {
     try {
-      const equipment = await EquipmentRepository.findEquipped(accountId);
+      const equipment = await EquipmentRepository.findUserEquipped(accountId);
       return equipment;
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);
@@ -115,12 +138,12 @@ export class EquipmentService {
     }
   }
 
-  static async findUserEquipmentByType(
+  static async findUserEquipmentsByType(
     accountId: bigint,
     type: EQUIPMENT_TYPE
   ): Promise<UserEquipmentWithEquipment[]> {
     try {
-      const equipment = await EquipmentRepository.findUserEquipmentByType(
+      const equipment = await EquipmentRepository.findUserEquipmentsByType(
         accountId,
         type
       );
@@ -134,6 +157,50 @@ export class EquipmentService {
         { accountId }
       );
       throw new Error("Ошибка при поиске оборудования по типу");
+    }
+  }
+
+  static async equipUserEquipment(
+    accountId: bigint,
+    equipmentId: bigint
+  ): Promise<UserEquipmentWithEquipment> {
+    try {
+      const existedEquipment = await EquipmentRepository.findUserEquipment(
+        accountId,
+        equipmentId
+      );
+
+      if (!existedEquipment) throw new Error("Оборудка не найдена");
+
+      const userEquipped = await EquipmentRepository.findUserEquipped(
+        accountId
+      );
+
+      const prevEquipped = userEquipped.find(
+        (u) => u.equipment.type === existedEquipment.equipment.type
+      );
+
+      if (prevEquipped) {
+        if (prevEquipped.equipmentId === existedEquipment.equipmentId) {
+          return existedEquipment;
+        }
+
+        await EquipmentRepository.unequipUserEquipment(
+          accountId,
+          prevEquipped.equipmentId
+        );
+      }
+
+      return EquipmentRepository.equipUserEquipment(accountId, equipmentId);
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "UserEquipmentService.equipUserEquipment",
+        `Ошибка при активировании оборудования: ${err}`,
+        { accountId }
+      );
+      throw new Error("Ошибка при активировании оборудования");
     }
   }
 }

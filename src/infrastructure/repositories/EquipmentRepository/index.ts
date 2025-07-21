@@ -33,7 +33,17 @@ export class EquipmentRepository {
     });
   }
 
-  static async findUserEquipmentByAccountId(
+  static async findUserEquipment(
+    accountId: bigint,
+    equipmentId: bigint
+  ): Promise<UserEquipmentWithEquipment | null> {
+    return prisma.userEquipment.findUnique({
+      where: { accountId_equipmentId: { accountId, equipmentId } },
+      include: { equipment: true },
+    });
+  }
+
+  static async findUserEquipmentsByAccountId(
     accountId: bigint
   ): Promise<UserEquipmentWithEquipment[]> {
     return prisma.userEquipment.findMany({
@@ -44,7 +54,7 @@ export class EquipmentRepository {
     });
   }
 
-  static async findEquipped(
+  static async findUserEquipped(
     accountId: bigint
   ): Promise<UserEquipmentWithEquipment[]> {
     return prisma.userEquipment.findMany({
@@ -55,7 +65,7 @@ export class EquipmentRepository {
     });
   }
 
-  static async findUserEquipmentByType(
+  static async findUserEquipmentsByType(
     accountId: bigint,
     type: EQUIPMENT_TYPE
   ): Promise<UserEquipmentWithEquipment[]> {
@@ -69,6 +79,28 @@ export class EquipmentRepository {
       include: {
         equipment: true,
       },
+    });
+  }
+
+  static async equipUserEquipment(
+    accountId: bigint,
+    equipmentId: bigint
+  ): Promise<UserEquipmentWithEquipment> {
+    return prisma.userEquipment.update({
+      where: { accountId_equipmentId: { accountId, equipmentId } },
+      data: { isEquipped: true },
+      include: { equipment: true },
+    });
+  }
+
+  static async unequipUserEquipment(
+    accountId: bigint,
+    equipmentId: bigint
+  ): Promise<UserEquipmentWithEquipment> {
+    return prisma.userEquipment.update({
+      where: { accountId_equipmentId: { accountId, equipmentId } },
+      data: { isEquipped: false },
+      include: { equipment: true },
     });
   }
 }
