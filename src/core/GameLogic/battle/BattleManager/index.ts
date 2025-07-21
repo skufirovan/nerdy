@@ -94,7 +94,9 @@ class BattleManager {
     serviceLogger(
       "info",
       "BattleManager.setCombo",
-      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+      `${battle?.id} - ${battle.player1.username} ${
+        battle.player1.combo ?? ""
+      } VS ${battle.player2?.username} ${battle.player2?.combo ?? ""}`
     );
 
     return battle;
@@ -109,8 +111,10 @@ class BattleManager {
 
     serviceLogger(
       "info",
-      "BattleManager.finishBattle",
-      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+      "BattleManager.setCombo",
+      `${battle?.id} - ${battle.player1.username} ${
+        battle.player1.combo ?? ""
+      } VS ${battle.player2?.username} ${battle.player2?.combo ?? ""}`
     );
   }
 
@@ -119,8 +123,10 @@ class BattleManager {
 
     serviceLogger(
       "info",
-      "BattleManager.getBattle",
-      `${battle?.id} - ${battle?.player1.username} VS ${battle?.player2?.username}`
+      "BattleManager.setCombo",
+      `${battle?.id} - ${battle?.player1.username} ${
+        battle?.player1.combo ?? ""
+      } VS ${battle?.player2?.username} ${battle?.player2?.combo ?? ""}`
     );
     return battle;
   }
