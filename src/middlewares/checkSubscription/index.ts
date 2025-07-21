@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { MiddlewareFn } from "telegraf";
 import { MyContext } from "@bot/features/scenes";
-import userActionsLogger from "@infrastructure/logger/userActionsLogger";
+import { userActionsLogger } from "@infrastructure/logger/userActionsLogger";
 
 config();
 
