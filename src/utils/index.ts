@@ -186,3 +186,20 @@ export async function handleError(
   });
   await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
 }
+
+export function extractEquipmenNameFromCaption(caption: string): {
+  brand: string;
+  model: string;
+} {
+  const lines = caption.split("\n");
+  const firstLine = lines[0];
+
+  const cleaned = firstLine.replace(/[🎤🎧🎛]/g, "").trim();
+
+  const [brand, model] = cleaned.split("\u200B");
+
+  return {
+    brand: brand?.trim() || "",
+    model: model?.trim() || "",
+  };
+}

@@ -1,25 +1,12 @@
 import { MyContext } from "@bot/features/scenes";
 import { Markup, Telegraf } from "telegraf";
-import { EQUIPMENT_SHOP_BUTTONS } from "../equipmentShop/keyboard";
-import { handleError, hasCaption } from "@utils/index";
 import { UserController } from "@controller";
-
-function extractEquipmenNameFromCaption(caption: string): {
-  brand: string;
-  model: string;
-} {
-  const lines = caption.split("\n");
-  const firstLine = lines[0];
-
-  const cleaned = firstLine.replace(/[🎤🎧🎛]/g, "").trim();
-
-  const [brand, model] = cleaned.split("\u200B");
-
-  return {
-    brand: brand?.trim() || "",
-    model: model?.trim() || "",
-  };
-}
+import { EQUIPMENT_SHOP_BUTTONS } from "../equipmentShop/keyboard";
+import {
+  handleError,
+  hasCaption,
+  extractEquipmenNameFromCaption,
+} from "@utils/index";
 
 export const buyEquipmentAction = (bot: Telegraf<MyContext>) => {
   bot.action(EQUIPMENT_SHOP_BUTTONS.BUY_EQUIPMENT.callback, async (ctx) => {

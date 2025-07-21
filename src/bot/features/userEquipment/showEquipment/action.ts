@@ -1,9 +1,9 @@
 import path from "path";
 import { Telegraf } from "telegraf";
-import { MyContext, SessionData } from "../scenes";
+import { MyContext, SessionData } from "../../scenes";
 import { EquipmentController } from "@controller";
-import { formatPaginated } from "../pagination/action";
-import { paginationKeyboard } from "../pagination/keyboard";
+import { formatPaginated } from "../../pagination/action";
+import { showEquipmentKeyboard, showOneEquipmentKeyboard } from "./keyboard";
 import { PROFILE_BUTTONS } from "@bot/handlers";
 import { getRandomImage, handleError } from "@utils/index";
 
@@ -12,9 +12,10 @@ export const showEquipmentAction = (bot: Telegraf<MyContext>) => {
     try {
       await ctx.answerCbQuery();
 
-      const userEquipment = await EquipmentController.findByAccountId(
-        ctx.user!.accountId
-      );
+      const userEquipment =
+        await EquipmentController.findUserEquipmentsByAccountId(
+          ctx.user!.accountId
+        );
 
       if (!userEquipment || userEquipment.length === 0) {
         return await ctx.reply("👮🏿‍♂️ Обнаружен лейм без оборудки");
@@ -23,7 +24,9 @@ export const showEquipmentAction = (bot: Telegraf<MyContext>) => {
       const equipment = userEquipment.map((e) => e.equipment);
 
       const replyMarkup =
-        equipment.length > 1 ? paginationKeyboard.reply_markup : undefined;
+        equipment.length > 1
+          ? showEquipmentKeyboard.reply_markup
+          : showOneEquipmentKeyboard.reply_markup;
 
       const session = ctx.session as SessionData;
       session.pagination = {
@@ -34,8 +37,8 @@ export const showEquipmentAction = (bot: Telegraf<MyContext>) => {
       };
 
       const imagePath = await getRandomImage(
-        path.resolve(__dirname, "../../assets/images/EQUIPMENT"),
-        path.resolve(__dirname, "../../assets/images/EQUIPMENT/1.jpg")
+        path.resolve(__dirname, "../../../assets/images/EQUIPMENT"),
+        path.resolve(__dirname, "../../../assets/images/EQUIPMENT/1.jpg")
       );
 
       const first = equipment[0];
