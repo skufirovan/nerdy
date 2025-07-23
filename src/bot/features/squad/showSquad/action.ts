@@ -7,7 +7,6 @@ import { SECTION_EMOJI } from "@utils/constants";
 import { createSquadKeyboard } from "./keyboard";
 import {
   formatSquadMembers,
-  getRandomImage,
   getSquadKeyboardByRole,
   handleError,
 } from "@utils/index";
@@ -41,7 +40,7 @@ export const showSquadAction = (bot: Telegraf<MyContext>) => {
         membership.squadName
       );
 
-      const title = `${membership.squadName}\n`;
+      const title = `🧌 ${membership.squadName} - ${membership.squad.seasonalFame} Fame\n`;
       const body = formatSquadMembers(members);
       const squadText = [title, ...body];
 
@@ -50,16 +49,14 @@ export const showSquadAction = (bot: Telegraf<MyContext>) => {
         membership.squadName
       );
 
-      const imagePath = await getRandomImage(
-        path.resolve(__dirname, `../../../assets/images/SQUAD`),
-        path.resolve(__dirname, `../../../assets/images/SQUAD/1.jpg`)
-      );
+      const dir = path.resolve("public", "squads");
+      const imagePath = path.resolve(dir, `${membership.squadName}.jpg`);
 
       await ctx.replyWithPhoto(
         { source: imagePath },
         {
           caption: squadText.join("\n"),
-          parse_mode: "Markdown",
+          parse_mode: "HTML",
           reply_markup: squadKeyboard.reply_markup,
         }
       );

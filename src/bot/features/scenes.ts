@@ -19,6 +19,7 @@ export interface SessionData extends Scenes.SceneSessionData {
   referral?: bigint | null;
   demo?: { name?: string; text?: string };
   video?: { description?: string; demo?: DemoDto };
+  createSquad?: { name?: string };
   pagination?: PaginationData<unknown>;
   battleId?: string;
   squadData?: SquadData;

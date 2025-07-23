@@ -1,5 +1,4 @@
 import { Scenes } from "telegraf";
-import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { SquadController } from "@controller";
 import { ValidationError, validate, handleError } from "@utils/index";
@@ -11,41 +10,62 @@ createSquadScene.enter(async (ctx: MyContext) => {
   await ctx.reply("👨🏿‍🏫 Введи название объединения");
 });
 
-createSquadScene.on(message("text"), async (ctx: MyContext) => {
-  if (!ctx.message || !("text" in ctx.message))
-    return await ctx.reply("⚠️ Отправь текст ТЕКСТ #ТЕКСТ");
-
+createSquadScene.on("message", async (ctx: MyContext) => {
   const accountId = ctx.user!.accountId;
-  const name = ctx.message.text.trim();
-  const validation = validate(name);
-
-  if (!validation.isValid) {
-    const errorMessages: Record<ValidationError, string> = {
-      TOO_SHORT: "В названии должно быть минимум 3 символа",
-      TOO_LONG: "В названии должно быть максимум 40 символов",
-      INVALID_CHARS: "Можно использовать только буквы, цифры и _-.,!?",
-    };
-
-    return await ctx.reply(
-      `⚠️ ${errorMessages[validation.error!]}\n➖ Давай заново`
-    );
-  }
 
   try {
-    const existed = await SquadController.findSquadByName(accountId, name);
+    const session = ctx.session as SessionData;
+    const message = ctx.message;
 
-    if (existed) {
-      return await ctx.reply(
-        `❌ Оппы были быстрее и заняли это название, попробуй другой вариант`
-      );
+    if (message && "text" in message && !session.createSquad?.name) {
+      const name = message.text.trim();
+      const validation = validate(name);
+
+      if (!validation.isValid) {
+        const errorMessages: Record<ValidationError, string> = {
+          TOO_SHORT: "В названии должно быть минимум 3 символа",
+          TOO_LONG: "В названии должно быть максимум 40 символов",
+          INVALID_CHARS: "Можно использовать только буквы, цифры и _-.,!?",
+        };
+        return await ctx.reply(
+          `⚠️ ${errorMessages[validation.error!]}\n➖ Давай заново`
+        );
+      }
+
+      const existed = await SquadController.findSquadByName(accountId, name);
+      if (existed) {
+        return await ctx.reply(
+          `❌ Оппы были быстрее и заняли это название, попробуй другой вариант`
+        );
+      }
+
+      session.createSquad = { name };
+      await ctx.reply(`🦸🏿 Название выбрано, теперь отправь фото лейбла`);
     }
 
-    await SquadController.createSquad(accountId, name);
+    if (message && "photo" in message && session.createSquad?.name) {
+      const squadName = session.createSquad.name;
+      const photo = message.photo.at(-1);
+      const fileId = photo!.file_id;
+      const fileLink = await ctx.telegram.getFileLink(photo!.file_id);
 
-    await ctx.reply(
-      `${SECTION_EMOJI} Объединение создано, теперь ты можешь наебывать на роялти`
-    );
-    return ctx.scene.leave();
+      if (!fileLink.href.startsWith("http")) {
+        throw new Error(`Невалидная ссылка на фото ${fileLink.href}`);
+      }
+
+      await SquadController.createSquad(
+        accountId,
+        squadName,
+        fileId,
+        fileLink.href
+      );
+
+      await ctx.reply(
+        `${SECTION_EMOJI} Объединение создано, теперь ты можешь наебывать на роялти`
+      );
+      delete session.createSquad;
+      return ctx.scene.leave();
+    }
   } catch (error) {
     await handleError(ctx, error, "createSquadScene.on");
     return ctx.scene.leave();
