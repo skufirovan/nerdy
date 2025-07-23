@@ -1,3 +1,6 @@
+import axios from "axios";
+import fs from "fs";
+import path from "path";
 import { UserService } from "../UserService";
 import { SquadRepository } from "@infrastructure/repositories";
 import { serviceLogger } from "@infrastructure/logger";
@@ -12,7 +15,8 @@ export class SquadService {
   static async createSquad(
     accountId: bigint,
     name: string,
-    photo: string
+    photo: string,
+    fileUrl: string
   ): Promise<Squad> {
     try {
       const user = await UserService.findByAccountId(accountId);
@@ -25,6 +29,20 @@ export class SquadService {
         throw new Error(
           `${accountId} уже состоит в объединении ${existing.squadName}`
         );
+
+      if (fileUrl) {
+        const response = await axios.get(fileUrl, { responseType: "stream" });
+        const dir = path.resolve("public", "squads");
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        const filePath = path.resolve(dir, `${name}.jpg`);
+        const writer = fs.createWriteStream(filePath);
+
+        await new Promise<void>((resolve, reject) => {
+          response.data.pipe(writer);
+          writer.on("finish", () => resolve(undefined));
+          writer.on("error", (err) => reject(err));
+        });
+      }
 
       const squad = await SquadRepository.createSquad(
         accountId,
@@ -201,6 +219,11 @@ export class SquadService {
         squadName
       );
 
+      const filePath = path.resolve("public", "squads", `${squadName}.jpg`);
+      if (fs.existsSync(filePath)) {
+        await fs.promises.unlink(filePath);
+      }
+
       serviceLogger(
         "info",
         "SquadService.deleteSquad",
@@ -243,7 +266,7 @@ export class SquadService {
 
       if (!requesterMembership || requesterMembership.squadName !== squadName)
         throw new Error(`${accountId} не состоит в объединении ${squadName}`);
-      if (!targetMember || requesterMembership.squadName !== squadName)
+      if (!targetMember || targetMember.squadName !== squadName)
         throw new Error(`${userId} не состоит в объединении ${squadName}`);
 
       if (isSelfLeave) {
@@ -271,6 +294,11 @@ export class SquadService {
             accountId,
             squadName
           );
+
+          const filePath = path.resolve("public", "squads", `${squadName}.jpg`);
+          if (fs.existsSync(filePath)) {
+            await fs.promises.unlink(filePath);
+          }
 
           serviceLogger(
             "info",
@@ -447,7 +475,7 @@ export class SquadService {
 
       serviceLogger(
         "info",
-        "SquadService.deleteSquadMember",
+        "SquadService.transferOwnership",
         `Админ передал права на объединение: ${squadName}`,
         { accountId }
       );

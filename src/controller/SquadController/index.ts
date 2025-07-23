@@ -8,17 +8,23 @@ import {
 import { NON_UPDATABLE_SQUAD_FIELDS } from "@domain/types";
 import { Squad, SquadMemberRole } from "@prisma/generated";
 
-const TTL = 5 * 1000;
+const TTL = 5 * 60 * 1000;
 const cache = new InMemoryCache<"top_squads", SquadWithMembersDto[]>(TTL);
 
 export class SquadController {
   static async createSquad(
     accountId: bigint,
     name: string,
-    photo: string
+    photo: string,
+    fileUrl: string
   ): Promise<SquadDto> {
     try {
-      const squad = await SquadService.createSquad(accountId, name, photo);
+      const squad = await SquadService.createSquad(
+        accountId,
+        name,
+        photo,
+        fileUrl
+      );
       const dto = new SquadDto(squad);
       return dto;
     } catch (error) {
@@ -139,11 +145,31 @@ export class SquadController {
         userId
       );
 
-      if ("role" in result) {
-        return new SquadMemberWithUserAndSquadDto(result);
+      const cacheKey = "top_squads";
+      const cached = cache.get(cacheKey);
+
+      if ("name" in result) {
+        if (cached) {
+          const updatedCache = cached.filter((s) => s.name !== squadName);
+          cache.set(cacheKey, updatedCache);
+        }
+        return new SquadDto(result);
       }
 
-      return new SquadDto(result);
+      if (cached) {
+        const updatedCache = cached.map((s) => {
+          if (s.name === squadName) {
+            return {
+              ...s,
+              members: s.members.filter((m) => m.accountId !== userId),
+            };
+          }
+          return s;
+        });
+        cache.set(cacheKey, updatedCache);
+      }
+
+      return new SquadMemberWithUserAndSquadDto(result);
     } catch (error) {
       throw error;
     }
