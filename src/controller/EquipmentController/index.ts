@@ -4,7 +4,7 @@ import { UserEquipmentDto } from "@domain/dtos/UserEquipmentDto";
 import { InMemoryCache } from "@infrastructure/cache";
 import { EQUIPMENT_TYPE } from "@prisma/generated";
 
-const TTL = 24 * 60 * 60 * 60 * 1000;
+const TTL = 24 * 60 * 60 * 1000;
 const cache = new InMemoryCache<"shop_equipment", EquipmentDto[]>(TTL);
 
 export class EquipmentController {
