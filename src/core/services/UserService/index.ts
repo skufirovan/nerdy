@@ -4,6 +4,7 @@ import { calculateLevelAndRacks } from "@core/GameLogic";
 import { serviceLogger } from "@infrastructure/logger";
 import { User } from "@prisma/generated";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
+import { SquadService } from "../SquadService";
 
 export class UserService {
   static async register(
@@ -179,6 +180,14 @@ export class UserService {
       const updatedFame = user.fame + amount;
       const updatedSeasonalFame = user.seasonalFame + amount;
       const { level, racks } = calculateLevelAndRacks(user.level, updatedFame);
+
+      const membership = await SquadService.findMembershipByUserId(accountId);
+
+      if (membership) {
+        await SquadService.updateSquadInfo(accountId, membership.squadName, {
+          seasonalFame: membership.squad.seasonalFame + amount,
+        });
+      }
 
       if (level !== user.level) {
         const updatedUser = await UserRepository.updateUserInfo(accountId, {

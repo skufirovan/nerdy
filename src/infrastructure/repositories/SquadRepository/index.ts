@@ -1,12 +1,21 @@
 import { prisma } from "@prisma/client";
-import { SquadMemberWithUser } from "@domain/types";
 import { Squad, SquadMemberRole } from "@prisma/generated";
+import {
+  NON_UPDATABLE_SQUAD_FIELDS,
+  SquadMemberWithUserAndSquad,
+  SquadWithMembers,
+} from "@domain/types";
 
 export class SquadRepository {
-  static async createSquad(adminId: bigint, name: string): Promise<Squad> {
+  static async createSquad(
+    adminId: bigint,
+    name: string,
+    seasonalFame: number,
+    photo: string
+  ): Promise<Squad> {
     return prisma.$transaction(async (tx) => {
       const squad = await tx.squad.create({
-        data: { adminId, name },
+        data: { adminId, name, seasonalFame, photo },
       });
 
       await tx.squadMember.create({
@@ -24,15 +33,21 @@ export class SquadRepository {
   static async addMember(
     squadName: string,
     newMemberId: bigint,
+    seasonalFame: number,
     role: SquadMemberRole = SquadMemberRole.MEMBER
-  ): Promise<SquadMemberWithUser> {
+  ): Promise<SquadMemberWithUserAndSquad> {
+    await prisma.squad.update({
+      where: { name: squadName },
+      data: { seasonalFame: { increment: seasonalFame } },
+    });
+
     return prisma.squadMember.create({
       data: {
         squadName,
         accountId: newMemberId,
         role,
       },
-      include: { user: true },
+      include: { user: true, squad: true },
     });
   }
 
@@ -42,20 +57,28 @@ export class SquadRepository {
 
   static async findMembershipByUserId(
     accountId: bigint
-  ): Promise<SquadMemberWithUser | null> {
+  ): Promise<SquadMemberWithUserAndSquad | null> {
     return prisma.squadMember.findUnique({
       where: { accountId },
-      include: { user: true },
+      include: { user: true, squad: true },
     });
   }
 
   static async findSquadMembers(
     squadName: string
-  ): Promise<SquadMemberWithUser[]> {
+  ): Promise<SquadMemberWithUserAndSquad[]> {
     return prisma.squadMember.findMany({
       where: { squadName },
-      include: { user: true },
+      include: { user: true, squad: true },
       orderBy: { user: { seasonalFame: "desc" } },
+    });
+  }
+
+  static async findTopSquads(limit: number = 10): Promise<SquadWithMembers[]> {
+    return prisma.squad.findMany({
+      orderBy: { seasonalFame: "desc" },
+      take: limit,
+      include: { members: { include: { user: true, squad: true } } },
     });
   }
 
@@ -67,39 +90,42 @@ export class SquadRepository {
 
   static async deleteSquadMember(
     squadName: string,
-    accountId: bigint
-  ): Promise<SquadMemberWithUser> {
+    accountId: bigint,
+    seasonalFame: number
+  ): Promise<SquadMemberWithUserAndSquad> {
+    await prisma.squad.update({
+      where: { name: squadName },
+      data: { seasonalFame: { decrement: seasonalFame } },
+    });
+
     return prisma.squadMember.delete({
       where: {
         squadName,
         accountId,
       },
-      include: { user: true },
+      include: { user: true, squad: true },
     });
+  }
+
+  static async updateSquadInfo(
+    squadName: string,
+    data: Partial<Omit<Squad, NON_UPDATABLE_SQUAD_FIELDS>>
+  ): Promise<Squad> {
+    return prisma.squad.update({ where: { name: squadName }, data });
   }
 
   static async changeMemberRole(
     squadName: string,
     accountId: bigint,
     role: SquadMemberRole
-  ): Promise<SquadMemberWithUser> {
+  ): Promise<SquadMemberWithUserAndSquad> {
     return prisma.squadMember.update({
       where: {
         squadName,
         accountId,
       },
       data: { role },
-      include: { user: true },
-    });
-  }
-
-  static async transferOwnership(
-    squadName: string,
-    adminId: bigint
-  ): Promise<Squad> {
-    return prisma.squad.update({
-      where: { name: squadName },
-      data: { adminId },
+      include: { user: true, squad: true },
     });
   }
 }

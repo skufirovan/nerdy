@@ -1,9 +1,11 @@
-import { Prisma, User } from "@prisma/generated";
+import { Prisma, Squad, User } from "@prisma/generated";
 
 export type NON_UPDATABLE_USER_FIELDS = keyof Pick<
   User,
   "id" | "accountId" | "registeredAt"
 >;
+
+export type NON_UPDATABLE_SQUAD_FIELDS = keyof Pick<Squad, "id">;
 
 export type RawUser = {
   accountId: bigint;
@@ -14,6 +16,10 @@ export type UserEquipmentWithEquipment = Prisma.UserEquipmentGetPayload<{
   include: { equipment: true };
 }>;
 
-export type SquadMemberWithUser = Prisma.SquadMemberGetPayload<{
-  include: { user: true };
+export type SquadMemberWithUserAndSquad = Prisma.SquadMemberGetPayload<{
+  include: { user: true; squad: true };
+}>;
+
+export type SquadWithMembers = Prisma.SquadGetPayload<{
+  include: { members: { include: { user: true; squad: true } } };
 }>;

@@ -1,11 +1,24 @@
 import { SquadService } from "@core/index";
-import { SquadDto, SquadMemberDto } from "@domain/dtos";
-import { SquadMemberRole } from "@prisma/generated";
+import { InMemoryCache } from "@infrastructure/cache";
+import {
+  SquadDto,
+  SquadMemberWithUserAndSquadDto,
+  SquadWithMembersDto,
+} from "@domain/dtos";
+import { NON_UPDATABLE_SQUAD_FIELDS } from "@domain/types";
+import { Squad, SquadMemberRole } from "@prisma/generated";
+
+const TTL = 5 * 1000;
+const cache = new InMemoryCache<"top_squads", SquadWithMembersDto[]>(TTL);
 
 export class SquadController {
-  static async createSquad(accountId: bigint, name: string): Promise<SquadDto> {
+  static async createSquad(
+    accountId: bigint,
+    name: string,
+    photo: string
+  ): Promise<SquadDto> {
     try {
-      const squad = await SquadService.createSquad(accountId, name);
+      const squad = await SquadService.createSquad(accountId, name, photo);
       const dto = new SquadDto(squad);
       return dto;
     } catch (error) {
@@ -17,14 +30,14 @@ export class SquadController {
     accountId: bigint,
     squadName: string,
     newMemberId: bigint
-  ): Promise<SquadMemberDto> {
+  ): Promise<SquadMemberWithUserAndSquadDto> {
     try {
       const newMember = await SquadService.addMember(
         accountId,
         squadName,
         newMemberId
       );
-      const dto = new SquadMemberDto(newMember);
+      const dto = new SquadMemberWithUserAndSquadDto(newMember);
       return dto;
     } catch (error) {
       throw error;
@@ -48,11 +61,11 @@ export class SquadController {
 
   static async findMembershipByUserId(
     accountId: bigint
-  ): Promise<SquadMemberDto | null> {
+  ): Promise<SquadMemberWithUserAndSquadDto | null> {
     try {
       const membership = await SquadService.findMembershipByUserId(accountId);
       if (!membership) return null;
-      const dto = new SquadMemberDto(membership);
+      const dto = new SquadMemberWithUserAndSquadDto(membership);
       return dto;
     } catch (error) {
       throw error;
@@ -62,10 +75,31 @@ export class SquadController {
   static async findSquadMembers(
     accountId: bigint,
     squadName: string
-  ): Promise<SquadMemberDto[]> {
+  ): Promise<SquadMemberWithUserAndSquadDto[]> {
     try {
       const members = await SquadService.findSquadMembers(accountId, squadName);
-      const dtos = members.map((m) => new SquadMemberDto(m));
+      const dtos = members.map((m) => new SquadMemberWithUserAndSquadDto(m));
+      return dtos;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async findTopSquads(
+    accountId: bigint,
+    limit: number = 10
+  ): Promise<SquadWithMembersDto[]> {
+    try {
+      const cacheKey = "top_squads";
+
+      const cached = cache.get(cacheKey);
+      if (cached) return cached;
+
+      const topSquads = await SquadService.findTopSquads(accountId, limit);
+
+      const dtos = topSquads.map((s) => new SquadWithMembersDto(s));
+      cache.set(cacheKey, dtos);
+
       return dtos;
     } catch (error) {
       throw error;
@@ -79,6 +113,14 @@ export class SquadController {
     try {
       const squad = await SquadService.deleteSquad(accountId, squadName);
       const dto = new SquadDto(squad);
+
+      const cacheKey = "top_squads";
+      const cached = cache.get(cacheKey);
+      if (cached) {
+        const updatedCache = cached.filter((s) => s.name !== squadName);
+        cache.set(cacheKey, updatedCache);
+      }
+
       return dto;
     } catch (error) {
       throw error;
@@ -89,7 +131,7 @@ export class SquadController {
     accountId: bigint,
     squadName: string,
     userId: bigint
-  ): Promise<SquadMemberDto | SquadDto> {
+  ): Promise<SquadMemberWithUserAndSquadDto | SquadDto> {
     try {
       const result = await SquadService.deleteSquadMember(
         accountId,
@@ -98,10 +140,29 @@ export class SquadController {
       );
 
       if ("role" in result) {
-        return new SquadMemberDto(result);
+        return new SquadMemberWithUserAndSquadDto(result);
       }
 
       return new SquadDto(result);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateSquadInfo(
+    accountId: bigint,
+    squadName: string,
+    data: Partial<Omit<Squad, NON_UPDATABLE_SQUAD_FIELDS>>
+  ): Promise<SquadDto> {
+    try {
+      const updatedSquad = await SquadService.updateSquadInfo(
+        accountId,
+        squadName,
+        data
+      );
+
+      const dto = new SquadDto(updatedSquad);
+      return dto;
     } catch (error) {
       throw error;
     }
@@ -112,7 +173,7 @@ export class SquadController {
     squadName: string,
     userId: bigint,
     role: SquadMemberRole
-  ): Promise<SquadMemberDto> {
+  ): Promise<SquadMemberWithUserAndSquadDto> {
     try {
       const member = await SquadService.changeMemberRole(
         accountId,
@@ -120,7 +181,7 @@ export class SquadController {
         userId,
         role
       );
-      const dto = new SquadMemberDto(member);
+      const dto = new SquadMemberWithUserAndSquadDto(member);
       return dto;
     } catch (error) {
       throw error;

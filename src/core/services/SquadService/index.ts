@@ -2,10 +2,18 @@ import { UserService } from "../UserService";
 import { SquadRepository } from "@infrastructure/repositories";
 import { serviceLogger } from "@infrastructure/logger";
 import { Squad, SquadMemberRole } from "@prisma/generated";
-import { SquadMemberWithUser } from "@domain/types";
+import {
+  NON_UPDATABLE_SQUAD_FIELDS,
+  SquadMemberWithUserAndSquad,
+  SquadWithMembers,
+} from "@domain/types";
 
 export class SquadService {
-  static async createSquad(accountId: bigint, name: string): Promise<Squad> {
+  static async createSquad(
+    accountId: bigint,
+    name: string,
+    photo: string
+  ): Promise<Squad> {
     try {
       const user = await UserService.findByAccountId(accountId);
 
@@ -18,7 +26,12 @@ export class SquadService {
           `${accountId} уже состоит в объединении ${existing.squadName}`
         );
 
-      const squad = await SquadRepository.createSquad(accountId, name);
+      const squad = await SquadRepository.createSquad(
+        accountId,
+        name,
+        user.seasonalFame,
+        photo
+      );
 
       serviceLogger(
         "info",
@@ -36,7 +49,7 @@ export class SquadService {
         `Ошибка при создании объединения: ${err}`,
         { accountId }
       );
-      throw new Error("Сервис временно недоступен. Попробуйте позже.");
+      throw new Error("Ошибка при создании объединения");
     }
   }
 
@@ -44,12 +57,15 @@ export class SquadService {
     accountId: bigint,
     squadName: string,
     userId: bigint
-  ): Promise<SquadMemberWithUser> {
+  ): Promise<SquadMemberWithUserAndSquad> {
     try {
       const squad = await SquadRepository.findSquadByName(squadName);
       const members = await SquadRepository.findSquadMembers(squadName);
+
+      const user = await UserService.findByAccountId(userId);
       const existing = await SquadRepository.findMembershipByUserId(userId);
 
+      if (!user) throw new Error(`Пользователь ${userId} не найден`);
       if (!squad) throw new Error(`Объединение ${squadName} не найдено`);
       if (members.length > squad.capacity)
         throw new Error(`В объединении ${squadName} нет места`);
@@ -68,7 +84,11 @@ export class SquadService {
           `${userId} уже состоит в объединении ${existing.squadName}`
         );
 
-      const member = await SquadRepository.addMember(squadName, userId);
+      const member = await SquadRepository.addMember(
+        squadName,
+        userId,
+        user.seasonalFame
+      );
 
       serviceLogger(
         "info",
@@ -86,7 +106,7 @@ export class SquadService {
         `Ошибка при добавлении участника в объединение ${squadName}: ${err}`,
         { accountId }
       );
-      throw new Error("Сервис временно недоступен. Попробуйте позже.");
+      throw new Error("Ошибка при добавлении участника в объединение");
     }
   }
 
@@ -104,13 +124,13 @@ export class SquadService {
         `Ошибка при поиске объединения ${name}: ${err}`,
         { accountId }
       );
-      throw new Error(`Сервис временно недоступен. Попробуйте позже.`);
+      throw new Error(`Ошибка при поиске объединения ${name}`);
     }
   }
 
   static async findMembershipByUserId(
     accountId: bigint
-  ): Promise<SquadMemberWithUser | null> {
+  ): Promise<SquadMemberWithUserAndSquad | null> {
     try {
       return await SquadRepository.findMembershipByUserId(accountId);
     } catch (error) {
@@ -121,14 +141,14 @@ export class SquadService {
         `Не удалось получить данные об участии в объединении: ${err}`,
         { accountId }
       );
-      throw new Error("Сервис временно недоступен. Попробуйте позже.");
+      throw new Error("Не удалось получить данные об участии в объединении");
     }
   }
 
   static async findSquadMembers(
     accountId: bigint,
     squadName: string
-  ): Promise<SquadMemberWithUser[]> {
+  ): Promise<SquadMemberWithUserAndSquad[]> {
     try {
       return await SquadRepository.findSquadMembers(squadName);
     } catch (error) {
@@ -139,7 +159,26 @@ export class SquadService {
         `Ошибка при получении участников объединения ${squadName}: ${err}`,
         { accountId }
       );
-      throw new Error("Сервис временно недоступен. Попробуйте позже.");
+      throw new Error("Ошибка при получении участников объединения");
+    }
+  }
+
+  static async findTopSquads(
+    accountId: bigint,
+    limit: number = 10
+  ): Promise<SquadWithMembers[]> {
+    try {
+      const topSquads = await SquadRepository.findTopSquads(limit);
+      return topSquads;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "SquadService.findTopSquads",
+        `Ошибка при получении рейтинга объединений: ${err}`,
+        { accountId }
+      );
+      throw new Error("Ошибка при получении рейтинга объединений");
     }
   }
 
@@ -178,7 +217,7 @@ export class SquadService {
         `Ошибка при удалении объединения ${squadName}: ${err}`,
         { accountId }
       );
-      throw new Error("Сервис временно недоступен. Попробуйте позже.");
+      throw new Error(`Ошибка при удалении объединения ${squadName}`);
     }
   }
 
@@ -186,23 +225,33 @@ export class SquadService {
     accountId: bigint,
     squadName: string,
     userId: bigint
-  ): Promise<SquadMemberWithUser | Squad> {
+  ): Promise<SquadMemberWithUserAndSquad | Squad> {
     try {
       const isSelfLeave = accountId === userId;
 
-      const requester = await SquadRepository.findMembershipByUserId(accountId);
+      const requesterUser = await UserService.findByAccountId(accountId);
+      const requesterMembership = await SquadRepository.findMembershipByUserId(
+        accountId
+      );
+
+      const targetUser = await UserService.findByAccountId(userId);
       const targetMember = await SquadRepository.findMembershipByUserId(userId);
 
-      if (!requester || requester.squadName !== squadName)
+      if (!requesterUser)
+        throw new Error(`Пользователь ${accountId} не найден`);
+      if (!targetUser) throw new Error(`Пользователь ${userId} не найден`);
+
+      if (!requesterMembership || requesterMembership.squadName !== squadName)
         throw new Error(`${accountId} не состоит в объединении ${squadName}`);
-      if (!targetMember || requester.squadName !== squadName)
+      if (!targetMember || requesterMembership.squadName !== squadName)
         throw new Error(`${userId} не состоит в объединении ${squadName}`);
 
       if (isSelfLeave) {
-        if (requester.role !== SquadMemberRole.ADMIN) {
+        if (requesterMembership.role !== SquadMemberRole.ADMIN) {
           const deletedMember = await SquadRepository.deleteSquadMember(
             squadName,
-            userId
+            accountId,
+            requesterUser.seasonalFame
           );
 
           serviceLogger(
@@ -248,11 +297,14 @@ export class SquadService {
           nextOwner.accountId,
           "ADMIN"
         );
-        await SquadRepository.transferOwnership(squadName, nextOwner.accountId);
+        await SquadRepository.updateSquadInfo(squadName, {
+          adminId: nextOwner.accountId,
+        });
 
         const deletedMember = await SquadRepository.deleteSquadMember(
           squadName,
-          userId
+          accountId,
+          requesterUser.seasonalFame
         );
 
         serviceLogger(
@@ -265,7 +317,7 @@ export class SquadService {
         return deletedMember;
       }
 
-      if (requester.role !== SquadMemberRole.ADMIN)
+      if (requesterMembership.role !== SquadMemberRole.ADMIN)
         throw new Error(
           "Только администратор может удалять участников из объединения"
         );
@@ -274,12 +326,13 @@ export class SquadService {
         targetMember.role === SquadMemberRole.RECRUITER
       )
         throw new Error(
-          "Администратора или рекрутера нельзя удалить из объединения"
+          "Аминистратора или рекрутера нельзя удалить из объединения"
         );
 
       const deletedMember = await SquadRepository.deleteSquadMember(
         squadName,
-        userId
+        userId,
+        targetUser.seasonalFame
       );
 
       serviceLogger(
@@ -295,10 +348,35 @@ export class SquadService {
       serviceLogger(
         "error",
         "SquadService.deleteSquadMember",
-        `Ошибка при удалении участника из объединения: ${err}`,
+        `Ошибка при удалении участника из объединения ${squadName}: ${err}`,
         { accountId }
       );
-      throw new Error("Сервис временно недоступен. Попробуйте позже.");
+      throw new Error(
+        `Ошибка при удалении участника из объединения ${squadName}`
+      );
+    }
+  }
+
+  static async updateSquadInfo(
+    accountId: bigint,
+    squadName: string,
+    data: Partial<Omit<Squad, NON_UPDATABLE_SQUAD_FIELDS>>
+  ): Promise<Squad> {
+    try {
+      const updatedSquad = await SquadRepository.updateSquadInfo(
+        squadName,
+        data
+      );
+      return updatedSquad;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "SquadService.updateSquadInfo",
+        `Ошибка при обновлении данных объединения ${squadName}: ${err}`,
+        { accountId }
+      );
+      throw new Error(`Ошибка при обновлении данных объединения ${squadName}`);
     }
   }
 
@@ -307,7 +385,7 @@ export class SquadService {
     squadName: string,
     userId: bigint,
     role: SquadMemberRole
-  ): Promise<SquadMemberWithUser> {
+  ): Promise<SquadMemberWithUserAndSquad> {
     try {
       if (accountId === userId)
         throw new Error("Нельзя изменить собственную роль");
@@ -330,10 +408,12 @@ export class SquadService {
       serviceLogger(
         "error",
         "SquadService.changeMemberRole",
-        `Ошибка при изменении роли участника сквада: ${err}`,
+        `Ошибка при изменении роли участника объединения ${squadName}: ${err}`,
         { accountId }
       );
-      throw new Error("Сервис временно недоступен. Попробуйте позже.");
+      throw new Error(
+        `Ошибка при изменении роли участника объединения ${squadName}`
+      );
     }
   }
 
@@ -361,7 +441,9 @@ export class SquadService {
 
       await SquadRepository.changeMemberRole(squadName, accountId, "MEMBER");
       await SquadRepository.changeMemberRole(squadName, userId, "ADMIN");
-      const squad = await SquadRepository.transferOwnership(squadName, userId);
+      const squad = await SquadRepository.updateSquadInfo(squadName, {
+        adminId: userId,
+      });
 
       serviceLogger(
         "info",
@@ -376,10 +458,10 @@ export class SquadService {
       serviceLogger(
         "error",
         "SquadService.transferOwnership",
-        `Ошибка при передаче прав на объединение: ${err}`,
+        `Ошибка при передаче прав на объединение ${squadName}: ${err}`,
         { accountId }
       );
-      throw new Error("Сервис временно недоступен. Попробуйте позже.");
+      throw new Error(`Ошибка при передаче прав на объединение ${squadName}`);
     }
   }
 }
