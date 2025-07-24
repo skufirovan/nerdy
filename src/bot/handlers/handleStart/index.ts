@@ -22,7 +22,7 @@ export const handleStart = async (ctx: MyContext) => {
     );
 
     let user = await UserController.findByAccountId(accountId);
-    if (!user) {
+    if (!user || user.username !== ctx.user!.username) {
       const session = ctx.session as SessionData;
       const rawPayload = ctx.startPayload;
       session.referral =

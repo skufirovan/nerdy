@@ -17,10 +17,13 @@ export const showTopAction = (bot: Telegraf<MyContext>) => {
       );
 
       const text = seasonTop
-        .map(
-          (u) =>
-            `☁️ [${u.nickname}](https://t.me/${u.username}) ${u.level} lvl — ${u.seasonalFame} Fame`
-        )
+        .map((u) => {
+          const member = u.username
+            ? `[${u.nickname}](https://t.me/${u.username})`
+            : `${u.nickname}`;
+
+          return `☁️ ${member} ${u.level} lvl — ${u.seasonalFame} Fame`;
+        })
         .join("\n");
 
       await ctx.reply(
