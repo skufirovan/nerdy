@@ -10,7 +10,7 @@ export const kickMemberAction = (bot: Telegraf<MyContext>) => {
       const session = ctx.session as SessionData;
       session.squadData = {
         requesterId: ctx.user!.accountId,
-        name: ctx.match[1],
+        adminId: BigInt(ctx.match[1]),
       };
 
       await ctx.scene.enter("kickMember");

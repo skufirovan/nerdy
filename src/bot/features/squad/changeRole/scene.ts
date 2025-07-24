@@ -48,13 +48,17 @@ changeSquadMemberRoleScene.on(message("text"), async (ctx: MyContext) => {
         member.accountId
       );
 
-      if (!existMembership || existMembership.squadName !== squadData.name) {
+      if (
+        !existMembership ||
+        existMembership.squad.adminId !== squadData.adminId
+      ) {
         await ctx.reply(`❌ <b>${msg}</b> не подписан на твой лейбл`, {
           parse_mode: "HTML",
         });
         return ctx.scene.leave();
       }
 
+      squadData.name = existMembership.squad.name;
       squadData.targetUser = { accountId: member.accountId };
       const text = [
         `${SECTION_EMOJI} Напиши новую роль для <b>${msg}</b>\n`,

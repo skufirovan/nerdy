@@ -10,6 +10,7 @@ export type SquadActions =
 export type SquadData = {
   requesterId?: bigint;
   name?: string;
+  adminId?: bigint;
   targetUser?: {
     accountId?: bigint;
     intendedRole?: SquadMemberRole;

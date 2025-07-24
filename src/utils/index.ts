@@ -3,7 +3,7 @@ import path from "path";
 import { Markup } from "telegraf";
 import { MyContext } from "@bot/features/scenes";
 import { UserController } from "@controller";
-import { UserDto, SquadMemberDto } from "@domain/dtos";
+import { UserDto, SquadMemberWithUserAndSquadDto } from "@domain/dtos";
 import { SquadMemberRole } from "@prisma/generated";
 import { userActionsLogger, serviceLogger } from "@infrastructure/logger";
 
@@ -69,45 +69,46 @@ export const emojiMap: Record<SquadMemberRole, string> = {
   MEMBER: "👨🏿‍🌾",
 };
 
-export function formatSquadMembers(members: SquadMemberDto[]): string[] {
+export function formatSquad(members: SquadMemberWithUserAndSquadDto[]): string {
   const getRoleEmoji = (role: SquadMemberRole): string => {
     return emojiMap[role] || "👤";
   };
 
-  return members.map((member, index) => {
+  const title = `🧌 ${members[0].squadName} - ${members[0].squad.seasonalFame} Fame\n`;
+
+  const body = members.map((member) => {
     const username = member.user.username
       ? `https://t.me/${member.user.username}`
       : "#";
-    return `${getRoleEmoji(member.role)} [${
+    return `${getRoleEmoji(member.role)} <a href="${username}">${
       member.user.nickname
-    }](${username}) — ${member.user.seasonalFame} Fame`;
+    }</a> — ${member.user.seasonalFame} Fame`;
   });
+
+  return [title, ...body].join("\n");
 }
 
-export function getSquadKeyboardByRole(
-  role: SquadMemberRole,
-  squadName: string
-) {
+export function getSquadKeyboardByRole(role: SquadMemberRole, adminId: bigint) {
   const BUTTONS = {
     KICK_MEMBER: {
       text: "👨🏿‍⚖️ Выгнать",
-      callback: `KICK_MEMBER_${squadName}`,
+      callback: `KICK_MEMBER_${adminId}`,
     },
     INVITE_MEMBER: {
       text: "👶🏿 Пригласить",
-      callback: `INVITE_MEMBER_${squadName}`,
+      callback: `INVITE_MEMBER_${adminId}`,
     },
     LEAVE_SQUAD: {
       text: "🏃🏿 Покинуть объединение",
-      callback: `LEAVE_SQUAD_${squadName}`,
+      callback: `LEAVE_SQUAD_${adminId}`,
     },
     CHANGE_ROLE: {
       text: "👨🏿‍💼 Настроить роли",
-      callback: `PRE-CHANGE_ROLE_${squadName}`,
+      callback: `PRE-CHANGE_ROLE_${adminId}`,
     },
     DELETE_SQUAD: {
       text: "👊🏿 Распустить",
-      callback: `DELETE_SQUAD_${squadName}`,
+      callback: `DELETE_SQUAD_${adminId}`,
     },
   };
 

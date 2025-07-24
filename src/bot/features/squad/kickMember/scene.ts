@@ -40,7 +40,7 @@ kickMemberScene.on(message("text"), async (ctx: MyContext) => {
 
     if (
       !existMembership ||
-      existMembership.squadName !== session.squadData.name
+      existMembership.squad.adminId !== session.squadData.adminId
     ) {
       await ctx.reply(`❌ <b>${nickname}</b> не подписан на твой лейбл`, {
         parse_mode: "HTML",
@@ -50,13 +50,13 @@ kickMemberScene.on(message("text"), async (ctx: MyContext) => {
 
     await SquadController.deleteSquadMember(
       accountId,
-      session.squadData.name,
+      existMembership.squadName,
       member.accountId
     );
 
     ctx.telegram.sendMessage(
       String(member.accountId),
-      `🫵🏿 Ты больше не подписан на лейбл <b>${session.squadData.name}</b>`,
+      `🫵🏿 Ты больше не подписан на лейбл <b>${existMembership.squadName}</b>`,
       { parse_mode: "HTML" }
     );
 

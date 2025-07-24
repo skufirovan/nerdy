@@ -5,11 +5,7 @@ import { MENU_BUTTONS } from "@bot/handlers";
 import { SquadController, UserController } from "@controller";
 import { SECTION_EMOJI } from "@utils/constants";
 import { createSquadKeyboard } from "./keyboard";
-import {
-  formatSquadMembers,
-  getSquadKeyboardByRole,
-  handleError,
-} from "@utils/index";
+import { formatSquad, getSquadKeyboardByRole, handleError } from "@utils/index";
 
 export const showSquadAction = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.SQUAD.callback, async (ctx) => {
@@ -40,13 +36,11 @@ export const showSquadAction = (bot: Telegraf<MyContext>) => {
         membership.squadName
       );
 
-      const title = `🧌 ${membership.squadName} - ${membership.squad.seasonalFame} Fame\n`;
-      const body = formatSquadMembers(members);
-      const squadText = [title, ...body];
+      const squadText = formatSquad(members);
 
       const squadKeyboard = getSquadKeyboardByRole(
         membership.role,
-        membership.squadName
+        membership.squad.adminId
       );
 
       const dir = path.resolve("public", "squads");
@@ -55,7 +49,7 @@ export const showSquadAction = (bot: Telegraf<MyContext>) => {
       await ctx.replyWithPhoto(
         { source: imagePath },
         {
-          caption: squadText.join("\n"),
+          caption: squadText,
           parse_mode: "HTML",
           reply_markup: squadKeyboard.reply_markup,
         }

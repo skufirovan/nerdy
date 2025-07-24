@@ -8,12 +8,12 @@ export const changeSquadMemberRoleAction = (bot: Telegraf<MyContext>) => {
     try {
       await ctx.answerCbQuery();
 
-      const squadName = ctx.match[1];
+      const adminId = ctx.match[1];
 
       const PRE_CHANGE_ROLE_BUTTONS = {
         CHANGE_ROLE: {
           text: "👨🏿‍💼 Поменять роль",
-          callback: `CHANGE_ROLE_${squadName}`,
+          callback: `CHANGE_ROLE_${adminId}`,
         },
         INFO: {
           text: "ℹ️ Информация",
@@ -45,7 +45,7 @@ export const changeSquadMemberRoleAction = (bot: Telegraf<MyContext>) => {
       const session = ctx.session as SessionData;
       session.squadData = {
         requesterId: ctx.user!.accountId,
-        name: ctx.match[1],
+        adminId: BigInt(ctx.match[1]),
       };
 
       await ctx.scene.enter("changeSquadMemberRole");

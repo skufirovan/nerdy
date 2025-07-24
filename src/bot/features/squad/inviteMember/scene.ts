@@ -60,7 +60,7 @@ inviteMemberScene.on(message("text"), async (ctx: MyContext) => {
             [
               {
                 text: "✅ Принять",
-                callback_data: `SQUAD_INVITE_ACCEPT_${session.squadData.name}_${session.squadData.requesterId}_${newMember.accountId}`,
+                callback_data: `SQUAD_INVITE_ACCEPT_${session.squadData.adminId}_${session.squadData.requesterId}_${newMember.accountId}`,
               },
             ],
           ],

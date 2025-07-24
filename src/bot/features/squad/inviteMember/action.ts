@@ -9,10 +9,21 @@ export const inviteMemberActions = (bot: Telegraf<MyContext>) => {
     try {
       await ctx.answerCbQuery();
 
+      const accountId = ctx.user!.accountId;
+      const adminId = BigInt(ctx.match[1]);
+
+      const squad = await SquadController.findSquadByAdminId(
+        accountId,
+        adminId
+      );
+
+      if (!squad) return await ctx.reply("❌ Объединение не найдено");
+
       const session = ctx.session as SessionData;
       session.squadData = {
-        requesterId: ctx.user!.accountId,
-        name: ctx.match[1],
+        requesterId: accountId,
+        adminId,
+        name: squad.name,
       };
 
       await ctx.scene.enter("inviteMember");
@@ -25,25 +36,35 @@ export const inviteMemberActions = (bot: Telegraf<MyContext>) => {
     try {
       await ctx.answerCbQuery();
 
-      const squadName = ctx.match[1];
+      const adminId = ctx.match[1];
       const requesterId = BigInt(ctx.match[2]);
       const targetId = BigInt(ctx.match[3]);
 
       if (ctx.user!.accountId !== targetId)
         return await ctx.reply("❌ Недействительная кнопка");
 
+      const squad = await SquadController.findSquadByAdminId(
+        targetId,
+        BigInt(adminId)
+      );
+
+      if (!squad) return await ctx.reply("❌ Объединение не найдено");
+
       const member = await SquadController.addMember(
         requesterId,
-        squadName,
+        squad.name,
         targetId
       );
 
-      await ctx.editMessageText(`✅ Ты подписан на лейбл <b>${squadName}</b>`, {
-        parse_mode: "HTML",
-      });
+      await ctx.editMessageText(
+        `✅ Ты подписан на лейбл <b>${squad.name}</b>`,
+        {
+          parse_mode: "HTML",
+        }
+      );
       await ctx.telegram.sendMessage(
         String(requesterId),
-        `${SECTION_EMOJI} Теперь <b>${member.user.nickname}</b> — новый подписант лейбла <b>${squadName}</b>`,
+        `${SECTION_EMOJI} Теперь <b>${member.user.nickname}</b> — новый подписант лейбла <b>${squad.name}</b>`,
         { parse_mode: "HTML" }
       );
     } catch (error) {
