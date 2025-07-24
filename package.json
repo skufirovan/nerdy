@@ -4,7 +4,7 @@
   "main": "src/main.ts",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec tsx src/main.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias && cp -r src/prisma/generated dist/prisma/generated",
     "start": "node dist/main.js",
     "prisma:mig": "npx prisma migrate dev --schema src/prisma/schema.prisma",
     "test": "jest"
@@ -14,6 +14,7 @@
   "description": "Telegram game bot",
   "dependencies": {
     "@prisma/client": "^6.9.0",
+    "axios": "^1.10.0",
     "dotenv": "^16.5.0",
     "telegraf": "^4.16.3",
     "winston": "^3.17.0"
@@ -25,6 +26,7 @@
     "nodemon": "^3.1.10",
     "prisma": "^6.9.0",
     "ts-jest": "^29.4.0",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
