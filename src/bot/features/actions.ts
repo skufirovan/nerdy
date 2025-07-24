@@ -26,6 +26,8 @@ import {
   showDonationAction,
   showTopSquadsAction,
   paginateTopSquadsActions,
+  buyNerdPassAction,
+  paymentEvents,
 } from ".";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
@@ -52,6 +54,8 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   buyEquipmentAction(bot);
   equipEquipmentAction(bot);
   showDonationAction(bot);
+  buyNerdPassAction(bot);
   showTopSquadsAction(bot);
   paginateTopSquadsActions(bot);
+  paymentEvents(bot);
 };
