@@ -406,6 +406,13 @@ export class SquadService {
         squadName,
         data
       );
+
+      serviceLogger(
+        "info",
+        "SquadService.updateSquadInfo",
+        `Обновлены данные объединения ${JSON.stringify(data)}`
+      );
+
       return updatedSquad;
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);

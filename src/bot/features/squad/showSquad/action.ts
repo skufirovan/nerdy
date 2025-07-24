@@ -1,4 +1,3 @@
-import path from "path";
 import { Telegraf } from "telegraf";
 import { MyContext } from "../../scenes";
 import { MENU_BUTTONS } from "@bot/handlers";
@@ -6,6 +5,7 @@ import { SquadController, UserController } from "@controller";
 import { SECTION_EMOJI } from "@utils/constants";
 import { createSquadKeyboard } from "./keyboard";
 import { formatSquad, getSquadKeyboardByRole, handleError } from "@utils/index";
+import { updateFileIdIfNeeded } from "@utils/fileId";
 
 export const showSquadAction = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.SQUAD.callback, async (ctx) => {
@@ -31,29 +31,37 @@ export const showSquadAction = (bot: Telegraf<MyContext>) => {
         );
       }
 
+      const squad = membership.squad;
+
       const members = await SquadController.findSquadMembers(
         accountId,
-        membership.squadName
+        squad.name
       );
 
       const squadText = formatSquad(members);
 
       const squadKeyboard = getSquadKeyboardByRole(
         membership.role,
-        membership.squad.adminId
+        squad.adminId
       );
 
-      const dir = path.resolve("public", "squads");
-      const imagePath = path.resolve(dir, `${membership.squadName}.jpg`);
+      const fileId = await updateFileIdIfNeeded({
+        currentFileId: squad.photo,
+        localPath: `public/squads/${squad.name}.jpg`,
+        telegram: ctx.telegram,
+        chatId: process.env.PRIVATE_CHAT!,
+        onUpdate: async (newFileId) => {
+          await SquadController.updateSquadInfo(accountId, squad.name, {
+            photo: newFileId,
+          });
+        },
+      });
 
-      await ctx.replyWithPhoto(
-        { source: imagePath },
-        {
-          caption: squadText,
-          parse_mode: "HTML",
-          reply_markup: squadKeyboard.reply_markup,
-        }
-      );
+      await ctx.replyWithPhoto(fileId, {
+        caption: squadText,
+        parse_mode: "HTML",
+        reply_markup: squadKeyboard.reply_markup,
+      });
     } catch (error) {
       await handleError(ctx, error, "showSquadAction");
     }
