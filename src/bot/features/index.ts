@@ -19,6 +19,8 @@ export * from "./userEquipment/showEquipment/action";
 export * from "./userEquipment/equipEquipment/action";
 export * from "./showReferral/action";
 export * from "./showTop/action";
+export * from "./showTop/showTopSquads/action";
+export * from "./showTop/showTopSquads/pagination";
 export * from "./squad/createSquad/action";
 export * from "./squad/createSquad/scene";
 export * from "./squad/inviteMember/action";
