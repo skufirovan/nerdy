@@ -128,6 +128,24 @@ export class SquadService {
     }
   }
 
+  static async findSquadByAdminId(
+    accountId: bigint,
+    adminId: bigint
+  ): Promise<Squad | null> {
+    try {
+      return await SquadRepository.findSquadByAdminId(adminId);
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "SquadService.findSquadByAdminId",
+        `Ошибка при поиске объединения ${adminId}: ${err}`,
+        { accountId }
+      );
+      throw new Error(`Ошибка при поиске объединения ${adminId}`);
+    }
+  }
+
   static async findSquadByName(
     accountId: bigint,
     name: string
@@ -348,13 +366,6 @@ export class SquadService {
       if (requesterMembership.role !== SquadMemberRole.ADMIN)
         throw new Error(
           "Только администратор может удалять участников из объединения"
-        );
-      if (
-        targetMember.role === SquadMemberRole.ADMIN ||
-        targetMember.role === SquadMemberRole.RECRUITER
-      )
-        throw new Error(
-          "Аминистратора или рекрутера нельзя удалить из объединения"
         );
 
       const deletedMember = await SquadRepository.deleteSquadMember(

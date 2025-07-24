@@ -50,6 +50,21 @@ export class SquadController {
     }
   }
 
+  static async findSquadByAdminId(
+    accountId: bigint,
+    adminId: bigint
+  ): Promise<SquadDto | null> {
+    try {
+      const squad = await SquadService.findSquadByAdminId(accountId, adminId);
+      if (!squad) return null;
+
+      const dto = new SquadDto(squad);
+      return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async findSquadByName(
     accountId: bigint,
     name: string

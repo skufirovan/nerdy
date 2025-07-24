@@ -51,6 +51,10 @@ export class SquadRepository {
     });
   }
 
+  static async findSquadByAdminId(adminId: bigint): Promise<Squad | null> {
+    return prisma.squad.findUnique({ where: { adminId } });
+  }
+
   static async findSquadByName(name: string): Promise<Squad | null> {
     return prisma.squad.findUnique({ where: { name } });
   }
