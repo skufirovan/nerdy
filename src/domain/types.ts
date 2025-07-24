@@ -23,3 +23,7 @@ export type SquadMemberWithUserAndSquad = Prisma.SquadMemberGetPayload<{
 export type SquadWithMembers = Prisma.SquadGetPayload<{
   include: { members: { include: { user: true; squad: true } } };
 }>;
+
+export type PaymentWithInvoice = Prisma.PaymentGetPayload<{
+  include: { invoice: true };
+}>;
