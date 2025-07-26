@@ -71,22 +71,46 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
       const demoId = session.video!.demo!.id;
       const description = session.video!.description;
 
-      const fameReward = user.hasPass ? 1000 : 500;
-      const racksReward = user.hasPass ? 600 : 300;
+      const levelMultiplier = 1 + user.level / 100;
+      const inRecommendations = Math.random() < 0.1;
+
+      const baseRacksReward = user.level >= 5 ? (user.hasPass ? 400 : 300) : 0;
+      const baseFameReward = user.hasPass ? 400 : 300;
+
+      const fameReward = Math.floor(
+        inRecommendations
+          ? baseFameReward * levelMultiplier * 20
+          : baseFameReward * levelMultiplier
+      );
+      const racksReward = Math.floor(
+        inRecommendations
+          ? baseRacksReward * levelMultiplier * 10
+          : baseRacksReward * levelMultiplier
+      );
 
       await VideoController.create(accountId, demoId, description);
       await UserController.updateUserInfo(accountId, {
-        racks: user.racks + racksReward,
+        racks: user.racks + baseRacksReward,
       });
+
+      let caption = `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${fameReward} фейма`;
+
+      if (racksReward > 0) {
+        caption += ` и +${baseRacksReward} рексов`;
+      }
 
       await ctx.replyWithAnimation(
         { source: path.resolve(__dirname, `../../assets/images/VIDEO/1.gif`) },
-        {
-          caption: `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${fameReward} фейма и +${racksReward} рексов`,
-        }
+        { caption }
       );
 
-      await updateUserRewards(ctx, user, accountId, fameReward, racksReward);
+      await updateUserRewards(
+        ctx,
+        user,
+        accountId,
+        fameReward,
+        baseRacksReward
+      );
 
       delete session.video;
       await ctx.scene.leave();

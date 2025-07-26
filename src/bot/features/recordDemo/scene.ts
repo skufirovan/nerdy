@@ -88,16 +88,21 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
       const text = session.demo!.text;
 
       const equipment = await EquipmentController.findUserEquipped(accountId);
-      const multiplier = equipment.reduce(
+      const equipmentMultiplier = equipment.reduce(
         (acc, item) => acc * item.equipment.multiplier,
         1
       );
+      const levelMultiplier = 1 + user.level / 100;
 
-      const baseFameReward = user.hasPass ? 1000 : 500;
-      const baseRacksReward = user.hasPass ? 600 : 300;
+      const baseFameReward = user.hasPass ? 400 : 300;
+      const baseRacksReward = user.hasPass ? 400 : 300;
 
-      const fameReward = Math.floor(baseFameReward * multiplier);
-      const racksReward = Math.floor(baseRacksReward * multiplier);
+      const fameReward = Math.floor(
+        baseFameReward * equipmentMultiplier * levelMultiplier
+      );
+      const racksReward = Math.floor(
+        baseRacksReward * equipmentMultiplier * levelMultiplier
+      );
 
       await DemoController.create(accountId, name, text);
       await UserController.updateUserInfo(accountId, {
