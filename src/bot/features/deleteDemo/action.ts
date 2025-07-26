@@ -26,6 +26,7 @@ export const deleteDemoAction = (bot: Telegraf<MyContext>) => {
         parse_mode: "HTML",
         reply_markup: Markup.inlineKeyboard([
           Markup.button.callback("✅ Да", `CONFIRM_DELETE_DEMO_${demoName}`),
+          Markup.button.callback("❌ Нет", "DELETE_MESSAGE"),
         ]).reply_markup,
       });
     } catch (error) {
