@@ -4,16 +4,22 @@ import { Markup } from "telegraf";
 
 export const SHOW_EQUIPMENT_BUTTONS = {
   EQUIP_EQUIPMENT: {
-    text: "👨🏿‍💻 Использовать",
+    text: "👨🏿‍🔧 Использовать",
     callback: "EQUIP_EQUIPMENT",
+  },
+  EQUIPPED_EQUIPMENT: {
+    text: "👨🏿‍💻 Активная оборудка",
+    callback: "EQUIPPED_EQUIPMENT",
   },
 };
 
 export const showEquipmentKeyboard = Markup.inlineKeyboard([
   [toButton(PAGINATE_BUTTONS.PREV), toButton(PAGINATE_BUTTONS.NEXT)],
   [toButton(SHOW_EQUIPMENT_BUTTONS.EQUIP_EQUIPMENT)],
+  [toButton(SHOW_EQUIPMENT_BUTTONS.EQUIPPED_EQUIPMENT)],
 ]);
 
 export const showOneEquipmentKeyboard = Markup.inlineKeyboard([
   [toButton(SHOW_EQUIPMENT_BUTTONS.EQUIP_EQUIPMENT)],
+  [toButton(SHOW_EQUIPMENT_BUTTONS.EQUIPPED_EQUIPMENT)],
 ]);

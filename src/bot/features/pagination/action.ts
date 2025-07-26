@@ -34,10 +34,8 @@ export function formatPaginated(item: unknown, type: string): string {
           : "🎛";
 
       return [
-        `${emoji} <b>${equipment.brand} ${separator}${equipment.model}</b>`,
-        "",
-        `Множитель: ${equipment.multiplier}`,
-        `Цена: ${equipment.price}`,
+        `${emoji} <b>${equipment.brand} ${separator}${equipment.model}</b>\n`,
+        `🪙 ${equipment.price} рэксов`,
       ].join("\n");
     default:
       return "❌ Неизвестный формат";

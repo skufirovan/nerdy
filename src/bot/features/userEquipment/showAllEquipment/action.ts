@@ -7,7 +7,7 @@ import { showEquipmentKeyboard, showOneEquipmentKeyboard } from "./keyboard";
 import { PROFILE_BUTTONS } from "@bot/handlers";
 import { getRandomImage, handleError } from "@utils/index";
 
-export const showEquipmentAction = (bot: Telegraf<MyContext>) => {
+export const showAllEquipmentAction = (bot: Telegraf<MyContext>) => {
   bot.action(PROFILE_BUTTONS.EQUIPMENT.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();
