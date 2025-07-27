@@ -90,13 +90,13 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
 
       await VideoController.create(accountId, demoId, description);
       await UserController.updateUserInfo(accountId, {
-        racks: user.racks + baseRacksReward,
+        racks: user.racks + racksReward,
       });
 
       let caption = `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${fameReward} фейма`;
 
       if (racksReward > 0) {
-        caption += ` и +${baseRacksReward} рексов`;
+        caption += ` и +${racksReward} рексов`;
       }
 
       await ctx.replyWithAnimation(
