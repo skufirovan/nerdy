@@ -1,5 +1,6 @@
 import { prisma } from "@prisma/client";
 import { Demo } from "@prisma/generated";
+import { DemoWithUser } from "@domain/types";
 
 export class DemoRepository {
   static async create(
@@ -28,9 +29,10 @@ export class DemoRepository {
   static async findByName(
     accountId: bigint,
     name: string
-  ): Promise<Demo | null> {
+  ): Promise<DemoWithUser | null> {
     return prisma.demo.findUnique({
       where: { accountId_name: { accountId, name } },
+      include: { user: true },
     });
   }
 

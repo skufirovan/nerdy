@@ -1,8 +1,9 @@
+import { UserService } from "@core/index";
 import { DemoRepository } from "@infrastructure/repositories";
 import { serviceLogger } from "@infrastructure/logger";
-import { Demo } from "@prisma/generated";
 import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
-import { UserService } from "@core/index";
+import { DemoWithUser } from "@domain/types";
+import { Demo } from "@prisma/generated";
 
 export class DemoService {
   static async create(
@@ -59,7 +60,7 @@ export class DemoService {
   static async findByName(
     accountId: bigint,
     name: string
-  ): Promise<Demo | null> {
+  ): Promise<DemoWithUser | null> {
     try {
       const demo = await DemoRepository.findByName(accountId, name);
       return demo;

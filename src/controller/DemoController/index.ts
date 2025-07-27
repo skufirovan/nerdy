@@ -1,5 +1,5 @@
 import { DemoService } from "@core/index";
-import { DemoDto } from "@domain/dtos";
+import { DemoDto, DemoWithUserDto } from "@domain/dtos";
 
 export class DemoController {
   static async create(
@@ -32,13 +32,13 @@ export class DemoController {
   static async findByName(
     accountId: bigint,
     name: string
-  ): Promise<DemoDto | null> {
+  ): Promise<DemoWithUserDto | null> {
     try {
       const demo = await DemoService.findByName(accountId, name);
 
       if (!demo) return null;
 
-      const dto = new DemoDto(demo);
+      const dto = new DemoWithUserDto(demo);
       return dto;
     } catch (error) {
       throw error;
