@@ -4,31 +4,14 @@ import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { VideoController, DemoController, UserController } from "@controller";
 import { UserDto } from "@domain/dtos";
-import { getRandomImage, requireUser, handleError } from "@utils/index";
+import { requireUser, handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
 export const recordVideoScene = new Scenes.BaseScene<MyContext>("recordVideo");
 
 recordVideoScene.enter(async (ctx: MyContext) => {
   try {
-    const accountId = ctx.user!.accountId;
     const session = ctx.session as SessionData;
-
-    const { canRecord, remainingTimeText } = await VideoController.canRecord(
-      accountId
-    );
-
-    if (!canRecord) {
-      const imagePath = await getRandomImage(
-        path.resolve(__dirname, `../../assets/images/REMAINING`),
-        path.resolve(__dirname, `../../assets/images/REMAINING/1.jpg`)
-      );
-      await ctx.replyWithPhoto(
-        { source: imagePath },
-        { caption: `☁️ Охлади траханье, приходи через ${remainingTimeText!}` }
-      );
-      return ctx.scene.leave();
-    }
 
     session.video = {};
     await ctx.reply("📱 Напиши название демки, под которую снимешь ТТ");
@@ -93,10 +76,10 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
         racks: user.racks + racksReward,
       });
 
-      let caption = `🧖🏿 3к видосов под звуком и дропаю.. Ты получил +${fameReward} фейма`;
+      let caption = `🧖🏿 3к видосов под звуком и дропаю..\n🧌 +${fameReward} Fame\n`;
 
       if (racksReward > 0) {
-        caption += ` и +${racksReward} рексов`;
+        caption += ` 🪙 +${racksReward} Racks`;
       }
 
       await ctx.replyWithAnimation(
@@ -116,7 +99,7 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
       await ctx.scene.leave();
     }
   } catch (error) {
-    await handleError(ctx, error, "recordVideoScene.enter");
+    await handleError(ctx, error, "recordVideoScene.on");
     return ctx.scene.leave();
   }
 });

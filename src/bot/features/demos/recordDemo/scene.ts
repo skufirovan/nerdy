@@ -14,26 +14,7 @@ export const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
 
 recordDemoScene.enter(async (ctx: MyContext) => {
   try {
-    const accountId = ctx.user!.accountId;
     const session = ctx.session as SessionData;
-
-    const { canRecord, remainingTimeText } = await DemoController.canRecord(
-      accountId
-    );
-
-    if (!canRecord) {
-      const imagePath = await getRandomImage(
-        path.resolve(__dirname, `../../../assets/images/REMAINING`),
-        path.resolve(__dirname, `../../../assets/images/REMAINING/1.jpg`)
-      );
-      await ctx.replyWithPhoto(
-        { source: imagePath },
-        {
-          caption: `☁️ Ты уже надристал стиля, брачо, приходи через ${remainingTimeText!}`,
-        }
-      );
-      return ctx.scene.leave();
-    }
 
     session.demo = {};
     const firstVideoPath = path.resolve(
@@ -130,7 +111,7 @@ recordDemoScene.on("message", async (ctx: MyContext) => {
       await ctx.replyWithPhoto(
         { source: imagePath },
         {
-          caption: `🧖🏿 Демочка записана, ты получил +${fameReward} фейма и +${racksReward} рексов`,
+          caption: `🧖🏿 Демочка записана\n🧌 +${fameReward} фейма\n🪙 +${racksReward} рексов`,
         }
       );
 
