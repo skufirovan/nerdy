@@ -4,7 +4,8 @@ export class DemoDto {
   readonly id: bigint;
   readonly accountId: bigint;
   readonly name: string;
-  readonly text: string;
+  readonly text: string | null;
+  readonly fileId: string | null;
   readonly recordedAt: Date;
 
   constructor(demo: Demo) {
@@ -12,6 +13,7 @@ export class DemoDto {
     this.accountId = demo.accountId;
     this.name = demo.name;
     this.text = demo.text;
+    this.fileId = demo.fileId;
     this.recordedAt = demo.recordedAt;
   }
 }

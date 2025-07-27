@@ -17,7 +17,7 @@ import { SquadData } from "./squad/types";
 
 export interface SessionData extends Scenes.SceneSessionData {
   referral?: bigint | null;
-  demo?: { name?: string; text?: string };
+  demo?: { name?: string; text?: string; fileId?: string };
   video?: { description?: string; demo?: DemoDto };
   createSquad?: { name?: string };
   pagination?: PaginationData<unknown>;

@@ -14,7 +14,7 @@ import {
   recordDemoAction,
   recordVideoAction,
   showActivitiesAction,
-  showDemosAction,
+  showTextDemosAction,
   showAllEquipmentAction,
   showReferralAction,
   showSquadAction,
@@ -29,6 +29,9 @@ import {
   buyNerdPassAction,
   paymentEvents,
   showEquippedAction,
+  showDemosMenuAction,
+  showAudioDemosAction,
+  paginateAudioDemosActions,
 } from ".";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
@@ -36,7 +39,10 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   deleteDemoAction(bot);
   showActivitiesAction(bot);
   showTopAction(bot);
-  showDemosAction(bot);
+  showDemosMenuAction(bot);
+  showTextDemosAction(bot);
+  showAudioDemosAction(bot);
+  paginateAudioDemosActions(bot);
   showAllEquipmentAction(bot);
   showEquippedAction(bot);
   recordDemoAction(bot);

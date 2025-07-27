@@ -1,16 +1,16 @@
 import { Markup, Telegraf } from "telegraf";
-import { MyContext } from "../scenes";
+import { MyContext } from "../../scenes";
 import { DemoController } from "@controller";
-import { DEMOS_BUTTONS } from "../showDemos/keyboard";
+import { DELETE_DEMO_BUTTON } from "./keyboard";
 import { handleError, hasCaption } from "@utils/index";
 
 function extractDemoNameFromCaption(caption: string): string | null {
-  const match = caption.match(/🎤 (.+?)(?=\n|$)/);
+  const match = caption.match(/📝 (.+?)(?=\n|$)/);
   return match ? match[1] : null;
 }
 
 export const deleteDemoAction = (bot: Telegraf<MyContext>) => {
-  bot.action(DEMOS_BUTTONS.DELETE_DEMO.callback, async (ctx) => {
+  bot.action(DELETE_DEMO_BUTTON.DELETE_DEMO.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();
 

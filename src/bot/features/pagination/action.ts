@@ -14,13 +14,12 @@ export interface PaginationData<T> {
 
 export function formatPaginated(item: unknown, type: string): string {
   switch (type) {
-    case "demos":
+    case "textDemos":
       const demo = item as DemoDto;
 
       return [
-        `🎤 <b>${demo.name}</b>`,
-        `🕓 ${formatDateToDDMMYYYY(demo.recordedAt)}`,
-        "",
+        `📝 <b>${demo.name}</b>`,
+        `📅 ${formatDateToDDMMYYYY(demo.recordedAt)}\n`,
         demo.text,
       ].join("\n");
     case "equipment":

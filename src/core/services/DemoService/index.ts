@@ -8,16 +8,17 @@ export class DemoService {
   static async create(
     accountId: bigint,
     name: string,
-    text: string
+    text: string | null,
+    fileId: string | null
   ): Promise<Demo> {
     try {
-      const demos = await this.findByAccountId(accountId);
+      const demos = await DemoRepository.findByAccountId(accountId);
 
       if (demos.some((demo) => demo.name === name)) {
         throw new Error("Демка с таким названием уже существует");
       }
 
-      const demo = await DemoRepository.create(accountId, name, text);
+      const demo = await DemoRepository.create(accountId, name, text, fileId);
       await UserService.updateUserInfo(accountId, {
         lastDemoRecordedAt: new Date(),
       });
@@ -49,9 +50,7 @@ export class DemoService {
         "error",
         "DemoService.findByAccountId",
         `Ошибка при поиске демок: ${err}`,
-        {
-          accountId,
-        }
+        { accountId }
       );
       throw new Error("Ошибка при поиске демок");
     }

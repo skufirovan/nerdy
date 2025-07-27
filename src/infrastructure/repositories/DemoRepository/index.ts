@@ -5,13 +5,15 @@ export class DemoRepository {
   static async create(
     accountId: bigint,
     name: string,
-    text: string
+    text: string | null,
+    fileId: string | null
   ): Promise<Demo> {
     return prisma.demo.create({
       data: {
         accountId,
         name,
         text,
+        fileId,
       },
     });
   }

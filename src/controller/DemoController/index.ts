@@ -5,10 +5,11 @@ export class DemoController {
   static async create(
     accountId: bigint,
     name: string,
-    text: string
+    text: string | null,
+    fileId: string | null
   ): Promise<DemoDto> {
     try {
-      const demo = await DemoService.create(accountId, name, text);
+      const demo = await DemoService.create(accountId, name, text, fileId);
       const dto = new DemoDto(demo);
 
       return dto;

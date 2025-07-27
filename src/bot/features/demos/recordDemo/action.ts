@@ -1,6 +1,6 @@
 import { Telegraf } from "telegraf";
-import { MyContext } from "../scenes";
-import { ACTIVITIES_BUTTONS } from "../showActivities/keyboard";
+import { MyContext } from "../../scenes";
+import { ACTIVITIES_BUTTONS } from "../../showActivities/keyboard";
 import { handleError } from "@utils/index";
 
 export const recordDemoAction = (bot: Telegraf<MyContext>) => {

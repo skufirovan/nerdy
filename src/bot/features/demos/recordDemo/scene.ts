@@ -1,7 +1,6 @@
 import path from "path";
 import { Scenes } from "telegraf";
-import { message } from "telegraf/filters";
-import { MyContext, SessionData } from "../scenes";
+import { MyContext, SessionData } from "../../scenes";
 import {
   DemoController,
   UserController,
@@ -24,8 +23,8 @@ recordDemoScene.enter(async (ctx: MyContext) => {
 
     if (!canRecord) {
       const imagePath = await getRandomImage(
-        path.resolve(__dirname, `../../assets/images/REMAINING`),
-        path.resolve(__dirname, `../../assets/images/REMAINING/1.jpg`)
+        path.resolve(__dirname, `../../../assets/images/REMAINING`),
+        path.resolve(__dirname, `../../../assets/images/REMAINING/1.jpg`)
       );
       await ctx.replyWithPhoto(
         { source: imagePath },
@@ -39,12 +38,15 @@ recordDemoScene.enter(async (ctx: MyContext) => {
     session.demo = {};
     const firstVideoPath = path.resolve(
       __dirname,
-      "../../assets/videos/DEMO_1.gif"
+      "../../../assets/videos/DEMO_1.gif"
     );
 
     await ctx.replyWithAnimation(
       { source: firstVideoPath },
-      { caption: "📀 Фаа, сделал дело — рэпуй смело. Ну-ка накидай баров" }
+      {
+        caption:
+          "📀 Фаа, сделал дело — рэпуй смело. Накидай баров текстом или отправь аудиофайл",
+      }
     );
   } catch (error) {
     await handleError(ctx, error, "recordDemoScene.enter");
@@ -52,24 +54,34 @@ recordDemoScene.enter(async (ctx: MyContext) => {
   }
 });
 
-recordDemoScene.on(message("text"), async (ctx: MyContext) => {
-  if (!ctx.message || !("text" in ctx.message))
-    return await ctx.reply("⚠️ Отправь текст ТЕКСТ #ТЕКСТ");
-
+recordDemoScene.on("message", async (ctx: MyContext) => {
   const accountId = ctx.user!.accountId;
   const session = ctx.session as SessionData;
-  const msg = ctx.message.text.trim();
+  const message = ctx.message;
+
+  if (!message) {
+    return await ctx.reply("⚠️ Отправь текст или аудифайл");
+  }
 
   try {
     const user = await requireUser(ctx);
-
     if (!user) return ctx.scene.leave();
 
-    if (!session.demo!.text) {
-      session.demo!.text = msg;
+    if (!session.demo!.text && !session.demo!.fileId) {
+      if ("text" in message) {
+        session.demo!.text = message.text.trim();
+      } else if ("audio" in message) {
+        const file = message.audio;
+        session.demo!.fileId = file.file_id;
+      } else {
+        return await ctx.reply(
+          "🦸🏿 Че ты мне пытаешься впарить, ниггер, давай заново"
+        );
+      }
+
       const secondVideoPath = path.resolve(
         __dirname,
-        "../../assets/videos/DEMO_2.gif"
+        "../../../assets/videos/DEMO_2.gif"
       );
 
       return await ctx.replyWithAnimation(
@@ -81,11 +93,12 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
       );
     }
 
-    if (!session.demo!.name) {
-      session.demo!.name = msg;
+    if (!session.demo!.name && "text" in message) {
+      session.demo!.name = message.text.trim();
 
       const name = session.demo!.name;
-      const text = session.demo!.text;
+      const text = session.demo!.text || null;
+      const fileId = session.demo!.fileId || null;
 
       const equipment = await EquipmentController.findUserEquipped(accountId);
       const equipmentMultiplier = equipment.reduce(
@@ -104,14 +117,14 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
         baseRacksReward * equipmentMultiplier * levelMultiplier
       );
 
-      await DemoController.create(accountId, name, text);
+      await DemoController.create(accountId, name, text, fileId);
       await UserController.updateUserInfo(accountId, {
         racks: user.racks + racksReward,
       });
 
       const imagePath = await getRandomImage(
-        path.resolve(__dirname, `../../assets/images/DEMO`),
-        path.resolve(__dirname, `../../assets/images/DEMO/1.jpg`)
+        path.resolve(__dirname, `../../../assets/images/DEMO`),
+        path.resolve(__dirname, `../../../assets/images/DEMO/1.jpg`)
       );
 
       await ctx.replyWithPhoto(
@@ -126,6 +139,8 @@ recordDemoScene.on(message("text"), async (ctx: MyContext) => {
       delete session.demo;
       return ctx.scene.leave();
     }
+
+    await ctx.reply("🦸🏿 Че ты мне пытаешься впарить, ниггер, давай заново");
   } catch (error) {
     await handleError(ctx, error, "recordDemoScene.on");
     return ctx.scene.leave();
