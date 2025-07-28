@@ -73,4 +73,14 @@ export class DemoController {
       throw error;
     }
   }
+
+  static async canDistribute(accountId: bigint): Promise<boolean> {
+    try {
+      const canDistribute = await DemoService.canDistribute(accountId);
+
+      return canDistribute;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

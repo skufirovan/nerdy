@@ -4,6 +4,7 @@ import { serviceLogger } from "@infrastructure/logger";
 import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
 import { DemoWithUser } from "@domain/types";
 import { Demo } from "@prisma/generated";
+import { getLastFriday } from "@utils/index";
 
 export class DemoService {
   static async create(
@@ -128,6 +129,32 @@ export class DemoService {
         { accountId }
       );
       throw new Error("Ошибка при проверке возможности записи демки");
+    }
+  }
+
+  static async canDistribute(accountId: bigint): Promise<boolean> {
+    try {
+      const user = await UserService.findByAccountId(accountId);
+      if (!user) throw new Error(`Пользователь не найден ${accountId}`);
+
+      const now = new Date();
+      const currentFriday = getLastFriday(now);
+
+      const lastDistributedAt = user.lastDemoDistributedAt;
+      if (!lastDistributedAt || lastDistributedAt < currentFriday) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "DemoService.canDistribute",
+        `Ошибка при проверке возможности дистрибьюции демки: ${err}`,
+        { accountId }
+      );
+      throw new Error("Ошибка при проверке возможности дистрибьюции демки");
     }
   }
 }

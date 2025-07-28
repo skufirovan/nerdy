@@ -12,6 +12,7 @@ export class UserDto {
   readonly invitedUsersCount: number;
   readonly passExpiresAt: Date | null;
   readonly lastDemoRecordedAt: Date | null;
+  readonly lastDemoDistributedAt: Date | null;
   readonly registeredAt: Date;
 
   constructor(user: User) {
@@ -26,6 +27,7 @@ export class UserDto {
     this.invitedUsersCount = user.invitedUsersCount;
     this.passExpiresAt = user.passExpiresAt;
     this.lastDemoRecordedAt = user.lastDemoRecordedAt;
+    this.lastDemoDistributedAt = user.lastDemoDistributedAt;
     this.registeredAt = user.registeredAt;
   }
 }
