@@ -4,3 +4,4 @@ export * from "./EquipmentController";
 export * from "./VideoController";
 export * from "./SquadController";
 export * from "./InvoiceController";
+export * from "./DistributedDemoController";

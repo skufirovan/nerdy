@@ -5,3 +5,5 @@ export * from "./UserEquipmentDto";
 export * from "./VideoDto";
 export * from "./SquadDto";
 export * from "./SquadMemberDto";
+export * from "./DistributedDemoDto";
+export * from "./DistributedDemoLikeDto";

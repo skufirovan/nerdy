@@ -21,7 +21,14 @@ export type SquadMemberWithUserAndSquad = Prisma.SquadMemberGetPayload<{
 }>;
 
 export type SquadWithMembers = Prisma.SquadGetPayload<{
-  include: { members: { include: { user: true; squad: true } } };
+  include: {
+    members: {
+      include: {
+        user: true;
+        squad: true;
+      };
+    };
+  };
 }>;
 
 export type PaymentWithInvoice = Prisma.PaymentGetPayload<{
@@ -30,4 +37,15 @@ export type PaymentWithInvoice = Prisma.PaymentGetPayload<{
 
 export type DemoWithUser = Prisma.DemoGetPayload<{
   include: { user: true };
+}>;
+
+export type DistributedDemoWithDemoAndLikes = Prisma.DistributedDemoGetPayload<{
+  include: {
+    demo: {
+      include: {
+        user: true;
+      };
+    };
+    likes: true;
+  };
 }>;

@@ -4,3 +4,4 @@ export * from "./EquipmentRepository";
 export * from "./VideoRepository";
 export * from "./SquadRepository";
 export * from "./InvoiceRepository";
+export * from "./DistributedDemoRepository";

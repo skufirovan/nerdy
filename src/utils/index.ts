@@ -19,6 +19,27 @@ export function formatDateToDDMMYYYY(date: Date): string {
   return `${day}.${month}.${year}`;
 }
 
+export function getLastFriday(from: Date): Date {
+  const date = new Date(from);
+  const day = date.getDay();
+  const diff = day >= 5 ? day - 5 : 7 + day - 5;
+  date.setDate(date.getDate() - diff);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+export function getLastTwoFridays(): [Date, Date] {
+  const now = new Date();
+  const lastFriday = new Date(now);
+  lastFriday.setDate(now.getDate() - ((now.getDay() + 2) % 7));
+  lastFriday.setHours(0, 0, 0, 0);
+
+  const prevFriday = new Date(lastFriday);
+  prevFriday.setDate(lastFriday.getDate() - 7);
+
+  return [prevFriday, lastFriday];
+}
+
 type ValidationResult<T> = {
   isValid: boolean;
   error?: T;
