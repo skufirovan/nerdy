@@ -13,12 +13,11 @@ export function getWaitingTime(hasPass: boolean): WaitingTimeResult {
 }
 
 export function getRemainingTimeText(remainingTimeMs: number): string {
-  const remainingHours = Math.floor(remainingTimeMs / (60 * 60 * 1000));
-  const remainingMinutes = Math.ceil(
-    (remainingTimeMs % (60 * 60 * 1000)) / (60 * 1000)
-  );
+  const totalMinutes = Math.floor(remainingTimeMs / (60 * 1000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
 
-  return `${remainingHours} ч ${remainingMinutes} мин`;
+  return `${hours} ч ${minutes} мин`;
 }
 
 export function calculateLevelAndRacks(
