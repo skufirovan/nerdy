@@ -32,6 +32,10 @@ import {
   showDemosMenuAction,
   showAudioDemosAction,
   paginateAudioDemosActions,
+  distributeDemoAction,
+  paginateDistributedDemosActions,
+  showDistributedDemosAction,
+  likeDistributedDemoAction,
 } from ".";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
@@ -66,4 +70,8 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   showTopSquadsAction(bot);
   paginateTopSquadsActions(bot);
   paymentEvents(bot);
+  distributeDemoAction(bot);
+  showDistributedDemosAction(bot);
+  paginateDistributedDemosActions(bot);
+  likeDistributedDemoAction(bot);
 };

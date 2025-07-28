@@ -2,12 +2,8 @@ import { Markup, Telegraf } from "telegraf";
 import { MyContext } from "../../scenes";
 import { DemoController } from "@controller";
 import { DELETE_DEMO_BUTTON } from "./keyboard";
+import { extractDemoNameFromCaption } from "../utils";
 import { handleError, hasCaption } from "@utils/index";
-
-function extractDemoNameFromCaption(caption: string): string | null {
-  const match = caption.match(/📝 (.+?)(?=\n|$)/);
-  return match ? match[1] : null;
-}
 
 export const deleteDemoAction = (bot: Telegraf<MyContext>) => {
   bot.action(DELETE_DEMO_BUTTON.DELETE_DEMO.callback, async (ctx) => {
