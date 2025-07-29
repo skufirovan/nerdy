@@ -4,6 +4,8 @@ import { paginate } from "@bot/features/pagination/action";
 import { AUDIO_DEMOS_BUTTONS } from "./keyboard";
 import { DemoDto } from "@domain/dtos";
 import { handleError, formatDateToDDMMYYYY } from "@utils/index";
+import { refreshDemoFileIdIfNeeded } from "@utils/fileId";
+import { DemoController } from "@controller";
 
 export const formatAudioDemo = (demo: DemoDto) => {
   return [
@@ -28,10 +30,24 @@ export const paginateAudioDemosActions = (bot: Telegraf<MyContext>) => {
 
       const newCaption = formatAudioDemo(currentItem);
 
+      const fileId = await refreshDemoFileIdIfNeeded({
+        currentFileId: currentItem.fileId!,
+        channelId: process.env.DEMO_CHAT!,
+        messageId: currentItem.messageId!,
+        telegram: ctx.telegram,
+        onUpdate: async (newFileId, newMessageId) => {
+          await DemoController.updateDemoInfo(
+            ctx.user!.accountId,
+            currentItem.id,
+            { fileId: newFileId, messageId: newMessageId }
+          );
+        },
+      });
+
       await ctx.editMessageMedia(
         {
           type: "audio",
-          media: currentItem.fileId!,
+          media: fileId,
           caption: newCaption,
           parse_mode: "HTML",
         },

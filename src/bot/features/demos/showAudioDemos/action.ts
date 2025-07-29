@@ -5,6 +5,7 @@ import { formatAudioDemo } from "./pagination";
 import { SHOW_DEMOS_BUTTONS } from "../showDemosMenu/keyboard";
 import { showAudioDemosKeyboard, showOneAudioDemosKeyboard } from "./keyboard";
 import { handleError } from "@utils/index";
+import { refreshDemoFileIdIfNeeded } from "@utils/fileId";
 
 export const showAudioDemosAction = (bot: Telegraf<MyContext>) => {
   bot.action(SHOW_DEMOS_BUTTONS.AUDIO_DEMOS.callback, async (ctx) => {
@@ -35,8 +36,20 @@ export const showAudioDemosAction = (bot: Telegraf<MyContext>) => {
       };
 
       const first = audioDemos[0];
+      const fileId = await refreshDemoFileIdIfNeeded({
+        currentFileId: first.fileId!,
+        channelId: process.env.DEMO_CHAT!,
+        messageId: first.messageId!,
+        telegram: ctx.telegram,
+        onUpdate: async (newFileId, newMessageId) => {
+          await DemoController.updateDemoInfo(ctx.user!.accountId, first.id, {
+            fileId: newFileId,
+            messageId: newMessageId,
+          });
+        },
+      });
 
-      await ctx.replyWithAudio(first.fileId!, {
+      await ctx.replyWithAudio(fileId, {
         caption: formatAudioDemo(first),
         parse_mode: "HTML",
         reply_markup: replyMarkup,

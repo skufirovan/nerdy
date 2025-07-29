@@ -52,3 +52,37 @@ export async function updateFileIdIfNeeded({
   await onUpdate(newFileId);
   return newFileId;
 }
+
+export async function refreshDemoFileIdIfNeeded({
+  currentFileId,
+  channelId,
+  messageId,
+  telegram,
+  onUpdate,
+}: {
+  currentFileId: string;
+  channelId: string;
+  messageId: number;
+  telegram: Telegram;
+  onUpdate: (newFileId: string, newMessageId: number) => Promise<void>;
+}): Promise<string> {
+  const isValid = await isFileIdValid(currentFileId, telegram);
+  if (isValid) return currentFileId;
+
+  const forwardedMessage = await telegram.forwardMessage(
+    channelId,
+    channelId,
+    messageId
+  );
+
+  if (!("audio" in forwardedMessage) || !forwardedMessage.audio?.file_id) {
+    throw new Error(
+      `❌ Не удалось получить audio.file_id из сообщения при пересылке demo ${messageId}`
+    );
+  }
+
+  const newFileId = forwardedMessage.audio.file_id;
+  const newMessageId = forwardedMessage.message_id;
+  await onUpdate(newFileId, newMessageId);
+  return newFileId;
+}
