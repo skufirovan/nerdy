@@ -2,7 +2,7 @@ import { UserService } from "@core/index";
 import { DemoRepository } from "@infrastructure/repositories";
 import { serviceLogger } from "@infrastructure/logger";
 import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
-import { DemoWithUser } from "@domain/types";
+import { DemoWithUser, NON_UPDATABLE_DEMO_FIELDS } from "@domain/types";
 import { Demo } from "@prisma/generated";
 import { getLastFriday } from "@utils/index";
 
@@ -11,7 +11,8 @@ export class DemoService {
     accountId: bigint,
     name: string,
     text: string | null,
-    fileId: string | null
+    fileId: string | null,
+    messageId: number | null
   ): Promise<Demo> {
     try {
       const demos = await DemoRepository.findByAccountId(accountId);
@@ -20,7 +21,13 @@ export class DemoService {
         throw new Error("Демка с таким названием уже существует");
       }
 
-      const demo = await DemoRepository.create(accountId, name, text, fileId);
+      const demo = await DemoRepository.create(
+        accountId,
+        name,
+        text,
+        fileId,
+        messageId
+      );
       await UserService.updateUserInfo(accountId, {
         lastDemoRecordedAt: new Date(),
       });
@@ -74,6 +81,27 @@ export class DemoService {
         { accountId }
       );
       throw new Error("Ошибка при поиске демки");
+    }
+  }
+
+  static async updateDemoInfo(
+    accountId: bigint,
+    id: bigint,
+    data: Partial<Omit<Demo, NON_UPDATABLE_DEMO_FIELDS>>
+  ): Promise<Demo> {
+    try {
+      const updatedDemo = await DemoRepository.updateDemoInfo(id, data);
+
+      return updatedDemo;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "DemoService.updateDemoInfo",
+        `Ошибка при обновлении демки: ${err}`,
+        { accountId }
+      );
+      throw new Error("Ошибка при обновлении демки");
     }
   }
 

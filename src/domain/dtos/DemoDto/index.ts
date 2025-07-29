@@ -8,6 +8,7 @@ export class DemoDto {
   readonly name: string;
   readonly text: string | null;
   readonly fileId: string | null;
+  readonly messageId: number | null;
   readonly recordedAt: Date;
 
   constructor(demo: Demo) {
@@ -16,6 +17,7 @@ export class DemoDto {
     this.name = demo.name;
     this.text = demo.text;
     this.fileId = demo.fileId;
+    this.messageId = demo.messageId;
     this.recordedAt = demo.recordedAt;
   }
 }

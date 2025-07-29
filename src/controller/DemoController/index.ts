@@ -1,15 +1,24 @@
 import { DemoService } from "@core/index";
 import { DemoDto, DemoWithUserDto } from "@domain/dtos";
+import { NON_UPDATABLE_DEMO_FIELDS } from "@domain/types";
+import { Demo } from "@prisma/generated";
 
 export class DemoController {
   static async create(
     accountId: bigint,
     name: string,
     text: string | null,
-    fileId: string | null
+    fileId: string | null,
+    messageId: number | null
   ): Promise<DemoDto> {
     try {
-      const demo = await DemoService.create(accountId, name, text, fileId);
+      const demo = await DemoService.create(
+        accountId,
+        name,
+        text,
+        fileId,
+        messageId
+      );
       const dto = new DemoDto(demo);
 
       return dto;
@@ -39,6 +48,21 @@ export class DemoController {
       if (!demo) return null;
 
       const dto = new DemoWithUserDto(demo);
+      return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateDemoInfo(
+    accountId: bigint,
+    id: bigint,
+    data: Partial<Omit<Demo, NON_UPDATABLE_DEMO_FIELDS>>
+  ): Promise<DemoDto> {
+    try {
+      const updatedDemo = await DemoService.updateDemoInfo(accountId, id, data);
+
+      const dto = new DemoDto(updatedDemo);
       return dto;
     } catch (error) {
       throw error;

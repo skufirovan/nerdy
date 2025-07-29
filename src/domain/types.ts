@@ -1,4 +1,4 @@
-import { Prisma, Squad, User } from "@prisma/generated";
+import { Prisma, Squad, User, Demo } from "@prisma/generated";
 
 export type NON_UPDATABLE_USER_FIELDS = keyof Pick<
   User,
@@ -6,6 +6,11 @@ export type NON_UPDATABLE_USER_FIELDS = keyof Pick<
 >;
 
 export type NON_UPDATABLE_SQUAD_FIELDS = keyof Pick<Squad, "id">;
+
+export type NON_UPDATABLE_DEMO_FIELDS =
+  | keyof Pick<Demo, "id">
+  | "recordedAt"
+  | "accountId";
 
 export type RawUser = {
   accountId: bigint;

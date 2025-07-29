@@ -98,7 +98,21 @@ recordDemoScene.on("message", async (ctx: MyContext) => {
         baseRacksReward * equipmentMultiplier * levelMultiplier
       );
 
-      await DemoController.create(accountId, name, text, fileId);
+      const result = await ctx.telegram.sendAudio(
+        process.env.DEMO_CHAT!,
+        fileId!,
+        {
+          caption: `${user.accountId} @${user.username} - ${name}`,
+        }
+      );
+
+      await DemoController.create(
+        accountId,
+        name,
+        text,
+        fileId,
+        result.message_id
+      );
       await UserController.updateUserInfo(accountId, {
         racks: user.racks + racksReward,
       });

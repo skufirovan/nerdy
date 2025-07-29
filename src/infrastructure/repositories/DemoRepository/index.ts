@@ -1,13 +1,14 @@
 import { prisma } from "@prisma/client";
 import { Demo } from "@prisma/generated";
-import { DemoWithUser } from "@domain/types";
+import { DemoWithUser, NON_UPDATABLE_DEMO_FIELDS } from "@domain/types";
 
 export class DemoRepository {
   static async create(
     accountId: bigint,
     name: string,
     text: string | null,
-    fileId: string | null
+    fileId: string | null,
+    messageId: number | null
   ): Promise<Demo> {
     return prisma.demo.create({
       data: {
@@ -15,6 +16,7 @@ export class DemoRepository {
         name,
         text,
         fileId,
+        messageId,
       },
     });
   }
@@ -33,6 +35,18 @@ export class DemoRepository {
     return prisma.demo.findUnique({
       where: { accountId_name: { accountId, name } },
       include: { user: true },
+    });
+  }
+
+  static async updateDemoInfo(
+    id: bigint,
+    data: Partial<Omit<Demo, NON_UPDATABLE_DEMO_FIELDS>>
+  ): Promise<Demo> {
+    return prisma.demo.update({
+      where: {
+        id,
+      },
+      data,
     });
   }
 
