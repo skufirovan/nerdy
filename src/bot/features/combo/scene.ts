@@ -8,8 +8,12 @@ import {
   simulateBattle,
 } from "@core/GameLogic/battle";
 import { UserController } from "@controller";
-import { handleError, isValidCombo } from "@utils/index";
+import { handleError } from "@utils/index";
 import { FAME_TO_BATTLE, RACKS_TO_BATTLE } from "@utils/constants";
+
+const isValidCombo = (combo: string): boolean => {
+  return /^[1-6]{6}$/.test(combo);
+};
 
 export const comboScene = new Scenes.BaseScene<MyContext>("combo");
 

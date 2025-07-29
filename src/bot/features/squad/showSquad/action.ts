@@ -3,8 +3,8 @@ import { MyContext } from "../../scenes";
 import { MENU_BUTTONS } from "@bot/handlers";
 import { SquadController, UserController } from "@controller";
 import { SECTION_EMOJI } from "@utils/constants";
-import { createSquadKeyboard } from "./keyboard";
-import { formatSquad, getSquadKeyboardByRole, handleError } from "@utils/index";
+import { createSquadKeyboard, getSquadKeyboardByRole } from "./keyboard";
+import { formatSquad, handleError } from "@utils/index";
 import { updateFileIdIfNeeded } from "@utils/fileId";
 
 export const showSquadAction = (bot: Telegraf<MyContext>) => {

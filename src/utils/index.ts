@@ -6,6 +6,7 @@ import { UserController } from "@controller";
 import { UserDto, SquadMemberWithUserAndSquadDto } from "@domain/dtos";
 import { SquadMemberRole } from "@prisma/generated";
 import { userActionsLogger, serviceLogger } from "@infrastructure/logger";
+import { UserError } from "@infrastructure/error";
 
 export function formatDateToDDMMYYYY(date: Date): string {
   if (isNaN(date.getTime())) {
@@ -80,10 +81,6 @@ type Button = {
 export const toButton = ({ text, callback }: Button) =>
   Markup.button.callback(text, callback);
 
-export const isValidCombo = (combo: string): boolean => {
-  return /^[1-6]{6}$/.test(combo);
-};
-
 export const emojiMap: Record<SquadMemberRole, string> = {
   ADMIN: "👨🏿‍✈️",
   RECRUITER: "🕵🏿‍♂️",
@@ -107,50 +104,6 @@ export function formatSquad(members: SquadMemberWithUserAndSquadDto[]): string {
   });
 
   return [title, ...body].join("\n");
-}
-
-export function getSquadKeyboardByRole(role: SquadMemberRole, adminId: bigint) {
-  const BUTTONS = {
-    KICK_MEMBER: {
-      text: "👨🏿‍⚖️ Выгнать",
-      callback: `KICK_MEMBER_${adminId}`,
-    },
-    INVITE_MEMBER: {
-      text: "👶🏿 Пригласить",
-      callback: `INVITE_MEMBER_${adminId}`,
-    },
-    LEAVE_SQUAD: {
-      text: "🏃🏿 Покинуть объединение",
-      callback: `LEAVE_SQUAD_${adminId}`,
-    },
-    CHANGE_ROLE: {
-      text: "👨🏿‍💼 Настроить роли",
-      callback: `PRE-CHANGE_ROLE_${adminId}`,
-    },
-    DELETE_SQUAD: {
-      text: "👊🏿 Распустить",
-      callback: `DELETE_SQUAD_${adminId}`,
-    },
-  };
-
-  switch (role) {
-    case SquadMemberRole.ADMIN:
-      return Markup.inlineKeyboard([
-        [toButton(BUTTONS.KICK_MEMBER)],
-        [toButton(BUTTONS.INVITE_MEMBER)],
-        [toButton(BUTTONS.LEAVE_SQUAD)],
-        [toButton(BUTTONS.CHANGE_ROLE)],
-        [toButton(BUTTONS.DELETE_SQUAD)],
-      ]);
-    case SquadMemberRole.RECRUITER:
-      return Markup.inlineKeyboard([
-        [toButton(BUTTONS.INVITE_MEMBER)],
-        [toButton(BUTTONS.LEAVE_SQUAD)],
-      ]);
-    case SquadMemberRole.MEMBER:
-    default:
-      return Markup.inlineKeyboard([[toButton(BUTTONS.LEAVE_SQUAD)]]);
-  }
 }
 
 export async function getRandomImage(
@@ -202,11 +155,17 @@ export async function handleError(
   scope: string
 ) {
   const err = error instanceof Error ? error.message : String(error);
+
   userActionsLogger("error", scope, err, {
     accountId: ctx.user!.accountId,
     username: ctx.user!.username,
   });
-  await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+
+  if (error instanceof UserError) {
+    await ctx.reply(`🚫 ${error.message}`);
+  } else {
+    await ctx.reply("🚫 Произошла ошибка. Попробуйте позже.");
+  }
 }
 
 export function extractEquipmenNameFromCaption(caption: string): {
