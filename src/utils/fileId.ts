@@ -19,13 +19,27 @@ export async function refreshFileIdFromLocalFile(
   chatId: string
 ): Promise<string> {
   const fullPath = path.resolve(relativeFilePath);
-  const result = await telegram.sendPhoto(chatId, { source: fullPath });
+  const fileExtension = path.extname(fullPath).toLowerCase();
 
-  if (!result.photo || result.photo.length === 0) {
-    throw new Error(`Не удалось отправить фото из ${relativeFilePath}`);
+  if (fileExtension === ".gif") {
+    const result = await telegram.sendAnimation(chatId, { source: fullPath });
+
+    if (!result.animation || !result.animation.file_id) {
+      throw new Error(`Не удалось отправить GIF из ${relativeFilePath}`);
+    }
+
+    return result.animation.file_id;
+  } else if ([".jpg", ".jpeg", ".png"].includes(fileExtension)) {
+    const result = await telegram.sendPhoto(chatId, { source: fullPath });
+
+    if (!result.photo || result.photo.length === 0) {
+      throw new Error(`Не удалось отправить фото из ${relativeFilePath}`);
+    }
+
+    return result.photo.at(-1)!.file_id;
+  } else {
+    throw new Error(`Неподдерживаемый тип файла: ${fileExtension}`);
   }
-
-  return result.photo.at(-1)!.file_id;
 }
 
 export async function updateFileIdIfNeeded({

@@ -1,11 +1,12 @@
-import path from "path";
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { VideoController, DemoController, UserController } from "@controller";
+import { GifRepository } from "@infrastructure/repositories";
 import { UserDto } from "@domain/dtos";
 import { requireUser, handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
+import { updateFileIdIfNeeded } from "@utils/fileId";
 
 export const recordVideoScene = new Scenes.BaseScene<MyContext>("recordVideo");
 
@@ -82,18 +83,21 @@ recordVideoScene.on(message("text"), async (ctx: MyContext) => {
         caption += ` 🪙 +${racksReward} Racks`;
       }
 
-      await ctx.replyWithAnimation(
-        { source: path.resolve(__dirname, `../../assets/images/VIDEO/1.gif`) },
-        { caption }
-      );
+      const gif = await GifRepository.findByName("VIDEO_1");
 
-      await updateUserRewards(
-        ctx,
-        user,
-        accountId,
-        fameReward,
-        baseRacksReward
-      );
+      const fileId = await updateFileIdIfNeeded({
+        currentFileId: gif!.fileId,
+        localPath: `public/videos/${gif!.name}.gif`,
+        telegram: ctx.telegram,
+        chatId: process.env.PRIVATE_CHAT!,
+        onUpdate: async (newFileId) => {
+          await GifRepository.updateFileId(gif!.name, newFileId);
+        },
+      });
+
+      await ctx.replyWithAnimation(fileId, { caption });
+
+      await updateUserRewards(ctx, user, accountId, fameReward, racksReward);
 
       delete session.video;
       await ctx.scene.leave();

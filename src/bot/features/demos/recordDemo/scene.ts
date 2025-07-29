@@ -6,8 +6,10 @@ import {
   UserController,
   EquipmentController,
 } from "@controller";
+import { GifRepository } from "@infrastructure/repositories";
 import { UserDto } from "@domain/dtos";
 import { getRandomImage, requireUser, handleError } from "@utils/index";
+import { updateFileIdIfNeeded } from "@utils/fileId";
 import { SECTION_EMOJI } from "@utils/constants";
 
 export const recordDemoScene = new Scenes.BaseScene<MyContext>("recordDemo");
@@ -17,18 +19,23 @@ recordDemoScene.enter(async (ctx: MyContext) => {
     const session = ctx.session as SessionData;
 
     session.demo = {};
-    const firstVideoPath = path.resolve(
-      __dirname,
-      "../../../assets/videos/DEMO_1.gif"
-    );
 
-    await ctx.replyWithAnimation(
-      { source: firstVideoPath },
-      {
-        caption:
-          "📀 Фаа, сделал дело — рэпуй смело. Накидай баров текстом или отправь аудиофайл",
-      }
-    );
+    const gif = await GifRepository.findByName("DEMO_1");
+
+    const fileId = await updateFileIdIfNeeded({
+      currentFileId: gif!.fileId,
+      localPath: `public/videos/${gif!.name}.gif`,
+      telegram: ctx.telegram,
+      chatId: process.env.PRIVATE_CHAT!,
+      onUpdate: async (newFileId) => {
+        await GifRepository.updateFileId(gif!.name, newFileId);
+      },
+    });
+
+    await ctx.replyWithAnimation(fileId, {
+      caption:
+        "📀 Фаа, сделал дело — рэпуй смело. Накидай баров текстом или отправь аудиофайл",
+    });
   } catch (error) {
     await handleError(ctx, error, "recordDemoScene.enter");
     return ctx.scene.leave();
@@ -60,18 +67,22 @@ recordDemoScene.on("message", async (ctx: MyContext) => {
         );
       }
 
-      const secondVideoPath = path.resolve(
-        __dirname,
-        "../../../assets/videos/DEMO_2.gif"
-      );
+      const gif = await GifRepository.findByName("DEMO_2");
 
-      return await ctx.replyWithAnimation(
-        { source: secondVideoPath },
-        {
-          caption:
-            "💪🏿 Базару нет, ты немощь. Придумай название демки, оно не должно повторяться!",
-        }
-      );
+      const fileId = await updateFileIdIfNeeded({
+        currentFileId: gif!.fileId,
+        localPath: `public/videos/${gif!.name}.gif`,
+        telegram: ctx.telegram,
+        chatId: process.env.PRIVATE_CHAT!,
+        onUpdate: async (newFileId) => {
+          await GifRepository.updateFileId(gif!.name, newFileId);
+        },
+      });
+
+      return await ctx.replyWithAnimation(fileId, {
+        caption:
+          "💪🏿 Базару нет, ты немощь. Придумай название демки, оно не должно повторяться!",
+      });
     }
 
     if (!session.demo!.name && "text" in message) {
