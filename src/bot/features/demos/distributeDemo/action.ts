@@ -47,7 +47,7 @@ export const distributeDemoAction = (bot: Telegraf<MyContext>) => {
         demo.id
       );
 
-      if (existed) return await ctx.reply("🙎🏿‍♂️ Эта демка уже на площадках");
+      if (existed) return await ctx.reply("🙎🏿‍♂️ Эта демка уже отгружена");
 
       await DistributedDemoController.create(accountId, demo.id);
 
