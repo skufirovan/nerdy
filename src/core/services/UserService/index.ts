@@ -262,9 +262,13 @@ export class UserService {
       if (user.racks < equipment.price)
         throw new Error("Не хватает рексов для покупки");
 
+      const price = user.hasPass
+        ? Math.floor(equipment.price * 0.9)
+        : equipment.price;
+
       await EquipmentService.create(accountId, equipment.id);
       const updatedUser = await UserRepository.updateUserInfo(accountId, {
-        racks: user.racks - equipment.price,
+        racks: user.racks - price,
       });
 
       return updatedUser;
