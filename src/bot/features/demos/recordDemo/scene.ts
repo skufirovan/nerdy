@@ -98,21 +98,19 @@ recordDemoScene.on("message", async (ctx: MyContext) => {
         baseRacksReward * equipmentMultiplier * levelMultiplier
       );
 
-      const result = await ctx.telegram.sendAudio(
-        process.env.DEMO_CHAT!,
-        fileId!,
-        {
-          caption: `${user.accountId} @${user.username} - ${name}`,
-        }
-      );
+      let messageId = null;
+      if (fileId) {
+        const result = await ctx.telegram.sendAudio(
+          process.env.DEMO_CHAT!,
+          fileId!,
+          {
+            caption: `${user.accountId} @${user.username} - ${name}`,
+          }
+        );
+        messageId = result.message_id;
+      }
 
-      await DemoController.create(
-        accountId,
-        name,
-        text,
-        fileId,
-        result.message_id
-      );
+      await DemoController.create(accountId, name, text, fileId, messageId);
       await UserController.updateUserInfo(accountId, {
         racks: user.racks + racksReward,
       });
