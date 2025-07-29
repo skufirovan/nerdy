@@ -12,18 +12,17 @@ import { SECTION_EMOJI } from "@utils/constants";
 export const equipEquipmentAction = (bot: Telegraf<MyContext>) => {
   bot.action(SHOW_EQUIPMENT_BUTTONS.EQUIP_EQUIPMENT.callback, async (ctx) => {
     try {
-      await ctx.answerCbQuery();
-
       const accountId = ctx.user!.accountId;
       const message = ctx.update.callback_query.message;
       const caption = hasCaption(message) ? message.caption : undefined;
 
-      if (!caption) return await ctx.reply("❌ Не удалось закупить оборудку");
+      if (!caption)
+        return await ctx.answerCbQuery("❌ Не удалось активировать оборудку");
 
       const { brand, model } = extractEquipmenNameFromCaption(caption);
 
       if (!model || !brand)
-        return await ctx.reply("❌ Название оборудки не найдено");
+        return await ctx.answerCbQuery("❌ Название оборудки не найдено");
 
       const equipment = await EquipmentController.findEquipmentByBrandAndModel(
         accountId,
@@ -31,14 +30,12 @@ export const equipEquipmentAction = (bot: Telegraf<MyContext>) => {
         model
       );
 
-      if (!equipment) return ctx.reply("🙍🏿‍♂️ Оборудка не найдена");
+      if (!equipment) return ctx.answerCbQuery("🙍🏿‍♂️ Оборудка не найдена");
 
       await EquipmentController.equipUserEquipment(accountId, equipment.id);
 
-      await ctx.deleteMessage();
-      await ctx.reply(
-        `${SECTION_EMOJI} Выбрана оборудка <b>${equipment.brand} ${equipment.model}</b>`,
-        { parse_mode: "HTML" }
+      await ctx.answerCbQuery(
+        `${SECTION_EMOJI} Выбрана оборудка ${equipment.brand} ${equipment.model}`
       );
     } catch (error) {
       handleError(ctx, error, "equipEquipmentAction");

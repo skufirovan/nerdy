@@ -7,8 +7,6 @@ import { SECTION_EMOJI } from "@utils/constants";
 export const inviteMemberActions = (bot: Telegraf<MyContext>) => {
   bot.action(/^INVITE_MEMBER_(.+)$/, async (ctx) => {
     try {
-      await ctx.answerCbQuery();
-
       const accountId = ctx.user!.accountId;
       const adminId = BigInt(ctx.match[1]);
 
@@ -17,7 +15,7 @@ export const inviteMemberActions = (bot: Telegraf<MyContext>) => {
         adminId
       );
 
-      if (!squad) return await ctx.reply("❌ Объединение не найдено");
+      if (!squad) return await ctx.answerCbQuery("❌ Объединение не найдено");
 
       const session = ctx.session as SessionData;
       session.squadData = {
@@ -26,6 +24,7 @@ export const inviteMemberActions = (bot: Telegraf<MyContext>) => {
         name: squad.name,
       };
 
+      await ctx.answerCbQuery();
       await ctx.scene.enter("inviteMember");
     } catch (error) {
       await handleError(ctx, error, "inviteMemberActions");

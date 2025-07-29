@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { SquadController } from "@controller";
-import { TOP_BUTTONS } from "../keyboard";
+import { TOP_BUTTONS } from "../showTopUsers/keyboard";
 import { topSquadsKeyboard } from "./keyboard";
 import { formatSquad, handleError } from "@utils/index";
 import { updateFileIdIfNeeded } from "@utils/fileId";

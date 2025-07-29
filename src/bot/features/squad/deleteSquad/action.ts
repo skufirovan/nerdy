@@ -28,8 +28,6 @@ export const deleteSquadAction = (bot: Telegraf<MyContext>) => {
 
   bot.action(/^CONFIRM_DELETE_SQUAD_(.+)$/, async (ctx) => {
     try {
-      await ctx.answerCbQuery();
-
       const accountId = ctx.user!.accountId;
       const adminId = BigInt(ctx.match[1]);
 
@@ -38,10 +36,11 @@ export const deleteSquadAction = (bot: Telegraf<MyContext>) => {
         adminId
       );
 
-      if (!squad) return await ctx.reply("❌ Объединение не найдено");
+      if (!squad) return await ctx.answerCbQuery("❌ Объединение не найдено");
 
       await SquadController.deleteSquad(accountId, squad.name);
 
+      await ctx.answerCbQuery();
       await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
       await ctx.reply(`${SECTION_EMOJI} Ну и правильно, нахуй эти лейблы`);
     } catch (error) {

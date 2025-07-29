@@ -29,17 +29,15 @@ export const battleActions = (bot: Telegraf<MyContext>) => {
 
   bot.action(/^BATTLE_ACCEPT_(.+)$/, async (ctx) => {
     try {
-      await ctx.answerCbQuery();
-
       const battleId = ctx.match[1];
       const user = ctx.user!;
       const battle = battleManager.getBattle(battleId);
 
       if (!battle)
-        return await ctx.reply("❌ Баттл не найден или уже завершен");
+        return await ctx.answerCbQuery("❌ Баттл не найден или уже завершен");
 
       if (battleManager.getBattleByPlayer(user.accountId))
-        return await ctx.reply("❌ Ты уже баттлишься");
+        return await ctx.answerCbQuery("❌ Ты уже баттлишься");
 
       const accepted = battleManager.acceptBattle(battleId, {
         accountId: user.accountId,
@@ -47,8 +45,9 @@ export const battleActions = (bot: Telegraf<MyContext>) => {
         ctx,
       });
 
-      if (!accepted) return await ctx.reply("❌ Баттл не найден");
+      if (!accepted) return await ctx.answerCbQuery("❌ Баттл не найден");
 
+      await ctx.answerCbQuery();
       battleTimeoutService.clearInvitationTimeout(battleId);
 
       const session = ctx.session as SessionData;
@@ -67,13 +66,13 @@ export const battleActions = (bot: Telegraf<MyContext>) => {
 
   bot.action(/^BATTLE_DECLINE_(.+)$/, async (ctx) => {
     try {
-      await ctx.answerCbQuery();
-
       const battleId = ctx.match[1];
       const battle = battleManager.getBattle(battleId);
 
       if (!battle)
         return await ctx.answerCbQuery("❌ Баттл не найден или уже завершен");
+
+      await ctx.answerCbQuery();
 
       await ctx.telegram.sendMessage(
         String(battle.player1.accountId),

@@ -18,9 +18,9 @@ import {
   showAllEquipmentAction,
   showReferralAction,
   showSquadAction,
-  showTopAction,
-  showShopAction,
-  equipmentShopAction,
+  showTopUsersActions,
+  showShopMenuAction,
+  showEquipmentShopAction,
   buyEquipmentAction,
   equipEquipmentAction,
   showDonationAction,
@@ -42,7 +42,7 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   deleteMessageAction(bot);
   deleteDemoAction(bot);
   showActivitiesAction(bot);
-  showTopAction(bot);
+  showTopUsersActions(bot);
   showDemosMenuAction(bot);
   showTextDemosAction(bot);
   showAudioDemosAction(bot);
@@ -61,8 +61,8 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   kickMemberAction(bot);
   changeSquadMemberRoleAction(bot);
   showReferralAction(bot);
-  showShopAction(bot);
-  equipmentShopAction(bot);
+  showShopMenuAction(bot);
+  showEquipmentShopAction(bot);
   buyEquipmentAction(bot);
   equipEquipmentAction(bot);
   showDonationAction(bot);

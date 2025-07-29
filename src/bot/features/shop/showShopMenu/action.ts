@@ -5,7 +5,7 @@ import { MENU_BUTTONS } from "@bot/handlers";
 import { handleError, requireUser } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
-export const showShopAction = (bot: Telegraf<MyContext>) => {
+export const showShopMenuAction = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.SHOP.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();

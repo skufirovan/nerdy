@@ -3,11 +3,11 @@ import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { EquipmentController } from "controller/EquipmentController";
 import { formatPaginated } from "@bot/features/pagination/action";
-import { SHOP_BUTTONS } from "../showShop/keyboard";
+import { SHOP_BUTTONS } from "../showShopMenu/keyboard";
 import { equipmentShopKeyboard, oneEquipmentShopKeyboard } from "./keyboard";
 import { getRandomImage, handleError, requireUser } from "@utils/index";
 
-export const equipmentShopAction = (bot: Telegraf<MyContext>) => {
+export const showEquipmentShopAction = (bot: Telegraf<MyContext>) => {
   bot.action(SHOP_BUTTONS.EQUIPMENT.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();

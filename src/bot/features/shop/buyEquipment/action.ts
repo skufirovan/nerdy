@@ -1,7 +1,7 @@
 import { MyContext } from "@bot/features/scenes";
 import { Markup, Telegraf } from "telegraf";
 import { UserController } from "@controller";
-import { EQUIPMENT_SHOP_BUTTONS } from "../equipmentShop/keyboard";
+import { EQUIPMENT_SHOP_BUTTONS } from "../showEquipmentShop/keyboard";
 import {
   handleError,
   hasCaption,
@@ -11,18 +11,18 @@ import {
 export const buyEquipmentAction = (bot: Telegraf<MyContext>) => {
   bot.action(EQUIPMENT_SHOP_BUTTONS.BUY_EQUIPMENT.callback, async (ctx) => {
     try {
-      await ctx.answerCbQuery();
-
       const message = ctx.update.callback_query.message;
       const caption = hasCaption(message) ? message.caption : undefined;
 
-      if (!caption) return await ctx.reply("❌ Не удалось закупить оборудку");
+      if (!caption)
+        return await ctx.answerCbQuery("❌ Не удалось закупить оборудку");
 
       const { brand, model } = extractEquipmenNameFromCaption(caption);
 
       if (!model || !brand)
-        return await ctx.reply("❌ Название оборудки не найдено");
+        return await ctx.answerCbQuery("❌ Название оборудки не найдено");
 
+      await ctx.answerCbQuery();
       await ctx.reply(`🧾 Подтвердить покупку <b>${brand} ${model}</b>?`, {
         parse_mode: "HTML",
         reply_markup: Markup.inlineKeyboard([

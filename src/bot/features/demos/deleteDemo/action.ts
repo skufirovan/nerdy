@@ -8,16 +8,17 @@ import { handleError, hasCaption } from "@utils/index";
 export const deleteDemoAction = (bot: Telegraf<MyContext>) => {
   bot.action(DELETE_DEMO_BUTTON.DELETE_DEMO.callback, async (ctx) => {
     try {
-      await ctx.answerCbQuery();
-
       const message = ctx.update.callback_query.message;
       const caption = hasCaption(message) ? message.caption : undefined;
 
-      if (!caption) return await ctx.reply("❌ Не удалось определить демку");
+      if (!caption)
+        return await ctx.answerCbQuery("❌ Не удалось определить демку");
 
       const demoName = extractDemoNameFromCaption(caption);
-      if (!demoName) return await ctx.reply("❌ Название демки не найдено");
+      if (!demoName)
+        return await ctx.answerCbQuery("❌ Название демки не найдено");
 
+      await ctx.answerCbQuery();
       return await ctx.reply(`🗑️ Удалить демку <b>${demoName}</b>?`, {
         parse_mode: "HTML",
         reply_markup: Markup.inlineKeyboard([

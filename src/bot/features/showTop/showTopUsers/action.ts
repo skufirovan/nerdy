@@ -1,12 +1,12 @@
 import { Telegraf } from "telegraf";
-import { MyContext } from "../scenes";
+import { MyContext } from "../../scenes";
 import { UserController } from "@controller";
 import { MENU_BUTTONS } from "@bot/handlers";
 import { TOP_BUTTONS, topKeyboard } from "./keyboard";
 import { handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
-export const showTopAction = (bot: Telegraf<MyContext>) => {
+export const showTopUsersActions = (bot: Telegraf<MyContext>) => {
   bot.action(MENU_BUTTONS.TOP.callback, async (ctx) => {
     try {
       await ctx.answerCbQuery();
