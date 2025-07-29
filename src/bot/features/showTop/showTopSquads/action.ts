@@ -4,6 +4,7 @@ import { SquadController } from "@controller";
 import { TOP_BUTTONS } from "../keyboard";
 import { topSquadsKeyboard } from "./keyboard";
 import { formatSquad, handleError } from "@utils/index";
+import { updateFileIdIfNeeded } from "@utils/fileId";
 
 export const showTopSquadsAction = (bot: Telegraf<MyContext>) => {
   bot.action(TOP_BUTTONS.SQUAD_TOP.callback, async (ctx) => {
@@ -31,8 +32,21 @@ export const showTopSquadsAction = (bot: Telegraf<MyContext>) => {
       };
 
       const first = topSquadMembers[0];
+      const fileId = await updateFileIdIfNeeded({
+        currentFileId: first[0].squad.photo,
+        localPath: `public/squads/${first[0].squad.name}.jpg`,
+        telegram: ctx.telegram,
+        chatId: process.env.PRIVATE_CHAT!,
+        onUpdate: async (newFileId) => {
+          await SquadController.updateSquadInfo(
+            ctx.user!.accountId,
+            first[0].squad.name,
+            { photo: newFileId }
+          );
+        },
+      });
 
-      await ctx.replyWithPhoto(first[0].squad.photo, {
+      await ctx.replyWithPhoto(fileId, {
         caption: formatSquad(first),
         parse_mode: "HTML",
         reply_markup: replyMarkup,
