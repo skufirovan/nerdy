@@ -1,4 +1,5 @@
 import { VideoRepository } from "@infrastructure/repositories";
+import { UserError } from "@infrastructure/error";
 import { serviceLogger } from "@infrastructure/logger";
 import { UserService } from "@core/index";
 import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
@@ -14,7 +15,7 @@ export class VideoService {
       const videos = await this.findByAccountId(accountId);
 
       if (videos.some((video) => video.description === description)) {
-        throw new Error("Видео с таким описанием уже существует");
+        throw new UserError("Видео с таким описанием уже существует");
       }
 
       const video = await VideoRepository.create(
@@ -39,6 +40,7 @@ export class VideoService {
         `Ошибка при создании видео: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при создании видео");
     }
   }
@@ -81,7 +83,7 @@ export class VideoService {
   }> {
     try {
       const user = await UserService.findByAccountId(accountId);
-      if (!user) throw new Error("Пользователь не найден");
+      if (!user) throw new UserError("Ты не зарегистрирован");
 
       const WAITING_TIME = getWaitingTime(user.hasPass).recordVideoRT;
 
@@ -107,6 +109,7 @@ export class VideoService {
         `Ошибка при проверке возможности записи видео: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при проверке возможности записи видео");
     }
   }

@@ -1,5 +1,6 @@
 import { UserService } from "@core/index";
 import { DemoRepository } from "@infrastructure/repositories";
+import { UserError } from "@infrastructure/error";
 import { serviceLogger } from "@infrastructure/logger";
 import { getWaitingTime, getRemainingTimeText } from "@core/GameLogic";
 import { DemoWithUser, NON_UPDATABLE_DEMO_FIELDS } from "@domain/types";
@@ -18,7 +19,7 @@ export class DemoService {
       const demos = await DemoRepository.findByAccountId(accountId);
 
       if (demos.some((demo) => demo.name === name)) {
-        throw new Error("Демка с таким названием уже существует");
+        throw new UserError("Демка с таким названием уже существует");
       }
 
       const demo = await DemoRepository.create(
@@ -45,6 +46,7 @@ export class DemoService {
         `Ошибка при создании демки: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при создании демки");
     }
   }
@@ -108,9 +110,11 @@ export class DemoService {
   static async delete(accountId: bigint, name: string): Promise<Demo> {
     try {
       const deletedDemo = await DemoRepository.delete(accountId, name);
+
       serviceLogger("info", "DemoService.delete", "Демка удалена", {
         accountId,
       });
+
       return deletedDemo;
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);
@@ -120,6 +124,7 @@ export class DemoService {
         `Ошибка при удалении демки: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при удалении демки");
     }
   }
@@ -130,7 +135,7 @@ export class DemoService {
   }> {
     try {
       const user = await UserService.findByAccountId(accountId);
-      if (!user) throw new Error("Пользователь не найден");
+      if (!user) throw new UserError("Ты не зарегистрирован");
 
       const WAITING_TIME = getWaitingTime(user.hasPass).recordDemoRT;
 
@@ -156,6 +161,7 @@ export class DemoService {
         `Ошибка при проверке возможности записи демки: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при проверке возможности записи демки");
     }
   }

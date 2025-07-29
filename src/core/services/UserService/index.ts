@@ -1,4 +1,5 @@
 import { UserRepository } from "@infrastructure/repositories";
+import { UserError } from "@infrastructure/error";
 import { EquipmentService } from "../EquipmentService";
 import { calculateLevelAndRacks } from "@core/GameLogic";
 import { serviceLogger } from "@infrastructure/logger";
@@ -175,7 +176,7 @@ export class UserService {
     try {
       const user = await UserRepository.findByAccountId(accountId);
 
-      if (!user) throw new Error(`Пользователь ${accountId} не найден`);
+      if (!user) throw new UserError(`Ты не зарегистрирован`);
 
       const updatedFame = user.fame + amount;
       const updatedSeasonalFame = user.seasonalFame + amount;
@@ -236,6 +237,7 @@ export class UserService {
         `Ошибка при добавлении фейма: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при добавлении фейма");
     }
   }
@@ -248,7 +250,7 @@ export class UserService {
     try {
       const user = await UserRepository.findByAccountId(accountId);
 
-      if (!user) throw new Error(`Пользователь ${accountId} не найден`);
+      if (!user) throw new UserError(`Ты не зарегистрирован`);
 
       const equipment = await EquipmentService.findEquipmentByBrandAndModel(
         accountId,
@@ -257,10 +259,10 @@ export class UserService {
       );
 
       if (!equipment)
-        throw new Error(`Оборудование ${brand} ${model} не найдено`);
+        throw new UserError(`Оборудование ${brand} ${model} не найдено`);
 
       if (user.racks < equipment.price)
-        throw new Error("Не хватает рексов для покупки");
+        throw new UserError("Не хватает рексов для покупки");
 
       const price = user.hasPass
         ? Math.floor(equipment.price * 0.9)
@@ -280,6 +282,7 @@ export class UserService {
         `Ошибка при покупке оборудования: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при покупке оборудования");
     }
   }

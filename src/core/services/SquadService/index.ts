@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { UserService } from "../UserService";
 import { SquadRepository } from "@infrastructure/repositories";
+import { UserError } from "@infrastructure/error";
 import { serviceLogger } from "@infrastructure/logger";
 import { Squad, SquadMemberRole } from "@prisma/generated";
 import {
@@ -21,13 +22,13 @@ export class SquadService {
     try {
       const user = await UserService.findByAccountId(accountId);
 
-      if (!user) throw new Error(`Пользователь ${accountId} не найден`);
-      if (!user.hasPass) throw new Error("Отсутствует NERD PASS");
+      if (!user) throw new UserError("Ты не зарегистрирован");
+      if (!user.hasPass) throw new UserError("У тебя нет подписки NERD PASS");
 
       const existing = await SquadRepository.findMembershipByUserId(accountId);
       if (existing)
-        throw new Error(
-          `${accountId} уже состоит в объединении ${existing.squadName}`
+        throw new UserError(
+          `Ты уже состоишь в объединении ${existing.squadName}`
         );
 
       if (fileUrl) {
@@ -67,6 +68,7 @@ export class SquadService {
         `Ошибка при создании объединения: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при создании объединения");
     }
   }
@@ -83,23 +85,23 @@ export class SquadService {
       const user = await UserService.findByAccountId(userId);
       const existing = await SquadRepository.findMembershipByUserId(userId);
 
-      if (!user) throw new Error(`Пользователь ${userId} не найден`);
-      if (!squad) throw new Error(`Объединение ${squadName} не найдено`);
+      if (!user) throw new UserError("Приглашаемый игрок не зарегистрирован");
+      if (!squad) throw new UserError(`Объединение ${squadName} не найдено`);
       if (members.length > squad.capacity)
-        throw new Error(`В объединении ${squadName} нет места`);
+        throw new UserError(`В объединении ${squadName} нет места`);
 
       const requester = members.find((m) => m.accountId === accountId);
       if (!requester)
-        throw new Error(`${accountId} не состоит в объединении ${squadName}`);
+        throw new UserError(`Ты не состоишь в объединении ${squadName}`);
       if (
         requester.role !== SquadMemberRole.ADMIN &&
         requester.role !== SquadMemberRole.RECRUITER
       )
-        throw new Error("Недостаточно прав");
+        throw new UserError("Ты не можешь приглашать артистов на лейбл");
 
       if (existing)
-        throw new Error(
-          `${userId} уже состоит в объединении ${existing.squadName}`
+        throw new UserError(
+          `Игрок уже состоит в объединении ${existing.squadName}`
         );
 
       const member = await SquadRepository.addMember(
@@ -124,6 +126,7 @@ export class SquadService {
         `Ошибка при добавлении участника в объединение ${squadName}: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при добавлении участника в объединение");
     }
   }
@@ -204,8 +207,7 @@ export class SquadService {
     limit: number = 10
   ): Promise<SquadWithMembers[]> {
     try {
-      const topSquads = await SquadRepository.findTopSquads(limit);
-      return topSquads;
+      return await SquadRepository.findTopSquads(limit);
     } catch (error) {
       const err = error instanceof Error ? error.message : String(error);
       serviceLogger(
@@ -226,11 +228,11 @@ export class SquadService {
       const user = await SquadRepository.findMembershipByUserId(accountId);
       const squad = await SquadRepository.findSquadByName(squadName);
 
-      if (!squad) throw new Error(`Объединение ${squadName} не найдено`);
+      if (!squad) throw new UserError(`Объединение ${squadName} не найдено`);
       if (!user)
-        throw new Error(`${accountId} не состоит в объединении ${squadName}`);
+        throw new UserError(`Ты не состоишь в объединении ${squadName}`);
       if (user.role !== SquadMemberRole.ADMIN)
-        throw new Error("Только администратор может удалить объединение");
+        throw new UserError("Только администратор может удалить объединение");
 
       const deletedSquad = await SquadRepository.deleteSquad(
         accountId,
@@ -258,6 +260,7 @@ export class SquadService {
         `Ошибка при удалении объединения ${squadName}: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error(`Ошибка при удалении объединения ${squadName}`);
     }
   }
@@ -278,14 +281,15 @@ export class SquadService {
       const targetUser = await UserService.findByAccountId(userId);
       const targetMember = await SquadRepository.findMembershipByUserId(userId);
 
-      if (!requesterUser)
-        throw new Error(`Пользователь ${accountId} не найден`);
-      if (!targetUser) throw new Error(`Пользователь ${userId} не найден`);
+      if (!requesterUser) throw new UserError("Ты не зарегистрирован");
+      if (!targetUser) throw new UserError(`Участник объединения не найден`);
 
       if (!requesterMembership || requesterMembership.squadName !== squadName)
-        throw new Error(`${accountId} не состоит в объединении ${squadName}`);
+        throw new UserError(`Ты не состоишь в объединении ${squadName}`);
       if (!targetMember || targetMember.squadName !== squadName)
-        throw new Error(`${userId} не состоит в объединении ${squadName}`);
+        throw new UserError(
+          `${targetUser.nickname} не состоит в объединении ${squadName}`
+        );
 
       if (isSelfLeave) {
         if (requesterMembership.role !== SquadMemberRole.ADMIN) {
@@ -335,7 +339,7 @@ export class SquadService {
           ) ?? members.find((m) => m.accountId !== accountId);
 
         if (!nextOwner) {
-          throw new Error("Не удалось передать права на объединение");
+          throw new UserError("Не удалось передать права на объединение");
         }
 
         await SquadRepository.changeMemberRole(
@@ -364,9 +368,7 @@ export class SquadService {
       }
 
       if (requesterMembership.role !== SquadMemberRole.ADMIN)
-        throw new Error(
-          "Только администратор может удалять участников из объединения"
-        );
+        throw new UserError("Ты не можешь исключить игрока из объединения");
 
       const deletedMember = await SquadRepository.deleteSquadMember(
         squadName,
@@ -390,6 +392,7 @@ export class SquadService {
         `Ошибка при удалении участника из объединения ${squadName}: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error(
         `Ошибка при удалении участника из объединения ${squadName}`
       );
@@ -434,19 +437,19 @@ export class SquadService {
   ): Promise<SquadMemberWithUserAndSquad> {
     try {
       if (accountId === userId)
-        throw new Error("Нельзя изменить собственную роль");
+        throw new UserError("Нельзя изменить собственную роль");
 
       const requester = await SquadRepository.findMembershipByUserId(accountId);
 
       if (!requester)
-        throw new Error(`${accountId} не состоите в объединении ${squadName}`);
+        throw new UserError(`Ты не состоишь в объединении ${squadName}`);
       if (requester.role !== SquadMemberRole.ADMIN)
-        throw new Error("Только администратор может менять роли");
+        throw new UserError("Только администратор может менять роли");
 
       const member = await SquadRepository.findMembershipByUserId(userId);
 
       if (!member || member.squadName !== squadName)
-        throw new Error(`${userId} не состоит в объединении ${squadName}`);
+        throw new UserError(`Игрок не состоит в объединении ${squadName}`);
 
       return await SquadRepository.changeMemberRole(squadName, userId, role);
     } catch (error) {
@@ -457,6 +460,7 @@ export class SquadService {
         `Ошибка при изменении роли участника объединения ${squadName}: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error(
         `Ошибка при изменении роли участника объединения ${squadName}`
       );
@@ -470,20 +474,18 @@ export class SquadService {
   ): Promise<Squad> {
     try {
       if (accountId === userId)
-        throw new Error("Нельзя передать права на объединение самому себе");
+        throw new UserError("Нельзя передать права на объединение самому себе");
 
       const prevAdmin = await SquadRepository.findMembershipByUserId(accountId);
 
       if (!prevAdmin || prevAdmin.squadName !== squadName)
-        throw new Error(`${accountId} не состоит в объединении ${squadName}`);
+        throw new UserError(`Ты не состоишь в объединении ${squadName}`);
       if (prevAdmin.role !== SquadMemberRole.ADMIN)
-        throw new Error(
-          `${accountId} не является владельцем объединения ${squadName}`
-        );
+        throw new UserError(`Ты не владелец объединения ${squadName}`);
 
       const nextAdmin = await SquadRepository.findMembershipByUserId(userId);
       if (!nextAdmin || nextAdmin.squadName !== squadName)
-        throw new Error(`${userId} не состоит в объединении ${squadName}`);
+        throw new UserError(`Игрок не состоит в объединении ${squadName}`);
 
       await SquadRepository.changeMemberRole(squadName, accountId, "MEMBER");
       await SquadRepository.changeMemberRole(squadName, userId, "ADMIN");
@@ -507,6 +509,7 @@ export class SquadService {
         `Ошибка при передаче прав на объединение ${squadName}: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error(`Ошибка при передаче прав на объединение ${squadName}`);
     }
   }

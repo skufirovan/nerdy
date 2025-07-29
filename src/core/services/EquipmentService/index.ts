@@ -1,4 +1,5 @@
 import { EquipmentRepository } from "@infrastructure/repositories";
+import { UserError } from "@infrastructure/error";
 import { serviceLogger } from "@infrastructure/logger";
 import { Equipment, EQUIPMENT_TYPE } from "@prisma/generated";
 import { UserEquipmentWithEquipment } from "@domain/types";
@@ -170,7 +171,7 @@ export class EquipmentService {
         equipmentId
       );
 
-      if (!existedEquipment) throw new Error("Оборудка не найдена");
+      if (!existedEquipment) throw new UserError("Оборудка не найдена");
 
       const userEquipped = await EquipmentRepository.findUserEquipped(
         accountId
@@ -200,6 +201,7 @@ export class EquipmentService {
         `Ошибка при активировании оборудования: ${err}`,
         { accountId }
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при активировании оборудования");
     }
   }
