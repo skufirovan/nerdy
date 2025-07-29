@@ -10,11 +10,11 @@ export const likeDistributedDemoAction = (bot: Telegraf<MyContext>) => {
     try {
       const accountId = ctx.user!.accountId;
       const message = ctx.update.callback_query.message;
-      const caption = hasCaption(message) ? message.caption : undefined;
 
-      if (!caption)
+      if (!message || !hasCaption(message) || !("reply_markup" in message))
         return await ctx.answerCbQuery("❌ Не удалось определить трек");
 
+      const caption = message.caption;
       const { name, nickname } = extractNameAndNicknameFromCaption(caption);
 
       if (!name || !nickname)
@@ -34,6 +34,17 @@ export const likeDistributedDemoAction = (bot: Telegraf<MyContext>) => {
         accountId,
         distributedDemo.id
       );
+
+      const likesMatch = caption.match(/❤️ (\d+)/);
+      const currentLikes = likesMatch ? parseInt(likesMatch[1], 10) : 0;
+      const newLikes = isLiked ? currentLikes + 1 : currentLikes - 1;
+
+      const newCaption = caption.replace(/❤️ \d+/, `❤️ ${newLikes}`);
+
+      await ctx.editMessageCaption(newCaption, {
+        parse_mode: "HTML",
+        reply_markup: message.reply_markup,
+      });
 
       if (isLiked) {
         await ctx.answerCbQuery("❤️ Ты поставил лайк");
