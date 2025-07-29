@@ -28,6 +28,7 @@ export class DemoWithUserDto {
   readonly name: string;
   readonly text: string | null;
   readonly fileId: string | null;
+  readonly messageId: number | null;
   readonly recordedAt: Date;
   readonly user: UserDto;
 
@@ -37,6 +38,7 @@ export class DemoWithUserDto {
     this.name = demo.name;
     this.text = demo.text;
     this.fileId = demo.fileId;
+    this.messageId = demo.messageId;
     this.recordedAt = demo.recordedAt;
     this.user = new UserDto(demo.user);
   }
