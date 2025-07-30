@@ -1,5 +1,6 @@
 import fs from "fs/promises";
-import path from "path";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 import { Markup } from "telegraf";
 import { MyContext } from "@bot/features/scenes";
 import { UserController } from "@controller/index";
@@ -183,4 +184,10 @@ export function extractEquipmenNameFromCaption(caption: string): {
     brand: brand?.trim() || "",
     model: model?.trim() || "",
   };
+}
+
+export function getESMPaths(metaUrl: string) {
+  const __filename = fileURLToPath(metaUrl);
+  const __dirname = dirname(__filename);
+  return { __filename, __dirname };
 }

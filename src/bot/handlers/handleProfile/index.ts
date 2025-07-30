@@ -6,6 +6,7 @@ import {
   formatDateToDDMMYYYY,
   getRandomImage,
   handleError,
+  getESMPaths,
 } from "@utils/index";
 
 export const handleProfile = async (ctx: MyContext) => {
@@ -13,6 +14,7 @@ export const handleProfile = async (ctx: MyContext) => {
 
   try {
     const user = await UserController.findByAccountId(accountId);
+    const { __dirname } = getESMPaths(import.meta.url);
     const imagePath = await getRandomImage(
       path.resolve(__dirname, `../../assets/images/PROFILE`),
       path.resolve(__dirname, `../../assets/images/PROFILE/1.jpg`)

@@ -5,7 +5,7 @@ import { DemoController } from "@controller/index";
 import { formatPaginated } from "../../pagination/action";
 import { SHOW_DEMOS_BUTTONS } from "../showDemosMenu/keyboard";
 import { paginateDemosKeyboard } from "./keyboard";
-import { getRandomImage, handleError } from "@utils/index";
+import { getRandomImage, handleError, getESMPaths } from "@utils/index";
 
 export const showTextDemosAction = (bot: Telegraf<MyContext>) => {
   bot.action(SHOW_DEMOS_BUTTONS.TEXT_DEMOS.callback, async (ctx) => {
@@ -33,6 +33,7 @@ export const showTextDemosAction = (bot: Telegraf<MyContext>) => {
         replyMarkup,
       };
 
+      const { __dirname } = getESMPaths(import.meta.url);
       const imagePath = await getRandomImage(
         path.resolve(__dirname, "../../../assets/images/DEMO"),
         path.resolve(__dirname, "../../../assets/images/DEMO/1.jpg")

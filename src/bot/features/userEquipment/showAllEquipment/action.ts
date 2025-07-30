@@ -5,7 +5,7 @@ import { EquipmentController } from "@controller/index";
 import { formatPaginated } from "../../pagination/action";
 import { showEquipmentKeyboard, showOneEquipmentKeyboard } from "./keyboard";
 import { PROFILE_BUTTONS } from "@bot/handlers";
-import { getRandomImage, handleError } from "@utils/index";
+import { getRandomImage, handleError, getESMPaths } from "@utils/index";
 
 export const showAllEquipmentAction = (bot: Telegraf<MyContext>) => {
   bot.action(PROFILE_BUTTONS.EQUIPMENT.callback, async (ctx) => {
@@ -36,6 +36,7 @@ export const showAllEquipmentAction = (bot: Telegraf<MyContext>) => {
         replyMarkup,
       };
 
+      const { __dirname } = getESMPaths(import.meta.url);
       const imagePath = await getRandomImage(
         path.resolve(__dirname, "../../../assets/images/EQUIPMENT"),
         path.resolve(__dirname, "../../../assets/images/EQUIPMENT/1.jpg")

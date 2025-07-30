@@ -8,7 +8,12 @@ import {
 } from "@controller/index";
 import { AUDIO_DEMOS_BUTTONS } from "../showAudioDemos/keyboard";
 import { extractDemoNameFromCaption } from "../utils";
-import { getRandomImage, handleError, hasCaption } from "@utils/index";
+import {
+  getRandomImage,
+  handleError,
+  hasCaption,
+  getESMPaths,
+} from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 
 export const distributeDemoAction = (bot: Telegraf<MyContext>) => {
@@ -19,6 +24,7 @@ export const distributeDemoAction = (bot: Telegraf<MyContext>) => {
       );
 
       if (!canDistribute) {
+        const { __dirname } = getESMPaths(import.meta.url);
         const imagePath = await getRandomImage(
           path.resolve(__dirname, `../../../assets/images/REMAINING`),
           path.resolve(__dirname, `../../../assets/images/REMAINING/1.jpg`)

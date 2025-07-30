@@ -5,7 +5,12 @@ import { EquipmentController } from "controller/EquipmentController";
 import { formatPaginated } from "@bot/features/pagination/action";
 import { SHOP_BUTTONS } from "../showShopMenu/keyboard";
 import { equipmentShopKeyboard, oneEquipmentShopKeyboard } from "./keyboard";
-import { getRandomImage, handleError, requireUser } from "@utils/index";
+import {
+  getRandomImage,
+  handleError,
+  requireUser,
+  getESMPaths,
+} from "@utils/index";
 
 export const showEquipmentShopAction = (bot: Telegraf<MyContext>) => {
   bot.action(SHOP_BUTTONS.EQUIPMENT.callback, async (ctx) => {
@@ -34,6 +39,7 @@ export const showEquipmentShopAction = (bot: Telegraf<MyContext>) => {
         replyMarkup,
       };
 
+      const { __dirname } = getESMPaths(import.meta.url);
       const imagePath = await getRandomImage(
         path.resolve(__dirname, "../../../assets/images/EQUIPMENT"),
         path.resolve(__dirname, "../../../assets/images/EQUIPMENT/1.jpg")

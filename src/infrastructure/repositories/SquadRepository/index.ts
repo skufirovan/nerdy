@@ -1,5 +1,5 @@
 import { prisma } from "@prisma/client";
-import { Squad, SquadMemberRole } from "@prisma/generated";
+import { Prisma, Squad, SquadMemberRole } from "@prisma/generated";
 import {
   NON_UPDATABLE_SQUAD_FIELDS,
   SquadMemberWithUserAndSquad,
@@ -13,7 +13,7 @@ export class SquadRepository {
     seasonalFame: number,
     photo: string
   ): Promise<Squad> {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const squad = await tx.squad.create({
         data: { adminId, name, seasonalFame, photo },
       });

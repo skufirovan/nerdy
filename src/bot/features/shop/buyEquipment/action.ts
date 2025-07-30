@@ -27,11 +27,11 @@ export const buyEquipmentAction = (bot: Telegraf<MyContext>) => {
         parse_mode: "HTML",
         reply_markup: Markup.inlineKeyboard([
           [
+            Markup.button.callback("❌ Отменить", "DELETE_MESSAGE"),
             Markup.button.callback(
               "✅ Подтвердить",
               `CONFIRM_BUY_EQUIPMENT_${brand}_${model}`
             ),
-            Markup.button.callback("❌ Отменить", "DELETE_MESSAGE"),
           ],
         ]).reply_markup,
       });

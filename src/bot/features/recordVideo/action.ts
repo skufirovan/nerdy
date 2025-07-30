@@ -3,7 +3,7 @@ import { Telegraf } from "telegraf";
 import { MyContext } from "../scenes";
 import { VideoController } from "@controller/index";
 import { ACTIVITIES_BUTTONS } from "../showActivities/keyboard";
-import { getRandomImage, handleError } from "@utils/index";
+import { getRandomImage, handleError, getESMPaths } from "@utils/index";
 
 export const recordVideoAction = (bot: Telegraf<MyContext>) => {
   bot.action(ACTIVITIES_BUTTONS.RECORD_VIDEO.callback, async (ctx) => {
@@ -15,6 +15,7 @@ export const recordVideoAction = (bot: Telegraf<MyContext>) => {
       );
 
       if (!canRecord) {
+        const { __dirname } = getESMPaths(import.meta.url);
         const imagePath = await getRandomImage(
           path.resolve(__dirname, `../../assets/images/REMAINING`),
           path.resolve(__dirname, `../../assets/images/REMAINING/1.jpg`)

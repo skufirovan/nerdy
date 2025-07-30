@@ -4,7 +4,12 @@ import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
 import { UserController } from "@controller/index";
 import { battleManager, battleTimeoutService } from "@core/GameLogic/battle";
-import { getRandomImage, requireUser, handleError } from "@utils/index";
+import {
+  getRandomImage,
+  requireUser,
+  handleError,
+  getESMPaths,
+} from "@utils/index";
 import {
   SECTION_EMOJI,
   FAME_TO_BATTLE,
@@ -26,6 +31,7 @@ battleScene.enter(async (ctx: MyContext) => {
       return ctx.scene.leave();
     }
 
+    const { __dirname } = getESMPaths(import.meta.url);
     const imagePath = await getRandomImage(
       path.resolve(__dirname, `../../assets/images/BATTLE`),
       path.resolve(__dirname, `../../assets/images/BATTLE/1.jpg`)

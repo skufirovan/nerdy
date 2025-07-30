@@ -3,7 +3,7 @@ import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { EquipmentController } from "@controller/index";
 import { SHOW_EQUIPMENT_BUTTONS } from "../showAllEquipment/keyboard";
-import { getRandomImage, handleError } from "@utils/index";
+import { getRandomImage, handleError, getESMPaths } from "@utils/index";
 import { formatPaginated } from "@bot/features/pagination/action";
 import { showEquippedKeyboard, showOneEquippedKeyboard } from "./keyboard";
 
@@ -37,6 +37,7 @@ export const showEquippedAction = (bot: Telegraf<MyContext>) => {
           replyMarkup,
         };
 
+        const { __dirname } = getESMPaths(import.meta.url);
         const imagePath = await getRandomImage(
           path.resolve(__dirname, "../../../assets/images/EQUIPMENT"),
           path.resolve(__dirname, "../../../assets/images/EQUIPMENT/1.jpg")

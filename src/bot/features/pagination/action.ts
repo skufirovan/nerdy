@@ -1,5 +1,5 @@
 import { Telegraf } from "telegraf";
-import { InlineKeyboardMarkup } from "telegraf/typings/core/types/typegram";
+import { InlineKeyboardMarkup } from "telegraf/types";
 import { MyContext, SessionData } from "../scenes";
 import { DemoDto, EquipmentDto } from "@domain/dtos";
 import { formatDateToDDMMYYYY, hasCaption, handleError } from "@utils/index";

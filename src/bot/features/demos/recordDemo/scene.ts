@@ -8,7 +8,12 @@ import {
 } from "@controller/index";
 import { GifRepository } from "@infrastructure/repositories";
 import { UserDto } from "@domain/dtos";
-import { getRandomImage, requireUser, handleError } from "@utils/index";
+import {
+  getRandomImage,
+  requireUser,
+  handleError,
+  getESMPaths,
+} from "@utils/index";
 import { updateFileIdIfNeeded } from "@utils/fileId";
 import { SECTION_EMOJI } from "@utils/constants";
 
@@ -126,6 +131,7 @@ recordDemoScene.on("message", async (ctx: MyContext) => {
         racks: user.racks + racksReward,
       });
 
+      const { __dirname } = getESMPaths(import.meta.url);
       const imagePath = await getRandomImage(
         path.resolve(__dirname, `../../../assets/images/DEMO`),
         path.resolve(__dirname, `../../../assets/images/DEMO/1.jpg`)
