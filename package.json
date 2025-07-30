@@ -3,9 +3,16 @@
   "version": "1.0.0",
   "main": "src/main.ts",
   "scripts": {
-    "dev": "nodemon --watch src --ext ts --exec tsx src/main.ts",
-    "build": "tsc && tsc-alias && cp -r src/prisma/generated dist/prisma/generated",
+    "dev": "./scripts/dev.sh",
+    "dev:simple": "nodemon --watch src --ext ts --exec './node_modules/.bin/tsx src/main.ts'",
+    "build": "./scripts/build.sh",
+    "build:simple": "npm run build:clean && npm run build:compile && npm run build:aliases && npm run build:copy",
+    "build:clean": "rm -rf dist",
+    "build:compile": "tsc",
+    "build:aliases": "tsc-alias",
+    "build:copy": "cp -r src/prisma/generated dist/prisma/generated 2>/dev/null || true",
     "start": "node dist/main.js",
+    "start:prod": "NODE_ENV=production node dist/main.js",
     "prisma:mig": "npx prisma migrate dev --schema src/prisma/schema.prisma",
     "test": "jest"
   },

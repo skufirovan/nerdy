@@ -1,0 +1,6 @@
+{
+  "verbose": false,
+  "resolveFullPaths": true,
+  "replaceTscAliasPaths": true,
+  "replacer": "js"
+}

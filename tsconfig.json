@@ -15,7 +15,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": "src",
     "paths": {
-      "@prisma/*": ["prisma/*"],
+      "@prisma/generated": ["prisma/generated"],
+      "@prisma/client": ["prisma/client.ts"],
       "@bot/*": ["bot/*"],
       "@controller": ["controller/index.ts"],
       "@core/*": ["core/*"],
