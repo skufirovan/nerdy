@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "@bot/features/scenes";
-import { UserController, SquadController } from "@controller";
+import { UserController, SquadController } from "@controller/index";
 import { SECTION_EMOJI } from "@utils/constants";
 import { handleError } from "@utils/index";
 

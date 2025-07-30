@@ -1,4 +1,4 @@
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 
 export async function handlePurchase(
   accountId: bigint,

@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022", "DOM"],
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
@@ -17,7 +17,7 @@
     "paths": {
       "@prisma/*": ["prisma/*"],
       "@bot/*": ["bot/*"],
-      "@controller": ["controller/index.ts"],
+      "@controller/*": ["controller/*"],
       "@core/*": ["core/*"],
       "@domain/*": ["domain/*"],
       "@infrastructure/*": ["infrastructure/*"],

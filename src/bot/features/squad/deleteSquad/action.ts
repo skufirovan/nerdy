@@ -1,6 +1,6 @@
 import { Markup, Telegraf } from "telegraf";
 import { MyContext } from "@bot/features/scenes";
-import { SquadController } from "@controller";
+import { SquadController } from "@controller/index";
 import { handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 

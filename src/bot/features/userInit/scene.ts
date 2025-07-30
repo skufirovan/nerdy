@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { mainKeyboard } from "@bot/handlers/handleStart/keyboard";
 import { ValidationError, validate, handleError } from "@utils/index";
 

@@ -1,6 +1,6 @@
 import path from "path";
 import { MyContext } from "@bot/features/scenes";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { profileKeyboard } from "./keyboard";
 import {
   formatDateToDDMMYYYY,

@@ -3,7 +3,7 @@ import { Telegraf } from "telegraf";
 import { DISTRIBUTED_DEMOS_BUTTONS } from "../showDistributedDemos/keyboard";
 import { handleError, hasCaption } from "@utils/index";
 import { extractNameAndNicknameFromCaption } from "../utils";
-import { DistributedDemoController } from "@controller";
+import { DistributedDemoController } from "@controller/index";
 
 export const likeDistributedDemoAction = (bot: Telegraf<MyContext>) => {
   bot.action(DISTRIBUTED_DEMOS_BUTTONS.LIKE.callback, async (ctx) => {

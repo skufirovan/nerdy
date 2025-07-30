@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { Telegraf } from "telegraf";
 import { MyContext } from "../scenes";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { PROFILE_BUTTONS } from "@bot/handlers";
 import { handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";

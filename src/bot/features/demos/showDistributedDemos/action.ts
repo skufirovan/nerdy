@@ -2,7 +2,7 @@ import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "@bot/features/scenes";
 import { MENU_BUTTONS } from "@bot/handlers";
 import { handleError } from "@utils/index";
-import { DemoController, DistributedDemoController } from "@controller";
+import { DemoController, DistributedDemoController } from "@controller/index";
 import {
   distributedDemosKeyboard,
   oneDistributedDemosKeyboard,

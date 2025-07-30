@@ -5,7 +5,7 @@ import { TOP_SQUADS_BUTTON } from "./keyboard";
 import { SquadMemberWithUserAndSquadDto } from "@domain/dtos";
 import { handleError, formatSquad } from "@utils/index";
 import { updateFileIdIfNeeded } from "@utils/fileId";
-import { SquadController } from "@controller";
+import { SquadController } from "@controller/index";
 
 export const paginateTopSquadsActions = (bot: Telegraf<MyContext>) => {
   bot.action(TOP_SQUADS_BUTTON.NEXT.callback, async (ctx) => {

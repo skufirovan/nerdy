@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { MyContext } from "../../scenes";
 import { MENU_BUTTONS } from "@bot/handlers";
-import { SquadController, UserController } from "@controller";
+import { SquadController, UserController } from "@controller/index";
 import { SECTION_EMOJI } from "@utils/constants";
 import { createSquadKeyboard, getSquadKeyboardByRole } from "./keyboard";
 import { formatSquad, handleError } from "@utils/index";

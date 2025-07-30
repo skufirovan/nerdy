@@ -1,6 +1,6 @@
 import { Markup, Telegraf } from "telegraf";
 import { MyContext } from "../../scenes";
-import { DemoController } from "@controller";
+import { DemoController } from "@controller/index";
 import { DELETE_DEMO_BUTTON } from "./keyboard";
 import { extractDemoNameFromCaption } from "../utils";
 import { handleError, hasCaption } from "@utils/index";

@@ -1,6 +1,6 @@
 import { Telegraf } from "telegraf";
 import { MyContext } from "../../scenes";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { MENU_BUTTONS } from "@bot/handlers";
 import { TOP_BUTTONS, topKeyboard } from "./keyboard";
 import { handleError } from "@utils/index";

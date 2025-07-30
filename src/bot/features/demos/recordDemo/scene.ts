@@ -5,7 +5,7 @@ import {
   DemoController,
   UserController,
   EquipmentController,
-} from "@controller";
+} from "@controller/index";
 import { GifRepository } from "@infrastructure/repositories";
 import { UserDto } from "@domain/dtos";
 import { getRandomImage, requireUser, handleError } from "@utils/index";

@@ -1,6 +1,6 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "@bot/features/scenes";
-import { DemoController } from "@controller";
+import { DemoController } from "@controller/index";
 import { paginate } from "../../pagination/action";
 import { DISTRIBUTED_DEMOS_BUTTONS } from "./keyboard";
 import { DistributedDemoWithDemoAndLikesDto } from "@domain/dtos";

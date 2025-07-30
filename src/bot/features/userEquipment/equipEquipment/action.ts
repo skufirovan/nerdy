@@ -1,6 +1,6 @@
 import { MyContext } from "@bot/features/scenes";
 import { Telegraf } from "telegraf";
-import { EquipmentController } from "@controller";
+import { EquipmentController } from "@controller/index";
 import { SHOW_EQUIPMENT_BUTTONS } from "../showAllEquipment/keyboard";
 import {
   extractEquipmenNameFromCaption,

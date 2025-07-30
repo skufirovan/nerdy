@@ -2,7 +2,7 @@ import path from "path";
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { battleManager, battleTimeoutService } from "@core/GameLogic/battle";
 import { getRandomImage, requireUser, handleError } from "@utils/index";
 import {

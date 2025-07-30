@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { Markup } from "telegraf";
 import { MyContext } from "@bot/features/scenes";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { UserDto, SquadMemberWithUserAndSquadDto } from "@domain/dtos";
 import { SquadMemberRole } from "@prisma/generated";
 import { userActionsLogger, serviceLogger } from "@infrastructure/logger";

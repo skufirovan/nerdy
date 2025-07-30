@@ -5,7 +5,7 @@ import {
   DemoController,
   DistributedDemoController,
   UserController,
-} from "@controller";
+} from "@controller/index";
 import { AUDIO_DEMOS_BUTTONS } from "../showAudioDemos/keyboard";
 import { extractDemoNameFromCaption } from "../utils";
 import { getRandomImage, handleError, hasCaption } from "@utils/index";

@@ -1,6 +1,6 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../../scenes";
-import { DemoController } from "@controller";
+import { DemoController } from "@controller/index";
 import { formatAudioDemo } from "./pagination";
 import { SHOW_DEMOS_BUTTONS } from "../showDemosMenu/keyboard";
 import { showAudioDemosKeyboard, showOneAudioDemosKeyboard } from "./keyboard";

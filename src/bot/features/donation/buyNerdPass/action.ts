@@ -2,7 +2,7 @@ import { MyContext } from "@bot/features/scenes";
 import { Telegraf } from "telegraf";
 import { DONATION_BUTTONS } from "../showDonation/keyboard";
 import { handleError } from "@utils/index";
-import { InvoiceController } from "@controller";
+import { InvoiceController } from "@controller/index";
 
 export const buyNerdPassAction = (bot: Telegraf<MyContext>) => {
   bot.action(DONATION_BUTTONS.NERD_PASS.callback, async (ctx) => {

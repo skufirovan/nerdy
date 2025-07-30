@@ -1,6 +1,6 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "@bot/features/scenes";
-import { SquadController } from "@controller";
+import { SquadController } from "@controller/index";
 import { handleError } from "@utils/index";
 import { SECTION_EMOJI } from "@utils/constants";
 

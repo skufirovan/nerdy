@@ -1,6 +1,6 @@
 import { Telegraf } from "telegraf";
 import { MyContext } from "@bot/features/scenes";
-import { InvoiceController, UserController } from "@controller";
+import { InvoiceController, UserController } from "@controller/index";
 import { handleError } from "@utils/index";
 import { handlePurchase } from "../donation/handlePurchase";
 

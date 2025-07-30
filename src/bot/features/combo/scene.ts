@@ -7,7 +7,7 @@ import {
   formatResult,
   simulateBattle,
 } from "@core/GameLogic/battle";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { handleError } from "@utils/index";
 import { FAME_TO_BATTLE, RACKS_TO_BATTLE } from "@utils/constants";
 

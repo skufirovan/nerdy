@@ -1,7 +1,11 @@
 import { Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { MyContext, SessionData } from "../scenes";
-import { VideoController, DemoController, UserController } from "@controller";
+import {
+  VideoController,
+  DemoController,
+  UserController,
+} from "@controller/index";
 import { GifRepository } from "@infrastructure/repositories";
 import { UserDto } from "@domain/dtos";
 import { requireUser, handleError } from "@utils/index";

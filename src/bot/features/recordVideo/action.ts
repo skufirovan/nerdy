@@ -1,7 +1,7 @@
 import path from "path";
 import { Telegraf } from "telegraf";
 import { MyContext } from "../scenes";
-import { VideoController } from "@controller";
+import { VideoController } from "@controller/index";
 import { ACTIVITIES_BUTTONS } from "../showActivities/keyboard";
 import { getRandomImage, handleError } from "@utils/index";
 

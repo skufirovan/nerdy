@@ -1,5 +1,5 @@
 import { MyContext, SessionData } from "@bot/features/scenes";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { mainKeyboard } from "./keyboard";
 import { CHANNEL_LINK, SECTION_EMOJI } from "@utils/constants";
 import { handleError } from "@utils/index";

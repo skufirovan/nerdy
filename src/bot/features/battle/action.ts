@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../scenes";
 import { battleManager, battleTimeoutService } from "@core/GameLogic/battle";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { ACTIVITIES_BUTTONS } from "../showActivities/keyboard";
 import { handleError } from "@utils/index";
 import { FAME_TO_BATTLE, RACKS_TO_BATTLE } from "@utils/constants";

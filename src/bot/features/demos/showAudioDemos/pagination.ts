@@ -5,7 +5,7 @@ import { AUDIO_DEMOS_BUTTONS } from "./keyboard";
 import { DemoDto } from "@domain/dtos";
 import { handleError, formatDateToDDMMYYYY } from "@utils/index";
 import { refreshDemoFileIdIfNeeded } from "@utils/fileId";
-import { DemoController } from "@controller";
+import { DemoController } from "@controller/index";
 
 export const formatAudioDemo = (demo: DemoDto) => {
   return [

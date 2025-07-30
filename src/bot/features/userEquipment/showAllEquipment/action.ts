@@ -1,7 +1,7 @@
 import path from "path";
 import { Telegraf } from "telegraf";
 import { MyContext, SessionData } from "../../scenes";
-import { EquipmentController } from "@controller";
+import { EquipmentController } from "@controller/index";
 import { formatPaginated } from "../../pagination/action";
 import { showEquipmentKeyboard, showOneEquipmentKeyboard } from "./keyboard";
 import { PROFILE_BUTTONS } from "@bot/handlers";

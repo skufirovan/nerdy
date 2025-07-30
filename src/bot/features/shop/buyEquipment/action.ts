@@ -1,6 +1,6 @@
 import { MyContext } from "@bot/features/scenes";
 import { Markup, Telegraf } from "telegraf";
-import { UserController } from "@controller";
+import { UserController } from "@controller/index";
 import { EQUIPMENT_SHOP_BUTTONS } from "../showEquipmentShop/keyboard";
 import {
   handleError,
