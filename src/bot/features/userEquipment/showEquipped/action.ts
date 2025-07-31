@@ -45,6 +45,7 @@ export const showEquippedAction = (bot: Telegraf<MyContext>) => {
 
         const first = equipment[0];
 
+        await ctx.deleteMessage();
         await ctx.replyWithPhoto(
           { source: imagePath },
           {

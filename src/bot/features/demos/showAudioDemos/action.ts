@@ -49,6 +49,7 @@ export const showAudioDemosAction = (bot: Telegraf<MyContext>) => {
         },
       });
 
+      await ctx.deleteMessage();
       await ctx.replyWithAudio(fileId, {
         caption: formatAudioDemo(first),
         parse_mode: "HTML",

@@ -41,6 +41,7 @@ export const showTextDemosAction = (bot: Telegraf<MyContext>) => {
 
       const first = textDemos[0];
 
+      await ctx.deleteMessage();
       await ctx.replyWithPhoto(
         { source: imagePath },
         {
