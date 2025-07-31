@@ -10,16 +10,16 @@ export const buyNerdPassAction = (bot: Telegraf<MyContext>) => {
       await ctx.answerCbQuery();
 
       const accountId = ctx.user!.accountId;
-      const amount = 12900;
+      const amount = 99;
       const product = "NERD PASS";
       const payload = `${product}_${accountId}_${Date.now()}`;
 
       await ctx.sendInvoice({
         title: product,
-        description: "К оплате",
+        description: "ДА ДА ДАВАЙ ЖМИ",
         payload,
         provider_token: process.env.PROVIDER_TOKEN!,
-        currency: "RUB",
+        currency: "XTR",
         prices: [{ label: product, amount }],
       });
 

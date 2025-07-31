@@ -18,21 +18,23 @@ export function paymentEvents(bot: Telegraf<MyContext>) {
   bot.on("message", async (ctx) => {
     try {
       if ("successful_payment" in ctx.message) {
-        const accountId = ctx.user!.accountId;
         const successful_payment = ctx.message.successful_payment;
-        const { total_amount, invoice_payload, provider_payment_charge_id } =
+        const { total_amount, invoice_payload, telegram_payment_charge_id } =
           successful_payment;
+
+        const accountId = BigInt(invoice_payload.split("_")[1]);
+        const product = invoice_payload.split("_")[0];
 
         const invoice = await InvoiceController.findInvoiceByPayload(
           accountId,
           invoice_payload
         );
 
-        await handlePurchase(accountId, invoice_payload);
+        await handlePurchase(accountId, product);
 
         await InvoiceController.createPayment(
           accountId,
-          provider_payment_charge_id,
+          telegram_payment_charge_id,
           invoice!.id,
           total_amount
         );
