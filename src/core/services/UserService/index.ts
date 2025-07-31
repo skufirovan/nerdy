@@ -261,6 +261,12 @@ export class UserService {
       if (!equipment)
         throw new UserError(`Оборудование ${brand} ${model} не найдено`);
 
+      const existedEquipment = await EquipmentService.findUserEquipment(
+        accountId,
+        equipment.id
+      );
+      if (existedEquipment) throw new UserError("У тебя уже есть эта оборудка");
+
       if (user.racks < equipment.price)
         throw new UserError("Не хватает рексов для покупки");
 
