@@ -60,6 +60,7 @@ export class UserService {
         `Ошибка регистрации: ${err}`,
         meta
       );
+      if (error instanceof UserError) throw error;
       throw new Error("Ошибка при регистрации пользователя");
     }
   }

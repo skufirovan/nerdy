@@ -1,6 +1,8 @@
 import { prisma } from "@prisma/client";
 import { User } from "@prisma/generated";
 import { NON_UPDATABLE_USER_FIELDS } from "@domain/types";
+import { MAX_USERS } from "@utils/constants";
+import { UserError } from "@infrastructure/error";
 
 export class UserRepository {
   static async create(
@@ -9,7 +11,12 @@ export class UserRepository {
     nickname: string,
     invitedById: bigint | null
   ): Promise<User> {
-    return prisma.user.create({
+    const currentCount = await prisma.user.count();
+    if (currentCount >= MAX_USERS) {
+      throw new UserError("Регистрация закрыта. Лимит участников исчерпан.");
+    }
+
+    return await prisma.user.create({
       data: {
         accountId,
         username,
