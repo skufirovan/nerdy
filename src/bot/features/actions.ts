@@ -36,6 +36,7 @@ import {
   paginateDistributedDemosActions,
   showDistributedDemosAction,
   likeDistributedDemoAction,
+  minesweeperGameAction,
 } from ".";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
@@ -74,4 +75,5 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   showDistributedDemosAction(bot);
   paginateDistributedDemosActions(bot);
   likeDistributedDemoAction(bot);
+  minesweeperGameAction(bot);
 };

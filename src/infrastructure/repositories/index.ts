@@ -6,3 +6,4 @@ export * from "./SquadRepository";
 export * from "./InvoiceRepository";
 export * from "./DistributedDemoRepository";
 export * from "./GifRepository";
+export * from "./MinesweeperRepository";

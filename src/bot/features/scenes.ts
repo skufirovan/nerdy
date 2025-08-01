@@ -10,6 +10,7 @@ import {
   battleScene,
   comboScene,
   changeSquadMemberRoleScene,
+  minesweeperGameScene,
 } from ".";
 import { DemoDto } from "@domain/dtos";
 import { RawUser } from "@domain/types";
@@ -40,4 +41,5 @@ export const stage = new Scenes.Stage<MyContext>([
   inviteMemberScene,
   kickMemberScene,
   changeSquadMemberRoleScene,
+  minesweeperGameScene,
 ]);

@@ -42,3 +42,5 @@ export * from "./squad/kickMember/action";
 export * from "./squad/kickMember/scene";
 export * from "./squad/changeRole/action";
 export * from "./squad/changeRole/scene";
+export * from "./games/minesweeper/action";
+export * from "./games/minesweeper/scene";
