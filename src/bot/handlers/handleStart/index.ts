@@ -17,6 +17,9 @@ export const handleStart = async (ctx: MyContext) => {
       ].join("\n"),
       {
         parse_mode: "Markdown",
+        link_preview_options: {
+          is_disabled: true,
+        },
         ...mainKeyboard,
       }
     );

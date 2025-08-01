@@ -25,7 +25,12 @@ export const checkSubscription: MiddlewareFn<MyContext> = async (ctx, next) => {
     if (!allowedStatuses.includes(member.status)) {
       return await ctx.reply(
         `📛 Чтобы продолжить, подпишись на [NERDY](${CHANNEL_LINK})`,
-        { parse_mode: "Markdown" }
+        {
+          parse_mode: "Markdown",
+          link_preview_options: {
+            is_disabled: true,
+          },
+        }
       );
     }
     return next();
