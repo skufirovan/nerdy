@@ -4,9 +4,9 @@ import { UserController } from "@controller/UserController";
 import { MinesweeperRepository } from "@infrastructure/repositories";
 import { handleError, requireUser } from "@utils/index";
 
-const MINESWEEPER_BET = 500;
+const MINESWEEPER_BET = 400;
 const FIELD_SIZE = 4;
-const MINES_COUNT = 5;
+const MINES_COUNT = 4;
 
 interface MinesweeperField {
   cells: { x: number; y: number; isMine: boolean; isOpen: boolean }[];
@@ -130,11 +130,20 @@ minesweeperGameScene.action(/cell:(\d):(\d)/, async (ctx) => {
     field.openCount += 1;
 
     if (cell.isMine) {
+      field.cells.forEach((c) => {
+        if (c.isMine && !c.isOpen) {
+          c.isOpen = true;
+        }
+      });
       await MinesweeperRepository.update(game.id, {
         isActive: false,
+        field: JSON.stringify(field),
         currentWin: 0,
       });
-      await ctx.editMessageText("💥 Щит гаддем, ниггер, ты проебал");
+      await ctx.editMessageText(
+        "💥 Щит гаддем, ниггер, ты проебал",
+        renderField(field, 0)
+      );
       return ctx.scene.leave();
     }
 
