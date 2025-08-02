@@ -6,7 +6,7 @@ import { handleError, requireUser } from "@utils/index";
 
 const MINESWEEPER_BET = 500;
 const FIELD_SIZE = 4;
-const MINES_COUNT = 6;
+const MINES_COUNT = 5;
 
 interface MinesweeperField {
   cells: { x: number; y: number; isMine: boolean; isOpen: boolean }[];
@@ -179,5 +179,24 @@ minesweeperGameScene.action("MINESWEEPER_TAKE_WIN", async (ctx) => {
   } catch (error) {
     await handleError(ctx, error, "minesweeperScene.take_win");
     return ctx.scene.leave();
+  }
+});
+
+minesweeperGameScene.leave(async (ctx) => {
+  try {
+    const accountId = ctx.user!.accountId;
+    const game = await MinesweeperRepository.findActiveByAccountId(accountId);
+    if (game) {
+      await MinesweeperRepository.update(game.id, { isActive: false });
+
+      const user = await requireUser(ctx);
+      if (user) {
+        await UserController.updateUserInfo(accountId, {
+          racks: user.racks + game.currentWin,
+        });
+      }
+    }
+  } catch (error) {
+    await handleError(ctx, error, "minesweeperGameScene.leave");
   }
 });
