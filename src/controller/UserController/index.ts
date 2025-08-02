@@ -114,6 +114,22 @@ export class UserController {
     }
   }
 
+  static async subtractFame(
+    accountId: bigint,
+    amount: number
+  ): Promise<UserDto> {
+    try {
+      const user = await UserService.subtractFame(accountId, amount);
+
+      const dto = new UserDto(user);
+      cache.set(accountId, dto);
+
+      return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async buyEquipment(
     accountId: bigint,
     brand: string,

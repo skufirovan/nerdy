@@ -133,10 +133,9 @@ comboScene.on(message("text"), async (ctx: MyContext) => {
           await UserController.addFame(winner!.accountId, FAME_TO_BATTLE);
 
           await UserController.updateUserInfo(loser!.accountId, {
-            fame: loser!.fame - FAME_TO_BATTLE,
-            seasonalFame: loser!.seasonalFame - FAME_TO_BATTLE,
             racks: loser!.racks - RACKS_TO_BATTLE,
           });
+          await UserController.subtractFame(loser!.accountId, FAME_TO_BATTLE);
 
           await winnerCtx.reply(
             `✅ Обоссано\n\n🧌 +${FAME_TO_BATTLE} фейма\n🪙 +${RACKS_TO_BATTLE} рэксов`

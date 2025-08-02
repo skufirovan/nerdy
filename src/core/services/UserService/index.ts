@@ -243,6 +243,52 @@ export class UserService {
     }
   }
 
+  static async subtractFame(accountId: bigint, amount: number): Promise<User> {
+    try {
+      const user = await UserRepository.findByAccountId(accountId);
+
+      if (!user) throw new UserError(`Ты не зарегистрирован`);
+
+      const updatedFame = user.fame - amount;
+      const updatedSeasonalFame = user.seasonalFame - amount;
+
+      const membership = await SquadService.findMembershipByUserId(accountId);
+
+      if (membership) {
+        await SquadService.updateSquadInfo(accountId, membership.squadName, {
+          seasonalFame: membership.squad.seasonalFame - amount,
+        });
+      }
+
+      const updatedUser = await UserRepository.updateUserInfo(accountId, {
+        fame: updatedFame,
+        seasonalFame: updatedSeasonalFame,
+      });
+
+      serviceLogger(
+        "info",
+        "UserService.subtractFame",
+        `Обновлены данные пользователя ${JSON.stringify({
+          fame: updatedFame,
+          seasonalFame: updatedSeasonalFame,
+        })}`,
+        { accountId }
+      );
+
+      return updatedUser;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "UserService.subtractFame",
+        `Ошибка при уменьшении фейма: ${err}`,
+        { accountId }
+      );
+      if (error instanceof UserError) throw error;
+      throw new Error("Ошибка при уменьшении фейма");
+    }
+  }
+
   static async buyEquipment(
     accountId: bigint,
     brand: string,
