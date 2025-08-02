@@ -7,3 +7,4 @@ export * from "./InvoiceRepository";
 export * from "./DistributedDemoRepository";
 export * from "./GifRepository";
 export * from "./MinesweeperRepository";
+export * from "./PromocodeRepository";

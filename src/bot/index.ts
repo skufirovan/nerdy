@@ -8,6 +8,7 @@ import {
   handleProfile,
   handleMenu,
   MAIN_BUTTONS,
+  handlePromo,
 } from "@bot/handlers";
 
 config();
@@ -20,6 +21,7 @@ bot.use(stage.middleware());
 bot.start(handleStart);
 bot.use(checkSubscription);
 
+bot.command("promo", handlePromo);
 bot.hears(MAIN_BUTTONS.PROFILE, handleProfile);
 bot.hears(MAIN_BUTTONS.MENU, handleMenu);
 
