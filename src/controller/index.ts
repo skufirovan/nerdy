@@ -5,3 +5,4 @@ export * from "./VideoController";
 export * from "./SquadController";
 export * from "./InvoiceController";
 export * from "./DistributedDemoController";
+export * from "./TradeController";

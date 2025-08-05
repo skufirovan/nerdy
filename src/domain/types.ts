@@ -54,3 +54,12 @@ export type DistributedDemoWithDemoAndLikes = Prisma.DistributedDemoGetPayload<{
     likes: true;
   };
 }>;
+
+export type TradeWithUsersAndEquipments = Prisma.TradeGetPayload<{
+  include: {
+    initiator: true;
+    receiver: true;
+    equipmentFromItem: true;
+    equipmentToItem: true;
+  };
+}>;
