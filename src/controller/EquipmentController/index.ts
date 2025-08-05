@@ -67,6 +67,27 @@ export class EquipmentController {
     }
   }
 
+  static async findUserEquipmentByBrandAndModel(
+    accountId: bigint,
+    brand: string,
+    model: string
+  ): Promise<UserEquipmentDto | null> {
+    try {
+      const equipment = await EquipmentService.findUserEquipmentByBrandAndModel(
+        accountId,
+        brand,
+        model
+      );
+
+      if (!equipment) return null;
+
+      const dto = new UserEquipmentDto(equipment);
+      return dto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async findUserEquipment(
     accountId: bigint,
     equipmentId: bigint

@@ -1,7 +1,7 @@
 import { EquipmentRepository } from "@infrastructure/repositories";
 import { UserError } from "@infrastructure/error";
 import { serviceLogger } from "@infrastructure/logger";
-import { Equipment, EQUIPMENT_TYPE } from "@prisma/generated";
+import { Equipment, EQUIPMENT_TYPE, UserEquipment } from "@prisma/generated";
 import { UserEquipmentWithEquipment } from "@domain/types";
 
 export class EquipmentService {
@@ -75,6 +75,32 @@ export class EquipmentService {
         { accountId }
       );
       throw new Error("Ошибка при поиске оборудования");
+    }
+  }
+
+  static async findUserEquipmentByBrandAndModel(
+    accountId: bigint,
+    brand: string,
+    model: string
+  ): Promise<UserEquipmentWithEquipment | null> {
+    try {
+      const equipment =
+        await EquipmentRepository.findUserEquipmentByBrandAndModel(
+          accountId,
+          brand,
+          model
+        );
+
+      return equipment;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "EquipmentService.findUserEquipmentByBrandAndModel",
+        `Ошибка при поиске оборудования пользователя: ${err}`,
+        { accountId }
+      );
+      throw new Error("Ошибка при поиске оборудования пользователя");
     }
   }
 
@@ -158,6 +184,38 @@ export class EquipmentService {
         { accountId }
       );
       throw new Error("Ошибка при поиске оборудования по типу");
+    }
+  }
+
+  static async updateUserEquipment(
+    accountId: bigint,
+    userEquipmentId: bigint,
+    data: Partial<UserEquipment>
+  ): Promise<UserEquipmentWithEquipment> {
+    try {
+      const updatedEquipment = await EquipmentRepository.updateUserEquipment(
+        userEquipmentId,
+        data
+      );
+
+      serviceLogger(
+        "info",
+        "UserEquipmentService.updateUserEquipment",
+        JSON.stringify(data)
+      );
+
+      return updatedEquipment;
+    } catch (error) {
+      const err = error instanceof Error ? error.message : String(error);
+      serviceLogger(
+        "error",
+        "UserEquipmentService.updateUserEquipment",
+        `Ошибка при обновлении информации об оборудовании пользователя: ${err}`,
+        { accountId }
+      );
+      throw new Error(
+        "Ошибка при обновлении информации об оборудовании пользователя"
+      );
     }
   }
 

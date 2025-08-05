@@ -1,6 +1,6 @@
 import { UserEquipmentWithEquipment } from "@domain/types";
 import { prisma } from "@prisma/client";
-import { Equipment, EQUIPMENT_TYPE } from "@prisma/generated";
+import { Equipment, EQUIPMENT_TYPE, UserEquipment } from "@prisma/generated";
 
 export class EquipmentRepository {
   static async create(
@@ -30,6 +30,17 @@ export class EquipmentRepository {
   ): Promise<Equipment | null> {
     return prisma.equipment.findUnique({
       where: { brand_model: { brand, model } },
+    });
+  }
+
+  static async findUserEquipmentByBrandAndModel(
+    accountId: bigint,
+    brand: string,
+    model: string
+  ): Promise<UserEquipmentWithEquipment | null> {
+    return prisma.userEquipment.findFirst({
+      where: { accountId, equipment: { brand, model } },
+      include: { equipment: true },
     });
   }
 
@@ -79,6 +90,17 @@ export class EquipmentRepository {
       include: {
         equipment: true,
       },
+    });
+  }
+
+  static async updateUserEquipment(
+    id: bigint,
+    data: Partial<UserEquipment>
+  ): Promise<UserEquipmentWithEquipment> {
+    return prisma.userEquipment.update({
+      where: { id },
+      data,
+      include: { equipment: true },
     });
   }
 
