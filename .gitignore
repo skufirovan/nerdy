@@ -3,7 +3,8 @@ dist
 logs
 coverage
 public
-src/prisma
+src/prisma/generated
+src/prisma/migrations
 src/bot/assets
 .vscode
 .env

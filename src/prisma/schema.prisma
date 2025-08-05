@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    BigInt    @id @default(autoincrement())
+  accountId             BigInt    @unique @map("account_id")
+  username              String?
+  nickname              String    @unique
+  level                 Int       @default(1)
+  fame                  Int       @default(0)
+  seasonalFame          Int       @default(0) @map("seasonal_fame")
+  racks                 Int       @default(0)
+  hasPass               Boolean   @default(false) @map("has_pass")
+  invitedById           BigInt?   @map("invited_by_id")
+  invitedUsersCount     Int       @default(0) @map("invited_users_count")
+  passExpiresAt         DateTime? @map("pass_expires_at")
+  registeredAt          DateTime  @default(now()) @map("registered_at")
+  lastDemoRecordedAt    DateTime? @map("last_demo_recorded_at")
+  lastVideoRecordedAt   DateTime? @map("last_video_recorded_at")
+  lastDemoDistributedAt DateTime? @map("last_demo_distributed_at")
+
+  demos                Demo[]
+  distributedDemoLikes DistributedDemoLike[]
+  videos               Video[]
+  userEquipment        UserEquipment[]
+  squadAdmin           Squad?
+  squadMember          SquadMember?
+  minesweeperGames     MinesweeperGame[]
+  promocodes           UserPromocode[]
+  tradesInitiated      Trade[]               @relation("trade_initiator")
+  tradesReceived       Trade[]               @relation("trade_receiver")
+
+  @@map("user")
+}
+
+model Demo {
+  id         BigInt   @id @default(autoincrement())
+  name       String
+  text       String?  @db.Text
+  fileId     String?  @map("file_id")
+  messageId  Int?     @map("message_id")
+  recordedAt DateTime @default(now()) @map("recorded_at")
+
+  accountId BigInt @map("account_id")
+  user      User   @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+
+  distributedDemo DistributedDemo?
+  videos          Video[]
+
+  @@unique([accountId, name], name: "accountId_name")
+  @@map("demo")
+}
+
+model DistributedDemo {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  demoId BigInt @unique @map("demo_id")
+  demo   Demo   @relation(fields: [demoId], references: [id], onDelete: Cascade)
+
+  likes DistributedDemoLike[]
+
+  @@map("distributed_demo")
+}
+
+model DistributedDemoLike {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  distributedDemoId BigInt          @map("distributed_demo_id")
+  distributedDemo   DistributedDemo @relation(fields: [distributedDemoId], references: [id], onDelete: Cascade)
+
+  accountId BigInt @map("account_id")
+  user      User   @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+
+  @@unique([distributedDemoId, accountId], name: "distributedDemoId_accountId")
+  @@map("distributed_demo_like")
+}
+
+model Video {
+  id          BigInt   @id @default(autoincrement())
+  description String
+  recordedAt  DateTime @default(now()) @map("recorded_at")
+
+  accountId BigInt @map("account_id")
+  user      User   @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+  demoId    BigInt @map("demo_id")
+  demo      Demo   @relation(fields: [demoId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, description], name: "accountId_description")
+  @@map("video")
+}
+
+model Equipment {
+  id         BigInt         @id @default(autoincrement())
+  type       EQUIPMENT_TYPE
+  brand      String
+  model      String
+  price      Int
+  multiplier Float
+  inShop     Boolean        @default(false) @map("in_shop")
+  note       String?
+
+  userEquipment UserEquipment[]
+
+  @@unique([brand, model], name: "brand_model")
+  @@map("equipment")
+}
+
+enum EQUIPMENT_TYPE {
+  MICROPHONE
+  HEADPHONES
+  AUDIO_INTERFACE
+}
+
+model UserEquipment {
+  id         BigInt   @id @default(autoincrement())
+  isEquipped Boolean  @default(false) @map("is_equipped")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  accountId   BigInt @map("account_id")
+  equipmentId BigInt @map("equipment_id")
+
+  user      User      @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  tradesAsFrom Trade[] @relation("trade_equipment_from")
+  tradesAsTo   Trade[] @relation("trade_equipment_to")
+
+  @@unique([accountId, equipmentId], name: "accountId_equipmentId")
+  @@map("user_equipment")
+}
+
+model Trade {
+  id            BigInt       @id @default(autoincrement())
+  initiatorId   BigInt       @map("initiator_id")
+  receiverId    BigInt       @map("receiver_id")
+  status        TRADE_STATUS @default(PENDING)
+  equipmentFrom BigInt?      @map("equipment_from")
+  equipmentTo   BigInt?      @map("equipment_to")
+  racksFrom     Int?         @map("racks_from")
+  racksTo       Int?         @map("racks_to")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  expiresAt     DateTime?    @map("expires_at")
+
+  initiator         User           @relation("trade_initiator", fields: [initiatorId], references: [accountId], onDelete: Cascade)
+  receiver          User           @relation("trade_receiver", fields: [receiverId], references: [accountId], onDelete: Cascade)
+  equipmentFromItem UserEquipment? @relation("trade_equipment_from", fields: [equipmentFrom], references: [id], onDelete: SetNull)
+  equipmentToItem   UserEquipment? @relation("trade_equipment_to", fields: [equipmentTo], references: [id], onDelete: SetNull)
+
+  @@map("trade")
+}
+
+enum TRADE_STATUS {
+  PENDING
+  ACCEPTED
+  RESPONDED
+  COMPLETED
+  CANCELLED
+  DECLINED
+}
+
+model Squad {
+  id           BigInt @id @default(autoincrement())
+  capacity     Int    @default(10)
+  name         String @unique
+  seasonalFame Int    @default(0) @map("seasonal_fame")
+  photo        String
+
+  adminId BigInt @unique @map("admin_id")
+  admin   User   @relation(fields: [adminId], references: [accountId], onDelete: Cascade)
+
+  members SquadMember[]
+
+  @@map("squad")
+}
+
+model SquadMember {
+  squadName String          @map("squad_name")
+  accountId BigInt          @unique @map("account_id")
+  role      SquadMemberRole @default(MEMBER)
+  joinedAt  DateTime        @default(now()) @map("joined_at")
+
+  squad Squad @relation(fields: [squadName], references: [name], onDelete: Cascade)
+  user  User  @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+
+  @@id([squadName, accountId])
+  @@map("squad_member")
+}
+
+enum SquadMemberRole {
+  ADMIN
+  RECRUITER
+  MEMBER
+}
+
+model MinesweeperGame {
+  id         BigInt   @id @default(autoincrement())
+  bet        Int      @default(500)
+  currentWin Int      @default(500) @map("current_win")
+  field      String
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  accountId BigInt @map("account_id")
+  user      User   @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+
+  @@map("minesweeper_game")
+}
+
+model Promocode {
+  id          BigInt    @id @default(autoincrement())
+  code        String    @unique
+  rewardType  String    @map("reward_type")
+  rewardValue Int       @map("reward_value")
+  maxUses     Int       @default(0) @map("max_uses")
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  userPromocodes UserPromocode[]
+
+  @@map("promocode")
+}
+
+model UserPromocode {
+  id     BigInt   @id @default(autoincrement())
+  usedAt DateTime @default(now()) @map("used_at")
+
+  accountId BigInt @map("account_id")
+  user      User   @relation(fields: [accountId], references: [accountId])
+
+  promocodeId BigInt    @map("promocode_id")
+  promocode   Promocode @relation(fields: [promocodeId], references: [id])
+
+  @@unique([accountId, promocodeId])
+  @@map("user_promocode")
+}
+
+model Gif {
+  id     BigInt @id @default(autoincrement())
+  name   String @unique
+  fileId String @map("file_id")
+
+  @@map("gif")
+}
+
+model Invoice {
+  id        BigInt   @id @default(autoincrement())
+  userId    BigInt   @map("user_id")
+  product   String
+  amount    Int
+  payload   String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  payments Payment[]
+
+  @@map("invoice")
+}
+
+model Payment {
+  id        BigInt   @id @default(autoincrement())
+  userId    BigInt   @map("user_id")
+  paymentId String   @map("payment_id")
+  amount    Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  invoiceId BigInt  @map("invoice_id")
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@map("payment")
+}
