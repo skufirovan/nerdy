@@ -37,6 +37,14 @@ import {
   showDistributedDemosAction,
   likeDistributedDemoAction,
   minesweeperGameAction,
+  initiateTradeAction,
+  addRacksAction,
+  chooseEquipmentAction,
+  entryTradeAction,
+  acceptTradeAction,
+  cancelTradeAction,
+  completeTradeAction,
+  respondTradeAction,
 } from ".";
 
 export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
@@ -76,4 +84,12 @@ export const registerTelegramActions = (bot: Telegraf<MyContext>) => {
   paginateDistributedDemosActions(bot);
   likeDistributedDemoAction(bot);
   minesweeperGameAction(bot);
+  initiateTradeAction(bot);
+  addRacksAction(bot);
+  chooseEquipmentAction(bot);
+  entryTradeAction(bot);
+  acceptTradeAction(bot);
+  cancelTradeAction(bot);
+  completeTradeAction(bot);
+  respondTradeAction(bot);
 };

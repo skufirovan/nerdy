@@ -8,12 +8,14 @@ export const MENU_BUTTONS = {
   SQUAD: { text: "👬 Лейбл", callback: "MENU_SQUAD" },
   DONAT: { text: "🍩 Донат", callback: "MENU_DONAT" },
   CHARTS: { text: "👨🏿‍🎨 Чарты", callback: "MENU_CHARTS" },
+  TRADE: { text: "🤝 Трейд", callback: "MENU_TRADE" },
 };
 
 export const menuKeyboard = Markup.inlineKeyboard([
   [toButton(MENU_BUTTONS.TOP)],
   [toButton(MENU_BUTTONS.CHARTS)],
   [toButton(MENU_BUTTONS.ACTIVITIES)],
+  [toButton(MENU_BUTTONS.TRADE)],
   [toButton(MENU_BUTTONS.SHOP)],
   [toButton(MENU_BUTTONS.SQUAD)],
   [toButton(MENU_BUTTONS.DONAT)],

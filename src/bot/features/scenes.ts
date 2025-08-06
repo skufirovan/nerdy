@@ -11,8 +11,10 @@ import {
   comboScene,
   changeSquadMemberRoleScene,
   minesweeperGameScene,
+  addRacksToTradeScene,
+  chooseTradeReceiverScene,
 } from ".";
-import { DemoDto } from "@domain/dtos";
+import { DemoDto, UserEquipmentDto } from "@domain/dtos";
 import { RawUser } from "@domain/types";
 import { SquadData } from "./squad/types";
 
@@ -21,6 +23,10 @@ export interface SessionData extends Scenes.SceneSessionData {
   demo?: { name?: string; text?: string; fileId?: string };
   video?: { description?: string; demo?: DemoDto };
   createSquad?: { name?: string };
+  trade?: {
+    equipment?: UserEquipmentDto;
+    racks?: number;
+  };
   pagination?: PaginationData<unknown>;
   battleId?: string;
   squadData?: SquadData;
@@ -42,4 +48,6 @@ export const stage = new Scenes.Stage<MyContext>([
   kickMemberScene,
   changeSquadMemberRoleScene,
   minesweeperGameScene,
+  addRacksToTradeScene,
+  chooseTradeReceiverScene,
 ]);
