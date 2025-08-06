@@ -36,6 +36,8 @@ export const renderTradeEquipment = async (
         `❌ ${trade.receiver.nickname} отменил трейд`
       );
     }
+
+    return;
   }
 
   const replyMarkup =

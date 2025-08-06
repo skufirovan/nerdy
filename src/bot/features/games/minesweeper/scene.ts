@@ -44,7 +44,7 @@ function generateField(): MinesweeperField {
 function calculateWin(openCount: number): number {
   let multiplier = 1;
   for (let i = 0; i < openCount; i++) {
-    multiplier *= 1.2 + i * 0.1;
+    multiplier *= 1.1 + i * 0.1;
   }
   return Math.floor(MINESWEEPER_BET * multiplier);
 }
@@ -73,7 +73,7 @@ minesweeperGameScene.enter(async (ctx) => {
     const user = await requireUser(ctx);
 
     if (!user || user.racks < MINESWEEPER_BET) {
-      await ctx.reply("🤚🏿 Тебе нужно 500 рексов, чтобы депнуть");
+      await ctx.reply(`🤚🏿 Тебе нужно ${MINESWEEPER_BET} рексов, чтобы депнуть`);
       return ctx.scene.leave();
     }
 
@@ -92,7 +92,8 @@ minesweeperGameScene.enter(async (ctx) => {
     const field = generateField();
     const game = await MinesweeperRepository.create(
       accountId,
-      JSON.stringify(field)
+      JSON.stringify(field),
+      MINESWEEPER_BET
     );
 
     await ctx.reply(

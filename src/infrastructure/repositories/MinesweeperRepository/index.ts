@@ -4,10 +4,11 @@ import { MinesweeperGame } from "@prisma/generated";
 export class MinesweeperRepository {
   static async create(
     accountId: bigint,
-    field: string
+    field: string,
+    currentWin: number
   ): Promise<MinesweeperGame> {
     return prisma.minesweeperGame.create({
-      data: { accountId, field },
+      data: { accountId, field, currentWin },
     });
   }
 
