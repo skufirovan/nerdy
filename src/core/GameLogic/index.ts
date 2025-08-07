@@ -6,8 +6,8 @@ type WaitingTimeResult = {
 };
 
 export function getWaitingTime(hasPass: boolean): WaitingTimeResult {
-  const recordDemoRT = hasPass ? 1 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000;
-  const recordVideoRT = hasPass ? 1 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000;
+  const recordDemoRT = hasPass ? 3 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
+  const recordVideoRT = hasPass ? 3 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
 
   return { recordDemoRT, recordVideoRT };
 }
